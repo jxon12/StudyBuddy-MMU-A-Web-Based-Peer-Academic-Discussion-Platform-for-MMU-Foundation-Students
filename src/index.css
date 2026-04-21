@@ -1,42 +1,167 @@
-:root {
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
+@layer base {
+  :root {
+    --color-apple-blue: #0A84FF;
+    --color-apple-coral: #FF453A;
+    --color-apple-mint: #30D158;
+    --color-apple-indigo: #636EFF;
+    --color-apple-purple: #BF5AF2;
+    
+    --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif;
+    
+    --radius-superellipse: 28px;
+    --radius-button: 14px;
+    
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-@media (prefers-color-scheme: light) {
-  a:hover {
-    color: #747bff;
+    --bg-mesh: radial-gradient(at 0% 0%, rgba(210, 220, 255, 0.4) 0, transparent 60%),
+               radial-gradient(at 100% 100%, rgba(255, 220, 230, 0.4) 0, transparent 60%),
+               radial-gradient(at 50% 50%, rgba(240, 240, 255, 0.5) 0, transparent 80%);
+    --glass-bg: rgba(255, 255, 255, 0.3);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --text-primary: #1d1d1f;
+    --text-secondary: rgba(29, 29, 31, 0.6);
+    --accent-color: var(--color-apple-blue);
   }
-  button {
-    background-color: #f9f9f9;
+
+  .dark {
+    --bg-mesh: radial-gradient(at 0% 0%, #080C14 0, transparent 70%),
+               radial-gradient(at 100% 100%, #120822 0, transparent 70%),
+               radial-gradient(at 50% 40%, #0A1628 0, transparent 80%);
+    --glass-bg: rgba(20, 20, 25, 0.5);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.6);
+    --accent-color: var(--color-apple-blue);
+  }
+
+  body {
+    @apply antialiased overflow-x-hidden;
+    background: var(--bg-mesh);
+    background-color: #f5f5f7;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark body {
+    background-color: #050505;
+  }
+
+  h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; }
+  h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  p { font-size: 17px; line-height: 1.5; }
+
+  /* Ensure gradient text displays properly */
+  .bg-clip-text {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @keyframes spring-in {
+    0% { transform: translateY(20px) scale(0.95); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  @keyframes glass-float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(0.5deg); }
+  }
+
+  .animate-glass-float {
+    animation: glass-float 6s ease-in-out infinite;
   }
 }
+
+@layer components {
+  .bg-radial-glow {
+    background: radial-gradient(circle at center, var(--accent-color) 0%, transparent 70%);
+  }
+
+  .liquid-glass {
+    @apply backdrop-blur-[32px] saturate-[180%] border;
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.05);
+  }
+
+  .liquid-nav-global {
+    @apply fixed top-0 left-0 right-0 z-50 h-[44px] flex items-center justify-center;
+    @apply backdrop-blur-[24px] saturate-[180%] border border-t-0 border-x-0;
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+  }
+
+  .liquid-nav-local {
+    @apply fixed top-[44px] left-0 right-0 z-40 h-[52px] flex items-center justify-center;
+    @apply backdrop-blur-[24px] saturate-[180%] border border-t-0 border-x-0;
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+  }
+
+  .nav-item {
+    @apply text-[13px] font-medium transition-all cursor-pointer select-none;
+    color: var(--text-primary);
+    @apply hover:opacity-100 hover:scale-[1.02] active:scale-[0.97];
+    opacity: 0.7;
+  }
+
+  .active-accent {
+    color: var(--accent-color);
+    opacity: 1;
+  }
+
+  .glass-card {
+    @apply rounded-[28px] p-6;
+    @apply backdrop-blur-[32px] saturate-[180%] border;
+    @apply shadow-[0_12px_48px_-12px_rgba(0,0,0,0.2)];
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    transition: transform 0.6s var(--ease-spring), box-shadow 0.6s ease, border-color 0.6s ease;
+  }
+
+  .glass-card:hover {
+    @apply scale-[1.01] shadow-[0_24px_64px_-16px_rgba(0,0,0,0.3)];
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .apple-button-primary {
+    @apply h-[54px] px-10 rounded-[27px] font-bold flex items-center justify-center text-[17px] tracking-tight;
+    @apply backdrop-blur-[40px] saturate-[210%] border;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: var(--text-primary);
+    @apply shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] transform transition-all active:scale-[0.96] hover:scale-[1.04];
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.2), inset 0 0 20px rgba(255, 255, 255, 0.1);
+  }
+
+  .dark .apple-button-primary {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .apple-button-secondary {
+    @apply h-[54px] px-10 rounded-[27px] font-bold flex items-center justify-center text-[17px] tracking-tight;
+    @apply backdrop-blur-[32px] saturate-[180%] border;
+    background: rgba(0, 0, 0, 0.02);
+    border-color: var(--glass-border);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    color: var(--accent-color);
+    @apply transition-all active:scale-[0.96] hover:bg-white/5;
+  }
+
+  .dynamic-island-container {
+    @apply fixed top-2 left-1/2 -translate-x-1/2 z-[60];
+  }
+}
+
