@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Team } from '../components/team';
 import { 
   Search, 
   ChevronDown, 
@@ -24,6 +25,7 @@ const ACCENT_COLORS = [
 ];
 
 export default function App() {
+  const [currentPage, setCurrentPage] = useState<'home' | 'team'>('home');
   const [accentColor] = useState(ACCENT_COLORS[0]);
   const [showDocsMenu, setShowDocsMenu] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -52,9 +54,9 @@ export default function App() {
             <img src="/images/mmu-logo.svg" alt="MMU Logo" className="h-[18px] w-auto nav-item" />
             <div className="hidden lg:flex items-center gap-8">
               <span className="nav-item">Get Started</span>
-              <span className="nav-item">Platforms</span>
-              <span className="nav-item">Technologies</span>
-              <span className="nav-item">StudyBuddy</span>
+              <span className="nav-item cursor-pointer" onClick={() => setCurrentPage('team')}>About us</span>
+              <span className="nav-item cursor-pointer" onClick={() => document.getElementById('academic-help')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>StudyBuddy</span>
+              <span className="nav-item cursor-pointer" onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>How it works</span>
               <div 
                 className="relative"
                 onMouseEnter={() => setShowDocsMenu(true)}
@@ -75,13 +77,13 @@ export default function App() {
                       className="absolute top-full left-0 pt-3 w-72 -translate-x-1/4"
                     >
                       <div className="glass-card !p-2 !rounded-[24px]">
-                        <div className="flex items-start gap-4 p-4 rounded-[18px] hover:bg-white/10 dark:hover:bg-white/5 transition-all cursor-pointer group">
+                        <div className="flex items-start gap-4 p-4 rounded-[18px] hover:bg-white/10 dark:hover:bg-white/5 transition-all cursor-pointer group" onClick={() => { setCurrentPage('team'); setShowDocsMenu(false); }}>
                            <div className="w-10 h-10 rounded-[14px] liquid-glass flex items-center justify-center bg-apple-blue/20 text-apple-blue">
                              <BookOpen className="w-5 h-5" />
                            </div>
                            <div>
                              <div className="text-[15px] font-semibold">About StudyBuddy</div>
-                             <div className="text-[13px] opacity-60 leading-tight mt-1">Academics reimagined.</div>
+                             <div className="text-[13px] opacity-60 leading-tight mt-1">Meet our founders.</div>
                            </div>
                         </div>
                         <div className="flex items-start gap-4 p-4 rounded-[18px] hover:bg-white/10 dark:hover:bg-white/5 transition-all cursor-pointer group">
@@ -89,7 +91,7 @@ export default function App() {
                              <Play className="w-5 h-5" />
                            </div>
                            <div>
-                             <div className="text-[15px] font-semibold">Interactive Demo</div>
+                             <div className="text-[15px] font-semibold">Youtube user guide</div>
                              <div className="text-[13px] opacity-60 leading-tight mt-1">Explore spatial features.</div>
                            </div>
                         </div>
@@ -98,7 +100,6 @@ export default function App() {
                   )}
                 </AnimatePresence>
               </div>
-              <span className="nav-item">Downloads</span>
             </div>
           </div>
 
@@ -119,24 +120,45 @@ export default function App() {
 
       {/* Local Navigation — Liquid Glass Tier 2 */}
       <nav className="liquid-nav-local px-4 md:px-8">
-        <div className="w-full max-w-5xl flex items-center justify-between">
-          <div className="text-[22px] font-semibold tracking-tight">
-            StudyBuddy
-          </div>
-          <div className="flex items-center gap-6">
-            <span className="text-[13px] font-medium opacity-60 hover:opacity-100 cursor-pointer transition-all">Ask the Community</span>
-            <span className="text-[13px] font-medium opacity-60 hover:opacity-100 cursor-pointer transition-all">Browse</span>
-            <button className="h-[28px] px-4 bg-apple-blue hover:brightness-110 text-white text-[12px] font-semibold rounded-full transition-all active:scale-95">
-              Sign in
+        <div className="w-full flex items-center justify-center">
+          <div className="w-full max-w-5xl flex items-center justify-between">
+            <button 
+              type="button"
+              onClick={() => {
+                if (currentPage === 'home') {
+                  document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                  setCurrentPage('home');
+                }
+              }}
+              className="text-[18px] md:text-[22px] font-semibold tracking-tight text-slate-900 dark:text-white hover:text-apple-blue transition-colors cursor-pointer bg-transparent border-none p-0 m-0 flex-shrink-0"
+            >
+              StudyBuddy
             </button>
+            <div className="hidden sm:flex items-center gap-2 md:gap-6 ml-auto">
+              <span className="text-[11px] md:text-[13px] font-medium opacity-60 hover:opacity-100 cursor-pointer transition-all">Ask the Community</span>
+            
+              <button className="h-[28px] px-4 bg-apple-blue hover:brightness-110 text-white text-[11px] md:text-[12px] font-semibold rounded-full transition-all active:scale-95 flex-shrink-0">
+                Sign in
+              </button>
+            </div>
           </div>
         </div>
       </nav>
 
       {/* Main Content — HIG Spatial Structure */}
       <main className="flex-grow w-full">
+        <AnimatePresence mode="wait">
+          {currentPage === 'home' ? (
+            <motion.div
+              key="home"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+            >
         {/* HERO SECTION */}
-        <section className="flex flex-col items-center justify-center text-center px-4 pt-[180px] pb-32 max-w-7xl mx-auto">
+        <section id="hero" className="flex flex-col items-center justify-center text-center px-4 pt-[180px] pb-32 max-w-7xl mx-auto">
           <motion.div
              initial={{ opacity: 0, scale: 0.98, y: 30 }}
              whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -156,7 +178,7 @@ export default function App() {
 
             <div className="space-y-6 mb-16 max-w-2xl mx-auto">
               <p className="text-[19px] md:text-[22px] opacity-60 font-medium leading-normal">
-                A peer academic discussion platform built for <span className="text-apple-blue font-semibold">MMU foundation students</span>. 
+                A peer academic discussion platform built for <span className="text-apple-blue font-semibold">MMU FCI foundation students</span>. 
                 Ask questions, share answers, and discover the best study content — organized by subject and chapter.
               </p>
             </div>
@@ -167,7 +189,7 @@ export default function App() {
                  whileTap={{ scale: 0.95 }}
                  className="apple-button-primary w-full sm:w-auto min-w-[200px]"
                >
-                 Get Started Free
+                 Get Started
                </motion.button>
                <button className="flex items-center gap-2 text-[17px] font-medium opacity-60 hover:opacity-100 transition-all group">
                  Learn More 
@@ -176,27 +198,11 @@ export default function App() {
                  </motion.span>
                </button>
             </div>
-
-            {/* Hero Visual Placeholder */}
-            <div className="w-full max-w-5xl aspect-[16/9] md:aspect-[21/9] rounded-[32px] overflow-hidden glass-card !p-0 mx-auto group shadow-2xl">
-              <div className="w-full h-full bg-black/5 dark:bg-white/5 flex flex-col items-center justify-center relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-apple-blue/10 to-apple-purple/10 opacity-30 group-hover:opacity-50 transition-opacity duration-1000" />
-                <div className="z-10 flex flex-col items-center p-8">
-                  <div className="w-20 h-20 rounded-2xl liquid-glass flex items-center justify-center mb-6 shadow-2xl">
-                     <BookOpen className="w-10 h-10 text-apple-blue" />
-                  </div>
-                  <span className="text-[16px] font-bold tracking-widest uppercase opacity-40">
-                    [ PHOTO PLACEHOLDER: STUDYBUDDY MMU DASHBOARD INTERFACE ]
-                  </span>
-                  <p className="text-[14px] opacity-20 mt-3 font-medium">Lush Mesh Gradient Backgrounds • Ultra Glassy UI</p>
-                </div>
-              </div>
-            </div>
           </motion.div>
         </section>
 
         {/* PROBLEM / INTRO SECTION */}
-        <section className="py-32 px-4 bg-black/5 dark:bg-white/5 relative overflow-hidden">
+        <section id="academic-help" className="py-32 px-4 bg-black/5 dark:bg-white/5 relative overflow-hidden">
           {/* Subtle cinematic flare */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-radial-glow opacity-10 pointer-events-none" />
           
@@ -215,7 +221,7 @@ export default function App() {
               </p>
               <div className="glass-card !bg-apple-blue/10 !border-apple-blue/20">
                 <p className="text-[17px] font-medium text-apple-blue">
-                  "StudyBuddy MMU brings structure to foundation studies, making sure every question gets the visibility it deserves."
+                  "StudyBuddy MMU brings structure to FCI foundation studies, making sure every question gets the visibility it deserves."
                 </p>
               </div>
             </motion.div>
@@ -236,105 +242,10 @@ export default function App() {
           </div>
         </section>
 
-        {/* FEATURES GRID */}
-        <section className="py-32 px-4 bg-white/50 dark:bg-black/20 overflow-hidden">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-20 space-y-4">
-              <h2 className="text-[40px] font-bold tracking-tight">Powerful Collaboration Features</h2>
-              <p className="opacity-60 text-[19px]">Everything you need to succeed in your foundation year.</p>
-            </div>
 
-            {/* Stacked Cards Grid - More Compact */}
-            <div className="relative h-[480px] flex items-center justify-center">
-              {/* Feature 1 - User Authentication */}
-              {/* TODO: feature-1.svg */}
-              <motion.div 
-                whileHover={{ y: -10, rotate: -1 }}
-                className="absolute w-80 glass-card p-9 flex flex-col gap-3 shadow-lg hover:shadow-xl transition-shadow duration-300"
-                style={{ 
-                  left: '8%',
-                  top: '5%',
-                  rotate: -6,
-                  zIndex: 40
-                }}
-              >
-                <div className="w-20 h-20 rounded-xl flex items-center justify-center">
-                  <img src="/images/feature-1.png" alt="User Authentication" className="w-50 h-50" />
-                </div>
-                <h3 className="text-[19px] font-semibold">User Authentication</h3>
-                <p className="text-[14px] opacity-60 leading-relaxed">
-                  Secure login with MMU email
-                </p>
-              </motion.div>
-
-              {/* Feature 2 - Academic Feed */}
-              {/* TODO: feature-2.svg */}
-              <motion.div 
-                whileHover={{ y: -10, rotate: 1 }}
-                className="absolute w-80 glass-card p-9 flex flex-col gap-3 shadow-lg hover:shadow-xl transition-shadow duration-300"
-                style={{ 
-                  right: '8%',
-                  top: '20%',
-                  rotate: 4,
-                  zIndex: 30
-                }}
-              >
-                <div className="w-20 h-20 rounded-xl flex items-center justify-center">
-                  <img src="/images/feature-2.png" alt="Academic Feed" className="w-16 h-16" />
-                </div>
-                <h3 className="text-[19px] font-semibold">Academic Feed</h3>
-                <p className="text-[14px] opacity-60 leading-relaxed">
-                  Best answers surface automatically
-                </p>
-              </motion.div>
-
-              {/* Feature 3 - Smart Tagging */}
-              {/* TODO: feature-3.svg */}
-              <motion.div 
-                whileHover={{ y: -10, rotate: -1 }}
-                className="absolute w-80 glass-card p-9 flex flex-col gap-3 shadow-lg hover:shadow-xl transition-shadow duration-300"
-                style={{ 
-                  left: '12%',
-                  top: '48%',
-                  rotate: -4,
-                  zIndex: 20
-                }}
-              >
-                <div className="w-20 h-20 rounded-xl flex items-center justify-center">
-                  <img src="/images/feature-3.png" alt="Smart Tagging" className="w-16 h-16" />
-                </div>
-                <h3 className="text-[19px] font-semibold">Smart Recommendations</h3>
-                <p className="text-[14px] opacity-60 leading-relaxed">
-                  Organize by subject and chapter
-                </p>
-              </motion.div>
-
-              {/* Feature 4 - Threaded Chat */}
-              {/* TODO: feature-4.svg */}
-              <motion.div 
-                whileHover={{ y: -10, rotate: 1 }}
-                className="absolute w-80 glass-card p-9 flex flex-col gap-3 shadow-lg hover:shadow-xl transition-shadow duration-300"
-                style={{ 
-                  right: '12%',
-                  top: '63%',
-                  rotate: 3,
-                  zIndex: 10
-                }}
-              >
-                <div className="w-20 h-20 rounded-xl flex items-center justify-center">
-                  <img src="/images/feature-4.png" alt="Threaded Chat" className="w-16 h-16" />
-                </div>
-                <h3 className="text-[19px] font-semibold">Threaded Chat</h3>
-                <p className="text-[14px] opacity-60 leading-relaxed">
-                  Deep-dive discussions without context loss
-                </p>
-              </motion.div>
-            </div>
-          </div>
-        </section>
 
         {/* HOW IT WORKS SECTION */}
-        <section className="py-32 px-4 overflow-hidden">
+        <section id="how-it-works" className="py-32 px-4 overflow-hidden">
           <div className="max-w-5xl mx-auto">
             <h2 className="text-[40px] md:text-[56px] font-bold tracking-tight text-center mb-24">How It Works</h2>
             
@@ -427,35 +338,11 @@ export default function App() {
             </div>
           </div>
         </section>
-
-        {/* FINAL CTA SECTION */}
-        <section className="py-48 px-4 relative">
-          <div className="max-w-4xl mx-auto glass-card !p-20 text-center relative overflow-hidden">
-            {/* Background Glow */}
-            <div className="absolute inset-0 bg-gradient-to-br from-apple-blue/20 via-apple-indigo/20 to-apple-purple/20 -z-10" />
-            
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="space-y-10"
-            >
-              <h2 className="text-[48px] md:text-[64px] font-bold tracking-tight leading-tight">
-                Ready to study smarter?
-              </h2>
-              <p className="text-[21px] md:text-[24px] opacity-60 max-w-2xl mx-auto font-medium">
-                Join MMU foundation students already using StudyBuddy to get better answers, faster.
-              </p>
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="apple-button-primary !h-[64px] !px-12 text-[19px] !rounded-[24px] mx-auto"
-              >
-                Join StudyBuddy MMU
-              </motion.button>
             </motion.div>
-          </div>
-        </section>
+          ) : (
+            <Team onBackToHome={() => setCurrentPage('home')} />
+          )}
+        </AnimatePresence>
       </main>
 
       {/* Footer — Grouped Inset Style */}
@@ -464,7 +351,7 @@ export default function App() {
           <div className="col-span-1 md:col-span-1 space-y-4">
             <div className="text-[20px] font-bold tracking-tight">StudyBuddy MMU</div>
             <p className="text-[14px] opacity-50 leading-relaxed">
-              Open-source academic collaboration for MMU foundation students. Built by students, for students.
+              Open-source academic collaboration for MMU FCI foundation students. Built by students, for students.
             </p>
           </div>
           
@@ -490,8 +377,8 @@ export default function App() {
             <h4 className="text-[13px] font-bold opacity-30 uppercase tracking-widest">About</h4>
             <div className="flex flex-col gap-2">
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Our Mission</span>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Team</span>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Contact Us</span>
+              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer" onClick={() => setCurrentPage('team')}>Team</span>
+              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Feedback</span>
             </div>
           </div>
         </div>
@@ -499,7 +386,7 @@ export default function App() {
         <div className="glass-card flex flex-col md:flex-row items-center justify-between gap-10">
           <div className="flex flex-col gap-2 items-center md:items-start text-center md:text-left">
             <div className="text-[11px] font-bold opacity-30 tracking-widest uppercase">
-              © 2026 STUDYBUDDY MMU COMMUNITY • BUILT FOR MMU FOUNDATION STUDENTS
+              © 2026 STUDYBUDDY MMU COMMUNITY • BUILT FOR MMU FCI FOUNDATION STUDENTS
             </div>
             <div className="flex gap-6">
                <span className="text-[11px] font-medium opacity-50 hover:opacity-100 transition-all cursor-pointer">Terms & Conditions</span>

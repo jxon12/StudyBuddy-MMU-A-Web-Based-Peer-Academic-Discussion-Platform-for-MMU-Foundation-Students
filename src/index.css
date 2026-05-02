@@ -47,6 +47,7 @@
     color: var(--text-primary);
     font-family: var(--font-sans);
     transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    scroll-behavior: smooth;
   }
 
   .dark body {
@@ -101,8 +102,8 @@
   }
 
   .liquid-nav-local {
-    @apply fixed top-[44px] left-0 right-0 z-40 h-[52px] flex items-center justify-center;
-    @apply backdrop-blur-[24px] saturate-[180%] border border-t-0 border-x-0;
+    @apply fixed top-[44px] left-0 right-0 z-40 h-auto md:h-[52px] flex items-center justify-center pointer-events-auto;
+    @apply backdrop-blur-[24px] saturate-[180%] border border-t-0 border-x-0 py-2 md:py-0;
     background: var(--glass-bg);
     border-color: var(--glass-border);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
