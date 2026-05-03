@@ -158,16 +158,18 @@ export default function App() {
               transition={{ duration: 0.5, ease: "easeInOut" }}
             >
         {/* HERO SECTION */}
-        <section id="hero" className="flex flex-col items-center justify-center text-center px-4 pt-[180px] pb-32 max-w-7xl mx-auto relative overflow-hidden">
+        <section id="hero" className="flex flex-col items-center justify-center text-center px-4 pt-[180px] pb-32 relative overflow-hidden w-full">
           {/* Background Image with Mask */}
           <div 
-            className="absolute inset-0 -z-10"
+            className="absolute inset-0 -z-10 w-screen"
             style={{
               backgroundImage: 'url(/images/mmu-campus.jpg)',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               maskImage: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%)',
               WebkitMaskImage: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%)',
+              left: '50%',
+              transform: 'translateX(-50%)',
             }}
           />
           
@@ -176,7 +178,7 @@ export default function App() {
              whileInView={{ opacity: 1, scale: 1, y: 0 }}
              viewport={{ once: true }}
              transition={{ duration: 1, ease: [0.34, 1.56, 0.64, 1] }}
-             className="relative z-10"
+             className="relative z-10 max-w-7xl"
           >
             <div className="mb-4">
                <span className="text-[13px] font-bold tracking-[0.2em] opacity-40 uppercase">Academic peer discussion platform</span>
