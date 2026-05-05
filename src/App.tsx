@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Team } from '../components/team';
+import Homepage from '../components/homepage';
 import { 
   Search, 
   ChevronDown, 
@@ -25,7 +26,7 @@ const ACCENT_COLORS = [
 ];
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'team'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion'>('home');
   const [accentColor] = useState(ACCENT_COLORS[0]);
   const [showDocsMenu, setShowDocsMenu] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -118,34 +119,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* Local Navigation — Liquid Glass Tier 2 */}
-      <nav className="liquid-nav-local px-4 md:px-8">
-        <div className="w-full flex items-center justify-center">
-          <div className="w-full max-w-5xl flex items-center justify-between">
-            <button 
-              type="button"
-              onClick={() => {
-                if (currentPage === 'home') {
-                  document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                } else {
-                  setCurrentPage('home');
-                }
-              }}
-              className="text-[18px] md:text-[22px] font-semibold tracking-tight text-slate-900 dark:text-white hover:text-apple-blue transition-colors cursor-pointer bg-transparent border-none p-0 m-0 flex-shrink-0"
-            >
-              StudyBuddy
-            </button>
-            <div className="hidden sm:flex items-center gap-2 md:gap-6 ml-auto">
-              <span className="text-[11px] md:text-[13px] font-medium opacity-60 hover:opacity-100 cursor-pointer transition-all">Ask the Community</span>
-            
-              <button className="h-[28px] px-4 bg-apple-blue hover:brightness-110 text-white text-[11px] md:text-[12px] font-semibold rounded-full transition-all active:scale-95 flex-shrink-0">
-                Sign in
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       {/* Main Content — HIG Spatial Structure */}
       <main className="flex-grow w-full">
         <AnimatePresence mode="wait">
@@ -200,8 +173,7 @@ export default function App() {
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-24">
                <motion.button 
                  whileHover={{ scale: 1.05 }}
-                 whileTap={{ scale: 0.95 }}
-                 className="apple-button-primary w-full sm:w-auto min-w-[200px]"
+                 whileTap={{ scale: 0.95 }}                 onClick={() => setCurrentPage('discussion')}                 className="apple-button-primary w-full sm:w-auto min-w-[200px]"
                >
                  Get Started
                </motion.button>
@@ -353,6 +325,8 @@ export default function App() {
           </div>
         </section>
             </motion.div>
+          ) : currentPage === 'discussion' ? (
+            <Homepage />
           ) : (
             <Team onBackToHome={() => setCurrentPage('home')} />
           )}

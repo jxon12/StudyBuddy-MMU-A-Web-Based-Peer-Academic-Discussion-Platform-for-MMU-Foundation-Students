@@ -50,6 +50,15 @@
     scroll-behavior: smooth;
   }
 
+  /* Custom scrollbar styles */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   .dark body {
     background-color: #050505;
   }
