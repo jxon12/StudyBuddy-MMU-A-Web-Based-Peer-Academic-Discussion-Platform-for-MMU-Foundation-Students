@@ -1,16 +1,16 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   BookOpen, 
   MessageCircle, 
   Search, 
-  TrendingUp, 
   Plus, 
-  ThumbsUp,
   Bell,
   CheckCircle2,
-  MoreHorizontal
+  MoreHorizontal,
+  ArrowLeft,
+  Triangle
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 /**
  * @license
@@ -35,11 +35,13 @@ interface Post {
 // --- Mock Data ---
 
 const SUBJECTS = [
-  { id: 'math', name: 'Mathematics', icon: 'Σ', color: 'bg-blue-500', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
-  { id: 'prog', name: 'Programming', icon: '⌨️', color: 'bg-zinc-800', chapters: ['Python Basics', 'Control Structures', 'Data Structures'] },
-  { id: 'phys', name: 'Physics', icon: '⚛️', color: 'bg-purple-500', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
-  { id: 'biz', name: 'Business', icon: '📈', color: 'bg-green-500', chapters: ['Economics', 'Management', 'Marketing'] },
-  { id: 'crit', name: 'Critical', icon: '💡', color: 'bg-orange-500', chapters: ['Logic', 'Arguments', 'Fallacies'] },
+  { id: 'math', name: 'Mathematics', icon: 'Σ', color: 'bg-blue-500', cover: 'https://images.unsplash.com/photo-1509228468518-180dd482180c?auto=format&fit=crop&q=80&w=600', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
+  { id: 'prog', name: 'Programming', icon: '⌨️', color: 'bg-zinc-800', cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=600', chapters: ['Python Basics', 'Control Structures', 'Data Structures'] },
+  { id: 'phys', name: 'Physics', icon: '⚛️', color: 'bg-purple-500', cover: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
+  { id: 'biz', name: 'Business', icon: '📈', color: 'bg-green-500', cover: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600', chapters: ['Economics', 'Management', 'Marketing'] },
+  { id: 'crit', name: 'Critical Thinking', icon: '💡', color: 'bg-orange-500', cover: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600', chapters: ['Logic', 'Arguments', 'Fallacies'] },
+  { id: 'eng', name: 'English', icon: '📚', color: 'bg-pink-500', cover: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=600', chapters: ['Literature', 'Grammar', 'Composition'] },
+  { id: 'hist', name: 'History', icon: '🏛️', color: 'bg-yellow-600', cover: 'https://images.unsplash.com/photo-1461360228754-6e81c478c882?auto=format&fit=crop&q=80&w=600', chapters: ['Ancient Civilizations', 'Modern Era', 'World Wars'] },
 ];
 
 const MOCK_POSTS: Post[] = [
@@ -99,106 +101,91 @@ const MOCK_POSTS: Post[] = [
     likes: 52,
     replies: 9,
     timestamp: '3h ago'
-  }
+  },
 ];
 
 // --- Components ---
 
-const Navbar = ({ onPostClick }: { onPostClick?: () => void }) => {
+const Navbar = ({ onPostClick, onSubjectsClick, currentView }: { 
+  onPostClick?: () => void; 
+  onSubjectsClick?: () => void;
+  currentView: 'feed' | 'subjects';
+}) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   return (
-    <div className="fixed top-8 left-0 right-0 z-50 flex items-center justify-center gap-3 px-4 pointer-events-none sm:scale-100 scale-90 origin-top">
-      {/* Search Pill */}
-      <div className={`pointer-events-auto glass border border-black/[0.03] rounded-full px-4 py-2.5 shadow-sm flex items-center gap-3 transition-all duration-500 ease-in-out ${isSearchFocused ? 'w-[450px]' : 'w-[280px]'}`}>
-        <Search className={`w-4 h-4 transition-colors ${isSearchFocused ? 'text-zinc-900' : 'text-zinc-400'}`} />
-        <input 
-          type="text" 
-          placeholder="Search..." 
-          onFocus={() => setIsSearchFocused(true)}
-          onBlur={() => setIsSearchFocused(false)}
-          className="bg-transparent border-none text-[13px] font-semibold focus:outline-none w-full placeholder:text-zinc-300"
-        />
+    <>
+      {/* Search Bar - Moved Down */}
+      <div className="relative left-0 right-0 z-50 flex items-center justify-center px-4 pointer-events-none pt-24 pb-8">
+        <div className={`pointer-events-auto glass border border-black/[0.03] rounded-full px-4 py-2.5 shadow-sm flex items-center gap-3 transition-all duration-500 ease-in-out ${isSearchFocused ? 'w-[600px]' : 'w-[500px]'}`}>
+          <Search className={`w-4 h-4 transition-colors ${isSearchFocused ? 'text-zinc-900' : 'text-zinc-400'}`} />
+          <input 
+            type="text" 
+            placeholder="Search..." 
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
+            className="bg-transparent border-none text-[13px] font-semibold focus:outline-none w-full placeholder:text-zinc-300"
+          />
+        </div>
       </div>
 
-      {/* Subjects Pill */}
-      <button className="pointer-events-auto glass border border-black/[0.03] rounded-full px-5 py-2.5 shadow-sm flex items-center gap-2 hover:bg-white transition-all group">
-        <BookOpen className="w-4 h-4 text-zinc-500 group-hover:text-zinc-900 transition-colors" />
-        <span className="text-[13px] font-bold text-zinc-900">Subjects</span>
-      </button>
+      {/* Left Sidebar Navigation */}
+      <div className="fixed left-6 top-20 z-50 flex flex-col items-center justify-start gap-4 pointer-events-none">
+        {/* Subjects Pill */}
+        <button 
+          id="nav-subjects"
+          onClick={onSubjectsClick}
+          className={`pointer-events-auto glass border border-black/[0.03] rounded-full px-5 py-2.5 shadow-sm flex items-center gap-2 transition-all group ${
+            currentView === 'subjects' ? 'bg-zinc-900 text-white border-zinc-800' : 'hover:bg-white'
+          }`}
+        >
+          <BookOpen className={`w-4 h-4 ${currentView === 'subjects' ? 'text-white' : 'text-zinc-500 group-hover:text-zinc-900'} transition-colors`} />
+          <span className={`text-[13px] font-bold ${currentView === 'subjects' ? 'text-white' : 'text-zinc-900'}`}>Subjects</span>
+        </button>
 
-      {/* Post Action Pill */}
-      <button 
-        onClick={onPostClick}
-        className="pointer-events-auto bg-zinc-900 text-white rounded-full px-6 py-2.5 shadow-md flex items-center gap-2 hover:bg-zinc-800 transition-all active:scale-95 group"
-      >
-        <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
-        <span className="text-[13px] font-bold">Post</span>
-      </button>
+        {/* Post Action Pill */}
+        <button 
+          id="nav-post"
+          onClick={onPostClick}
+          className="pointer-events-auto bg-zinc-900 text-white rounded-full px-6 py-2.5 shadow-md flex items-center gap-2 hover:bg-zinc-800 transition-all active:scale-95 group"
+        >
+          <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
+          <span className="text-[13px] font-bold">Post</span>
+        </button>
 
-      {/* Notifications Pill */}
-      <button className="pointer-events-auto glass border border-black/[0.03] rounded-full p-3 shadow-sm group relative hover:bg-white transition-all">
-        <Bell className="w-4 h-4 text-zinc-500 group-hover:text-zinc-900 transition-colors" />
-        <div className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-blue-500 rounded-full border border-white" />
-      </button>
+        {/* Notifications Pill */}
+        <button id="nav-notifications" className="pointer-events-auto glass border border-black/[0.03] rounded-full p-3 shadow-sm group relative hover:bg-white transition-all">
+          <Bell className="w-4 h-4 text-zinc-500 group-hover:text-zinc-900 transition-colors" />
+          <div className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-blue-500 rounded-full border border-white" />
+        </button>
 
-      {/* Profile Pill */}
-      <button className="pointer-events-auto glass border border-black/[0.03] rounded-full pl-2 pr-5 py-1.5 shadow-sm flex items-center gap-2.5 group hover:bg-white transition-all">
-        <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-100 border border-zinc-200">
-           <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user8" alt="Profile" />
-        </div>
-        <span className="text-[13px] font-bold text-zinc-900 hidden sm:block">Felix</span>
-      </button>
-    </div>
-  );
-};
-
-const SubjectDock = ({ activeSubject, onSelectSubject }: { activeSubject: string, onSelectSubject: (id: string) => void }) => {
-  return (
-    <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-40 glass border border-black/5 rounded-[32px] p-2 shadow-2xl flex items-center gap-2">
-      {SUBJECTS.map((subject) => {
-        const isActive = activeSubject === subject.id;
-        return (
-          <div key={subject.id} className="relative group">
-            {/* Tooltip Label */}
-            <motion.div 
-               initial={{ opacity: 0, y: 10, scale: 0.8 }}
-               whileHover={{ opacity: 1, y: -45, scale: 1 }}
-               className="absolute left-1/2 -translate-x-1/2 px-3 py-1.5 bg-zinc-900 text-white rounded-xl text-[12px] font-bold pointer-events-none shadow-lg flex flex-col items-center"
-            >
-              {subject.name}
-              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-zinc-900 rotate-45 rounded-sm" />
-            </motion.div>
-
-            <button
-              onClick={() => onSelectSubject(subject.id)}
-              className={`w-14 h-14 rounded-[22px] flex items-center justify-center transition-all duration-300 ${
-                isActive 
-                  ? 'bg-zinc-900 shadow-xl' 
-                  : 'bg-white/50 hover:bg-white group-hover:-translate-y-2'
-              }`}
-            >
-              <span className={`text-[20px] ${isActive ? 'grayscale-0' : 'grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100'} transition-all`}>
-                {subject.icon}
-              </span>
-            </button>
+        {/* Profile Pill */}
+        <button id="nav-profile" className="pointer-events-auto glass border border-black/[0.03] rounded-full pl-2 pr-5 py-1.5 shadow-sm flex items-center gap-2.5 group hover:bg-white transition-all">
+          <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-100 border border-zinc-200">
+             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user8" alt="Profile" referrerPolicy="no-referrer" />
           </div>
-        );
-      })}
-    </div>
+          <span className="text-[13px] font-bold text-zinc-900 hidden sm:block">Felix</span>
+        </button>
+      </div>
+    </>
   );
 };
 
-const PostCard = ({ post }: { post: Post }) => (
+interface PostCardProps {
+  post: Post;
+  key?: string;
+}
+
+const PostCard = ({ post }: PostCardProps) => (
   <motion.div
     initial={{ opacity: 0, scale: 0.98 }}
     whileInView={{ opacity: 1, scale: 1 }}
     viewport={{ once: true }}
-    className="bg-white p-7 rounded-[32px] border border-black/[0.02] mb-6 hover:shadow-xl hover:border-black/[0.05] transition-all cursor-default group"
+    className="bg-white/80 backdrop-blur-md p-7 rounded-[32px] border border-black/[0.05] mb-6 hover:shadow-xl hover:border-black/[0.1] transition-all cursor-default group"
   >
     <div className="flex items-start justify-between mb-6">
       <div className="flex items-center gap-4">
-        <img src={post.avatar} alt={post.author} className="w-12 h-12 rounded-full border border-black/5" />
+        <img src={post.avatar} alt={post.author} className="w-12 h-12 rounded-full border border-black/5" referrerPolicy="no-referrer" />
         <div>
           <div className="flex items-center gap-1.5">
             <h4 className="text-[15px] font-bold text-zinc-900 tracking-tight">{post.author}</h4>
@@ -229,8 +216,8 @@ const PostCard = ({ post }: { post: Post }) => (
     <div className="flex items-center gap-8 pt-6 border-t border-black/[0.01]">
       <button className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 transition-colors group">
         <div className="p-2.5 px-4 rounded-full bg-zinc-50 group-hover:bg-zinc-100 flex items-center gap-2.5 transition-all">
-           <ThumbsUp className="w-4 h-4 group-hover:scale-110 transition-transform" />
-           <span className="text-[14px] font-bold">{post.likes}</span>
+           <Triangle className="w-4 h-4 group-hover:scale-110 transition-transform" />
+           <span className="text-[14px] font-bold">{post.likes} Upvoted</span>
         </div>
       </button>
       <button className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 transition-colors group">
@@ -243,59 +230,240 @@ const PostCard = ({ post }: { post: Post }) => (
   </motion.div>
 );
 
-const UserStats = () => (
-  <div className="fixed top-24 right-8 w-64 hidden xl:flex flex-col gap-4">
-    <div className="bg-zinc-900 p-7 rounded-[40px] text-white overflow-hidden relative shadow-2xl">
-      <div className="relative z-10">
-        <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-2">Weekly Ranking</p>
-        <h3 className="text-[22px] font-bold mb-5 tracking-tight">Top Contributor</h3>
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
-            <TrendingUp className="w-6 h-6" />
-          </div>
-          <div>
-            <p className="text-[17px] font-bold">Level 12</p>
-            <p className="text-[11px] text-white/50 font-medium">Next level in 214 XP</p>
-          </div>
-        </div>
-        <button className="w-full bg-white text-zinc-900 py-4 rounded-2xl text-[14px] font-bold hover:bg-zinc-100 active:scale-95 transition-all shadow-lg">
-          View Leaderboard
-        </button>
-      </div>
-      <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-blue-500/20 rounded-full blur-[50px]" />
-    </div>
-  </div>
-);
+// --- New Subjects Page Component ---
 
-export default function Homepage() {
+interface SubjectsPageProps {
+  onBack: () => void;
+  onSelectSubject: (id: string) => void;
+  key?: string;
+}
+
+const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  // Smooth horizontal scroll with mouse wheel
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) {
+      const onWheel = (e: WheelEvent) => {
+        if (e.deltaY === 0) return;
+        e.preventDefault();
+        el.scrollTo({
+          left: el.scrollLeft + e.deltaY * 3,
+          behavior: 'smooth'
+        });
+      };
+      el.addEventListener('wheel', onWheel);
+      return () => el.removeEventListener('wheel', onWheel);
+    }
+  }, []);
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-[#f8f8f8] z-[60] flex flex-col items-center justify-center overflow-hidden"
+    >
+      <button 
+        onClick={onBack}
+        className="absolute top-8 left-8 p-4 bg-white rounded-full shadow-lg hover:shadow-xl transition-all active:scale-90 z-50 group border border-black/5"
+      >
+        <ArrowLeft className="w-6 h-6 text-zinc-500 group-hover:text-zinc-900 transition-colors" />
+      </button>
+
+      <div className="text-center mb-16 relative">
+        <motion.p 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-xl font-medium text-zinc-400"
+        >
+          Explore More About MMU Subjects
+        </motion.p>
+      </div>
+
+      <div 
+        ref={scrollRef}
+        className="w-full h-[600px] flex items-center gap-0 overflow-x-auto no-scrollbar px-[20vw] cursor-grab active:cursor-grabbing pb-20"
+        style={{ scrollSnapType: 'x proximity' }}
+      >
+        {SUBJECTS.map((subject, index) => {
+          // Calculate rotation and position for fanned-out look
+          const rotation = (index - (SUBJECTS.length - 1) / 2) * 8;
+          const isHovered = hoveredId === subject.id;
+
+          return (
+            <motion.div
+              key={subject.id}
+              initial={{ opacity: 0, y: 50, rotate: rotation }}
+              animate={{ 
+                opacity: 1, 
+                y: isHovered ? -40 : 0, 
+                rotate: isHovered ? 0 : rotation,
+                scale: isHovered ? 1.1 : 1,
+                zIndex: isHovered ? 100 : index 
+              }}
+              onMouseEnter={() => setHoveredId(subject.id)}
+              onMouseLeave={() => setHoveredId(null)}
+              onClick={() => onSelectSubject(subject.id)}
+              className="relative flex-shrink-0 w-[240px] h-[360px] -ml-[100px] first:ml-0 transition-all duration-300 ease-out"
+              style={{ perspective: '1000px' }}
+            >
+              {/* Book Shadow */}
+              <div className="absolute inset-x-8 -bottom-10 h-8 bg-black/10 rounded-full blur-2xl" />
+
+              {/* Book Cover */}
+              <div 
+                className={`w-full h-full rounded-[24px] overflow-hidden shadow-2xl relative border-l-8 border-black/10 transition-all ${subject.color}`}
+              >
+                <img 
+                  src={subject.cover} 
+                  alt={subject.name} 
+                  className="w-full h-full object-cover mix-blend-overlay opacity-60" 
+                  referrerPolicy="no-referrer"
+                />
+                
+                <div className="absolute inset-0 p-8 flex flex-col justify-between text-white">
+                  <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl">
+                    {subject.icon}
+                  </div>
+                  
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 mb-1">Module {index + 1}</p>
+                    <h3 className="text-2xl font-bold leading-none tracking-tight">
+                      {subject.name}
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Aesthetic Detail Lines */}
+                <div className="absolute inset-y-0 left-0 w-2 bg-white/10" />
+                <div className="absolute right-4 bottom-4 w-8 h-8 bg-white/20 rounded-full blur-xl" />
+              </div>
+
+              {/* Reveal Text on Hover */}
+              <AnimatePresence>
+                {isHovered && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute -bottom-16 left-0 right-0 text-center pointer-events-none"
+                  >
+                    <span className="text-[14px] font-black uppercase tracking-[0.3em] text-zinc-900">
+                      {subject.name}
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Background Graphic */}
+      <h2 className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[15vw] font-black text-black/[0.02] pointer-events-none whitespace-nowrap select-none">
+        SUBJECTS
+      </h2>
+    </motion.div>
+  );
+};
+
+export default function App() {
+  const [view, setView] = useState<'feed' | 'subjects'>('feed');
   const [activeSubject, setActiveSubject] = useState('math');
   const activeSubjectData = SUBJECTS.find(s => s.id === activeSubject);
 
   return (
-    <div className="min-h-screen bg-[#fafafa] font-sans selection:bg-zinc-200">
+    <div className="min-h-screen bg-[#fafafa] font-sans selection:bg-zinc-200 overflow-x-hidden">
       
-      <Navbar />
+      <Navbar 
+        currentView={view}
+        onSubjectsClick={() => setView('subjects')} 
+      />
 
-      <main className="pt-20 pb-48 px-6 max-w-2xl mx-auto relative z-10">
-        
-        {/* Discussion Feed */}
-        <div className="space-y-4">
-          <AnimatePresence mode="popLayout">
-            {MOCK_POSTS
-              .filter(p => p.subject.toLowerCase() === activeSubjectData?.name.toLowerCase())
-              .map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
-          </AnimatePresence>
-        </div>
+      <AnimatePresence mode="wait">
+        {view === 'feed' ? (
+          <motion.main 
+            key="feed"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="pt-20 pb-48 px-6 max-w-2xl mx-auto relative z-10"
+          >
+            {/* Subject Selector Heading */}
+            <div className="mb-10 flex items-center justify-between">
+              <div>
+                <h2 className="text-3xl font-bold text-zinc-900 tracking-tight">
+                  {activeSubjectData?.name} Hub
+                </h2>
+                <p className="text-zinc-400 font-medium">Recently shared chapters and discussions</p>
+              </div>
+              <div className="flex -space-x-3">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-zinc-200">
+                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=user${i}`} alt="user" referrerPolicy="no-referrer" />
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Discussion Feed */}
+            <div className="space-y-4">
+              <AnimatePresence mode="popLayout">
+                {MOCK_POSTS
+                  .filter(p => {
+                    const postSubject = p.subject.toLowerCase();
+                    const activeSubjectLabel = activeSubjectData?.name.toLowerCase() || '';
+                    return postSubject.includes(activeSubjectLabel) || activeSubjectLabel.includes(postSubject);
+                  })
+                  .map((post) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
+                
+                {MOCK_POSTS.filter(p => {
+                  const postSubject = p.subject.toLowerCase();
+                  const activeSubjectLabel = activeSubjectData?.name.toLowerCase() || '';
+                  return postSubject.includes(activeSubjectLabel) || activeSubjectLabel.includes(postSubject);
+                }).length === 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0 }} 
+                    animate={{ opacity: 1 }} 
+                    className="text-center py-20 bg-zinc-50 rounded-[40px] border-2 border-dashed border-zinc-200"
+                  >
+                    <p className="text-zinc-400 font-bold">No discussions yet in this subject. Be the first to post!</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.main>
+        ) : (
+          <SubjectsPage 
+            key="subjects"
+            onBack={() => setView('feed')} 
+            onSelectSubject={(id) => {
+              setActiveSubject(id);
+              setView('feed');
+            }}
+          />
+        )}
+      </AnimatePresence>
 
-      </main>
-      
-      <SubjectDock activeSubject={activeSubject} onSelectSubject={setActiveSubject} />
+      {/* Global CSS for hiding scrollbar */}
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
 
       {/* Ambient Background Elements */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[500px] -z-10 bg-[radial-gradient(circle_at_50%_0%,rgba(0,102,204,0.04)_0%,transparent_70%)]" />
-      <div className="fixed inset-0 -z-20 bg-[#fafafa]" />
 
     </div>
   );
