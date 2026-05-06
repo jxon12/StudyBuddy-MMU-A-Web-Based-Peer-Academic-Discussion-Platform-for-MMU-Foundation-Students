@@ -8,7 +8,8 @@ import {
   CheckCircle2,
   MoreHorizontal,
   ArrowLeft,
-  Triangle
+  Triangle,
+  Star
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
@@ -35,13 +36,13 @@ interface Post {
 // --- Mock Data ---
 
 const SUBJECTS = [
-  { id: 'math', name: 'Mathematics', icon: 'Σ', color: 'bg-blue-500', cover: 'https://images.unsplash.com/photo-1509228468518-180dd482180c?auto=format&fit=crop&q=80&w=600', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
-  { id: 'prog', name: 'Programming', icon: '⌨️', color: 'bg-zinc-800', cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=600', chapters: ['Python Basics', 'Control Structures', 'Data Structures'] },
-  { id: 'phys', name: 'Physics', icon: '⚛️', color: 'bg-purple-500', cover: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
-  { id: 'biz', name: 'Business', icon: '📈', color: 'bg-green-500', cover: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600', chapters: ['Economics', 'Management', 'Marketing'] },
-  { id: 'crit', name: 'Critical Thinking', icon: '💡', color: 'bg-orange-500', cover: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600', chapters: ['Logic', 'Arguments', 'Fallacies'] },
-  { id: 'eng', name: 'English', icon: '📚', color: 'bg-pink-500', cover: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=600', chapters: ['Literature', 'Grammar', 'Composition'] },
-  { id: 'hist', name: 'History', icon: '🏛️', color: 'bg-yellow-600', cover: 'https://images.unsplash.com/photo-1461360228754-6e81c478c882?auto=format&fit=crop&q=80&w=600', chapters: ['Ancient Civilizations', 'Modern Era', 'World Wars'] },
+  { id: 'math', name: 'Mathematics', color: 'bg-blue-500', cover: 'https://images.unsplash.com/photo-1509228468518-180dd482180c?auto=format&fit=crop&q=80&w=600', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
+  { id: 'prog', name: 'Programming', color: 'bg-zinc-800', cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=600', chapters: ['Python Basics', 'Control Structures', 'Data Structures'] },
+  { id: 'phys', name: 'Physics', color: 'bg-purple-500', cover: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
+  { id: 'biz', name: 'Business', color: 'bg-green-500', cover: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600', chapters: ['Economics', 'Management', 'Marketing'] },
+  { id: 'crit', name: 'Critical Thinking', color: 'bg-orange-500', cover: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600', chapters: ['Logic', 'Arguments', 'Fallacies'] },
+  { id: 'eng', name: 'English', color: 'bg-pink-500', cover: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=600', chapters: ['Literature', 'Grammar', 'Composition'] },
+  { id: 'hist', name: 'Multimedia Fundamental', color: 'bg-yellow-600', cover: 'https://images.unsplash.com/photo-1461360228754-6e81c478c882?auto=format&fit=crop&q=80&w=600', chapters: ['Ancient Civilizations', 'Modern Era', 'World Wars'] },
 ];
 
 const MOCK_POSTS: Post[] = [
@@ -129,42 +130,35 @@ const Navbar = ({ onPostClick, onSubjectsClick, currentView }: {
         </div>
       </div>
 
-      {/* Left Sidebar Navigation */}
-      <div className="fixed left-6 top-20 z-50 flex flex-col items-center justify-start gap-4 pointer-events-none">
-        {/* Subjects Pill */}
+      {/* Left Sidebar Navigation - Vertical Column Grid */}
+      <div className="fixed left-6 top-20 z-50 flex flex-col gap-3 pointer-events-none w-20">
+        {/* Subjects Button */}
         <button 
           id="nav-subjects"
           onClick={onSubjectsClick}
-          className={`pointer-events-auto glass border border-black/[0.03] rounded-full px-5 py-2.5 shadow-sm flex items-center gap-2 transition-all group ${
+          className={`pointer-events-auto glass border border-black/[0.03] rounded-lg px-3 py-3 shadow-sm flex flex-col items-center justify-center gap-1.5 transition-all group h-20 ${
             currentView === 'subjects' ? 'bg-zinc-900 text-white border-zinc-800' : 'hover:bg-white'
           }`}
         >
-          <BookOpen className={`w-4 h-4 ${currentView === 'subjects' ? 'text-white' : 'text-zinc-500 group-hover:text-zinc-900'} transition-colors`} />
-          <span className={`text-[13px] font-bold ${currentView === 'subjects' ? 'text-white' : 'text-zinc-900'}`}>Subjects</span>
+          <BookOpen className={`w-5 h-5 ${currentView === 'subjects' ? 'text-white' : 'text-zinc-500 group-hover:text-zinc-900'} transition-colors`} />
+          <span className={`text-[11px] font-bold text-center ${currentView === 'subjects' ? 'text-white' : 'text-zinc-900'}`}>Subjects</span>
         </button>
 
-        {/* Post Action Pill */}
+        {/* Post Button */}
         <button 
           id="nav-post"
           onClick={onPostClick}
-          className="pointer-events-auto bg-zinc-900 text-white rounded-full px-6 py-2.5 shadow-md flex items-center gap-2 hover:bg-zinc-800 transition-all active:scale-95 group"
+          className="pointer-events-auto bg-zinc-900 text-white rounded-lg px-3 py-3 shadow-md flex flex-col items-center justify-center gap-1.5 hover:bg-zinc-800 transition-all active:scale-95 group h-20"
         >
-          <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
-          <span className="text-[13px] font-bold">Post</span>
+          <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+          <span className="text-[11px] font-bold text-center">Post</span>
         </button>
 
-        {/* Notifications Pill */}
-        <button id="nav-notifications" className="pointer-events-auto glass border border-black/[0.03] rounded-full p-3 shadow-sm group relative hover:bg-white transition-all">
-          <Bell className="w-4 h-4 text-zinc-500 group-hover:text-zinc-900 transition-colors" />
-          <div className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-blue-500 rounded-full border border-white" />
-        </button>
-
-        {/* Profile Pill */}
-        <button id="nav-profile" className="pointer-events-auto glass border border-black/[0.03] rounded-full pl-2 pr-5 py-1.5 shadow-sm flex items-center gap-2.5 group hover:bg-white transition-all">
-          <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-100 border border-zinc-200">
-             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user8" alt="Profile" referrerPolicy="no-referrer" />
-          </div>
-          <span className="text-[13px] font-bold text-zinc-900 hidden sm:block">Felix</span>
+        {/* Notifications Button */}
+        <button id="nav-notifications" className="pointer-events-auto glass border border-black/[0.03] rounded-lg px-3 py-3 shadow-sm group relative hover:bg-white transition-all flex flex-col items-center justify-center gap-1.5 h-20">
+          <Bell className="w-5 h-5 text-zinc-500 group-hover:text-zinc-900 transition-colors" />
+          <span className="text-[11px] font-bold text-zinc-900 text-center">Notify</span>
+          <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-blue-500 rounded-full border border-white" />
         </button>
       </div>
     </>
@@ -191,7 +185,7 @@ const PostCard = ({ post }: PostCardProps) => (
             <h4 className="text-[15px] font-bold text-zinc-900 tracking-tight">{post.author}</h4>
             {post.isVerified && <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 fill-blue-500/10" />}
           </div>
-          <p className="text-[12px] text-zinc-400 font-bold uppercase tracking-wider">{post.subject} • {post.timestamp}</p>
+          <p className="text-[12px] text-zinc-400 font-bold uppercase tracking-wider">{post.timestamp}</p>
         </div>
       </div>
       <button className="p-2.5 hover:bg-zinc-50 rounded-full transition-colors">
@@ -215,16 +209,16 @@ const PostCard = ({ post }: PostCardProps) => (
 
     <div className="flex items-center gap-8 pt-6 border-t border-black/[0.01]">
       <button className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 transition-colors group">
-        <div className="p-2.5 px-4 rounded-full bg-zinc-50 group-hover:bg-zinc-100 flex items-center gap-2.5 transition-all">
-           <Triangle className="w-4 h-4 group-hover:scale-110 transition-transform" />
-           <span className="text-[14px] font-bold">{post.likes} Upvoted</span>
-        </div>
+        <Triangle className="w-4 h-4 group-hover:scale-110 transition-transform" />
+        <span className="text-[14px] font-bold">{post.likes} Upvoted</span>
       </button>
       <button className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 transition-colors group">
-        <div className="p-2.5 px-4 rounded-full bg-zinc-50 group-hover:bg-zinc-100 flex items-center gap-2.5 transition-all">
-           <MessageCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
-           <span className="text-[14px] font-bold">{post.replies} Replies</span>
-        </div>
+        <MessageCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
+        <span className="text-[14px] font-bold">{post.replies} Replies</span>
+      </button>
+      <button className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 transition-colors group">
+        <Star className="w-4 h-4 group-hover:scale-110 transition-transform" />
+        <span className="text-[14px] font-bold">Save</span>
       </button>
     </div>
   </motion.div>
@@ -325,13 +319,8 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
                   referrerPolicy="no-referrer"
                 />
                 
-                <div className="absolute inset-0 p-8 flex flex-col justify-between text-white">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl">
-                    {subject.icon}
-                  </div>
-                  
+                <div className="absolute inset-0 p-8 flex flex-col justify-end text-white">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 mb-1">Module {index + 1}</p>
                     <h3 className="text-2xl font-bold leading-none tracking-tight">
                       {subject.name}
                     </h3>
@@ -373,8 +362,8 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
 
 export default function App() {
   const [view, setView] = useState<'feed' | 'subjects'>('feed');
-  const [activeSubject, setActiveSubject] = useState('math');
-  const activeSubjectData = SUBJECTS.find(s => s.id === activeSubject);
+  const [activeSubject, setActiveSubject] = useState<string | null>(null);
+  const activeSubjectData = activeSubject ? SUBJECTS.find(s => s.id === activeSubject) : null;
 
   return (
     <div className="min-h-screen bg-[#fafafa] font-sans selection:bg-zinc-200 overflow-x-hidden">
@@ -388,25 +377,29 @@ export default function App() {
         {view === 'feed' ? (
           <motion.main 
             key="feed"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: -60, scale: 0.95 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 60, scale: 0.95 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
             className="pt-20 pb-48 px-6 max-w-2xl mx-auto relative z-10"
           >
-            {/* Subject Selector Heading */}
+            {/* Feed Heading */}
             <div className="mb-10 flex items-center justify-between">
-              <div>
-                <h2 className="text-3xl font-bold text-zinc-900 tracking-tight">
-                  {activeSubjectData?.name} Hub
-                </h2>
-                <p className="text-zinc-400 font-medium">Recently shared chapters and discussions</p>
-              </div>
-              <div className="flex -space-x-3">
-                {[1,2,3,4].map(i => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-zinc-200">
-                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=user${i}`} alt="user" referrerPolicy="no-referrer" />
-                  </div>
-                ))}
+              <div className="flex items-center gap-4">
+                {activeSubjectData && (
+                  <button 
+                    onClick={() => setActiveSubject(null)}
+                    className="p-3 rounded-full hover:bg-zinc-100 transition-colors"
+                  >
+                    <ArrowLeft className="w-5 h-5 text-zinc-600 hover:text-zinc-900" />
+                  </button>
+                )}
+                <div>
+                  <h2 className="text-3xl font-bold text-zinc-900 tracking-tight">
+                    {activeSubjectData ? `${activeSubjectData.name} Hub` : 'Discover Discussions'}
+                  </h2>
+                  <p className="text-zinc-400 font-medium">{activeSubjectData ? 'Recently shared chapters and discussions' : 'Explore posts from different subjects'}</p>
+                </div>
               </div>
             </div>
             
@@ -415,34 +408,24 @@ export default function App() {
               <AnimatePresence mode="popLayout">
                 {MOCK_POSTS
                   .filter(p => {
+                    if (!activeSubjectData) return true; // Show all posts if no subject selected
                     const postSubject = p.subject.toLowerCase();
-                    const activeSubjectLabel = activeSubjectData?.name.toLowerCase() || '';
+                    const activeSubjectLabel = activeSubjectData.name.toLowerCase();
                     return postSubject.includes(activeSubjectLabel) || activeSubjectLabel.includes(postSubject);
                   })
                   .map((post) => (
                   <PostCard key={post.id} post={post} />
                 ))}
-                
-                {MOCK_POSTS.filter(p => {
-                  const postSubject = p.subject.toLowerCase();
-                  const activeSubjectLabel = activeSubjectData?.name.toLowerCase() || '';
-                  return postSubject.includes(activeSubjectLabel) || activeSubjectLabel.includes(postSubject);
-                }).length === 0 && (
-                  <motion.div 
-                    initial={{ opacity: 0 }} 
-                    animate={{ opacity: 1 }} 
-                    className="text-center py-20 bg-zinc-50 rounded-[40px] border-2 border-dashed border-zinc-200"
-                  >
-                    <p className="text-zinc-400 font-bold">No discussions yet in this subject. Be the first to post!</p>
-                  </motion.div>
-                )}
               </AnimatePresence>
             </div>
           </motion.main>
         ) : (
           <SubjectsPage 
             key="subjects"
-            onBack={() => setView('feed')} 
+            onBack={() => { 
+              setActiveSubject(null);
+              setView('feed');
+            }} 
             onSelectSubject={(id) => {
               setActiveSubject(id);
               setView('feed');
