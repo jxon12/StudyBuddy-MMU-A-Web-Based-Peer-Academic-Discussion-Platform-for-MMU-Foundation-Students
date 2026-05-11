@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BookOpen, 
   MessageCircle, 
@@ -396,6 +396,11 @@ const Navbar = ({ onPostClick, onSubjectsClick, currentView }: {
 }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
+  // Hide navbar when viewing subjects
+  if (currentView === 'subjects') {
+    return null;
+  }
+
   return (
     <>
       {/* 1. Global Search Bar (Top Center) */}
@@ -764,6 +769,7 @@ export default function App() {
       
       <Navbar 
         currentView={view}
+        onPostClick={() => setView('feed')}
         onSubjectsClick={() => setView('subjects')} 
       />
 
