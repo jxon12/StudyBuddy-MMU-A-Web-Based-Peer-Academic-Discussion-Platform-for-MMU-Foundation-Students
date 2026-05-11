@@ -55,9 +55,9 @@ export default function App() {
             <img src="/images/mmu-logo.svg" alt="MMU Logo" className="h-[18px] w-auto nav-item" />
             <div className="hidden lg:flex items-center gap-8">
               <span className="nav-item">Get Started</span>
-              <span className="nav-item cursor-pointer" onClick={() => setCurrentPage('team')}>About us</span>
+              <span className="nav-item cursor-pointer" onClick={() => setCurrentPage('team')}>About Us</span>
               <span className="nav-item cursor-pointer" onClick={() => document.getElementById('academic-help')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>StudyBuddy</span>
-              <span className="nav-item cursor-pointer" onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>How it works</span>
+              <span className="nav-item cursor-pointer" onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>How it Works</span>
               <div 
                 className="relative"
                 onMouseEnter={() => setShowDocsMenu(true)}
@@ -119,8 +119,25 @@ export default function App() {
         </div>
       </header>
 
+      {/* Local Navigation — Liquid Glass Tier 2 */}
+      <nav className="liquid-nav-local px-4 md:px-8">
+        <div className="w-full max-w-5xl flex items-center justify-between">
+          <div className="text-[20px] md:text-[22px] font-semibold tracking-tight cursor-pointer" onClick={() => setCurrentPage('home')}>
+            StudyBuddy
+          </div>
+          <div className="flex items-center gap-4 md:gap-6">
+            <span className="text-[11px] md:text-[13px] font-medium opacity-60 hover:opacity-100 cursor-pointer transition-all">Ask Community</span>
+            <button 
+              className="h-[28px] px-3 md:px-4 bg-apple-blue hover:brightness-110 text-white text-[11px] md:text-[12px] font-semibold rounded-full transition-all active:scale-95 shadow-sm"
+            >
+              Sign in
+            </button>
+          </div>
+        </div>
+      </nav>
+
       {/* Main Content — HIG Spatial Structure */}
-      <main className="flex-grow w-full">
+      <main className="flex-grow w-full relative">
         <AnimatePresence mode="wait">
           {currentPage === 'home' ? (
             <motion.div
@@ -129,30 +146,31 @@ export default function App() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
+              className="relative"
             >
-        {/* HERO SECTION */}
-        <section id="hero" className="flex flex-col items-center justify-center text-center px-4 pt-[180px] pb-32 relative overflow-hidden w-full">
-          {/* Background Image with Mask */}
-          <div 
-            className="absolute inset-0 -z-10 w-screen"
-            style={{
-              backgroundImage: 'url(/images/mmu-campus.jpg)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              maskImage: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%)',
-              WebkitMaskImage: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%)',
-              left: '50%',
-              transform: 'translateX(-50%)',
-            }}
-          />
-          
-          <motion.div
-             initial={{ opacity: 0, scale: 0.98, y: 30 }}
-             whileInView={{ opacity: 1, scale: 1, y: 0 }}
-             viewport={{ once: true }}
-             transition={{ duration: 1, ease: [0.34, 1.56, 0.64, 1] }}
-             className="relative z-10 max-w-7xl"
-          >
+                    {/* HERO SECTION */}
+              <section id="hero" className="flex flex-col items-center justify-center text-center px-4 pt-[180px] pb-32 relative overflow-hidden w-full">
+                {/* Background Image with Mask */}
+                <div 
+                  className="absolute inset-0 -z-10 w-screen"
+                  style={{
+                    backgroundImage: 'url(/images/mmu-campus.jpg)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    maskImage: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%)',
+                    WebkitMaskImage: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%)',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                  }}
+                />
+                
+                <motion.div
+                   initial={{ opacity: 0, scale: 0.98, y: 30 }}
+                   whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                   viewport={{ once: true }}
+                   transition={{ duration: 1, ease: [0.34, 1.56, 0.64, 1] }}
+                   className="relative z-10 max-w-7xl"
+                >
             <div className="mb-4">
                <span className="text-[13px] font-bold tracking-[0.2em] opacity-40 uppercase">Academic peer discussion platform</span>
             </div>
