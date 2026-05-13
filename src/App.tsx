@@ -6,7 +6,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Team } from '../components/team';
-import Homepage from '../components/homepage';
 import { 
   Search, 
   ChevronDown, 
@@ -347,7 +346,7 @@ export default function App() {
             <h4 className="text-[13px] font-bold opacity-30 uppercase tracking-widest">Platform</h4>
             <div className="flex flex-col gap-2">
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Features</span>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">How It Works</span>
+              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer" onClick={() => document.getElementById('how-it-works-heading')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>How It Works</span>
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Leaderboard</span>
             </div>
           </div>
