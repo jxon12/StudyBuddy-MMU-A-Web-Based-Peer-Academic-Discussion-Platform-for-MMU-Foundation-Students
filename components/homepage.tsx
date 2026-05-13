@@ -31,7 +31,6 @@ interface Post {
   likes: number;
   replies: number;
   timestamp: string;
-  isVerified?: boolean;
 }
 
 // --- Mock Data ---
@@ -57,7 +56,6 @@ const MOCK_POSTS: Post[] = [
     likes: 78,
     replies: 30,
     timestamp: '2h ago',
-    isVerified: true
   },
   {
     id: 'e1',
@@ -69,7 +67,6 @@ const MOCK_POSTS: Post[] = [
     likes: 12,
     replies: 5,
     timestamp: '1h ago',
-    isVerified: true
   },
   {
     id: 'm1',
@@ -81,7 +78,6 @@ const MOCK_POSTS: Post[] = [
     likes: 45,
     replies: 7,
     timestamp: '2h ago',
-    isVerified: true
   },
   {
     id: 'd1',
@@ -93,7 +89,6 @@ const MOCK_POSTS: Post[] = [
     likes: 28,
     replies: 12,
     timestamp: '3h ago',
-    isVerified: true
   },
   {
     id: 'p1',
@@ -105,7 +100,6 @@ const MOCK_POSTS: Post[] = [
     likes: 38,
     replies: 9,
     timestamp: '4h ago',
-    isVerified: true
   },
   {
     id: 'c1',
@@ -117,7 +111,7 @@ const MOCK_POSTS: Post[] = [
     likes: 64,
     replies: 8,
     timestamp: '10h ago',
-    isVerified: true
+
   },
   {
     id: 'e2',
@@ -383,7 +377,6 @@ const MOCK_POSTS: Post[] = [
     likes: 85,
     replies: 14,
     timestamp: '2d ago',
-    isVerified: true
   },
 ];
 

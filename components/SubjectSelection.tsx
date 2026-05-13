@@ -16,20 +16,20 @@ import {
 } from 'lucide-react';
 
 const SUBJECTS = [
-  { id: 'BIT1112', name: 'Introduction to Computing Tech', icon: Braces, color: 'blue' },
-  { id: 'CSC1122', name: 'Introduction to Digital System', icon: Zap, color: 'indigo' },
-  { id: 'CSC11XX', name: 'Multimedia Fundamentals', icon: Brush, color: 'purple' },
-  { id: 'BIT1132', name: 'Mathematics 1', icon: Grid3x3, color: 'mint' },
-  { id: 'MTH1112', name: 'Mathematics 2', icon: Grid3x3, color: 'blue' },
-  { id: 'MTH11XX', name: 'Mathematics 3', icon: Grid3x3, color: 'blue' },
-  { id: 'BIT11XX', name: 'Principles of Physics', icon: Beaker, color: 'indigo' },
-  { id: 'COM11XX', name: 'Problem Solving & Program Design', icon: Braces, color: 'purple' },
-  { id: 'MGT11XX', name: 'Mini IT Project', icon: LayoutGrid, color: 'mint' },
-  { id: 'EEE11XX', name: 'Intro to Business Management', icon: Briefcase, color: 'blue' },
-  { id: 'ART11XX', name: 'Academic English', icon: Square, color: 'indigo' },
-  { id: 'ART11XX', name: 'Communicative English', icon: MessageSquare, color: 'purple' },
-  { id: 'COM11XX', name: 'Critical Thinking', icon: Lightbulb, color: 'mint' },
-  { id: 'BIT11XX', name: 'Essential English', icon: Layers, color: 'blue' },
+  { id: 'CCT1114', name: 'Introduction to Computing Tech', icon: Braces, color: 'blue' },
+  { id: 'CDS1114', name: 'Introduction to Digital System', icon: Zap, color: 'indigo' },
+  { id: 'CMF1114', name: 'Multimedia Fundamentals', icon: Brush, color: 'purple' },
+  { id: 'CMT1114', name: 'Mathematics 1', icon: Grid3x3, color: 'mint' },
+  { id: 'CMT1124', name: 'Mathematics 2', icon: Grid3x3, color: 'blue' },
+  { id: 'CMT1134', name: 'Mathematics 3', icon: Grid3x3, color: 'blue' },
+  { id: 'CPP1113', name: 'Principles of Physics', icon: Beaker, color: 'indigo' },
+  { id: 'CSP1114', name: 'Problem Solving & Program Design', icon: Braces, color: 'purple' },
+  { id: 'CSP1123', name: 'Mini IT Project', icon: LayoutGrid, color: 'mint' },
+  { id: 'GNB1114', name: 'Intro to Business Management', icon: Briefcase, color: 'blue' },
+  { id: 'LAE1113', name: 'Academic English', icon: Square, color: 'indigo' },
+  { id: 'LCE1113', name: 'Communicative English', icon: MessageSquare, color: 'purple' },
+  { id: 'LCT1113', name: 'Critical Thinking', icon: Lightbulb, color: 'mint' },
+  { id: 'LEE1113', name: 'Essential English', icon: Layers, color: 'blue' },
 ];
 
 interface SubjectSelectionProps {
