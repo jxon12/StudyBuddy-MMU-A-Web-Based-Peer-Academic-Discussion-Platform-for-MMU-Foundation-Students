@@ -38,7 +38,7 @@ interface Post {
 const SUBJECTS = [
   { id: 'english', name: 'LAE1113 Academic English', color: 'bg-[#AF52DE]', cover: 'https://i.pinimg.com/736x/91/d4/91/91d491485a1126a79219f01c444d53db.jpg', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
   { id: 'math', name: 'CMT 1134 Mathematics III', color: 'bg-[#5856D6]', cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
-  { id: 'digital', name: 'CDS1114 Intro to Digital System', color: 'bg-[#7D7AFF]', cover: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
+  { id: 'digital', name: 'CDS1114\nIntro to Digital System', color: 'bg-[#7D7AFF]', cover: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
   { id: 'physics', name: 'CPP1113 Principles of Physics', color: 'bg-[#BF5AF2]', cover: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
   { id: 'critical', name: 'LCT1113 Critical Thinking', color: 'bg-[#3634A3]', cover: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600', chapters: ['Logic', 'Arguments', 'Fallacies'] },
   { id: 'mini-it', name: 'CSP1123 Mini IT Project', color: 'bg-[#DA8FFF]', cover: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600', chapters: ['Project Planning', 'Development', 'Documentation'] },
@@ -93,7 +93,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'p1',
     author: 'Michael Chen',
-    avatar: 'https://i.pinimg.com/736x/58/37/b8/5837b8491705a0c1fc454fb5a56110e0.jpg',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael',
     subject: 'CPP1113 Principles of Physics',
     chapter: 'Mechanics',
     content: 'Need help understanding Newton\'s Third Law in circular motion. How does centripetal force factor in?',
@@ -104,7 +104,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'c1',
     author: 'Priya Sharma',
-    avatar: 'https://i.pinimg.com/736x/ce/37/10/ce37104adb3634256957b3ab7273fc72.jpg',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya',
     subject: 'LCT1113 Critical Thinking',
     chapter: 'Fallacies',
     content: 'Spotted a "Straw Man" argument in a recent news article. It\'s cool being able to identify these in the real world!',
@@ -245,7 +245,7 @@ const MOCK_POSTS: Post[] = [
     replies: 25,
     timestamp: '1d ago'
   },
-  // Adding 2 more for each subject to reach 5
+
   {
     id: 'e4',
     author: 'James Tan',
@@ -292,7 +292,7 @@ const MOCK_POSTS: Post[] = [
   },
   {
     id: 'd4',
-    author: 'Taufiq H.',
+    author: 'Aiman Khalib',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Taufiq',
     subject: 'CDS1114 Intro to Digital System',
     chapter: 'Circuit Design',
@@ -303,7 +303,7 @@ const MOCK_POSTS: Post[] = [
   },
   {
     id: 'd5',
-    author: 'Ying Yue',
+    author: 'Moustafa',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ying',
     subject: 'CDS1114 Intro to Digital System',
     chapter: 'Binary Logic',
@@ -336,7 +336,7 @@ const MOCK_POSTS: Post[] = [
   },
   {
     id: 'c4',
-    author: 'Ivan K.',
+    author: 'Ivan Wong',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ivan',
     subject: 'LCT1113 Critical Thinking',
     chapter: 'Logic',
@@ -347,7 +347,7 @@ const MOCK_POSTS: Post[] = [
   },
   {
     id: 'c5',
-    author: 'Bella M.',
+    author: 'Vinayagam',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bella',
     subject: 'LCT1113 Critical Thinking',
     chapter: 'Arguments',
@@ -358,7 +358,7 @@ const MOCK_POSTS: Post[] = [
   },
   {
     id: 'mi4',
-    author: 'Chris L.',
+    author: 'Wah Teck Hao',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Chris',
     subject: 'CSP1123 Mini IT Project',
     chapter: 'Documentation',
@@ -369,7 +369,7 @@ const MOCK_POSTS: Post[] = [
   },
   {
     id: 'mi5',
-    author: 'Maya N.',
+    author: 'Mittyram',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Maya',
     subject: 'CSP1123 Mini IT Project',
     chapter: 'Development',
