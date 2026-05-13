@@ -7,6 +7,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Team } from '../components/team';
 import Homepage from '../components/homepage';
+import { AuthPage } from '../components/AuthPage';
+import { SubjectSelection } from '../components/SubjectSelection';
 import { 
   Search, 
   ChevronDown, 
@@ -26,7 +28,8 @@ const ACCENT_COLORS = [
 ];
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion' | 'auth-login' | 'auth-signup' | 'subject-selection'>('home');
+  const [previousAuthType, setPreviousAuthType] = useState<'login' | 'signup'>('login');
   const [accentColor] = useState(ACCENT_COLORS[0]);
   const [showDocsMenu, setShowDocsMenu] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -54,7 +57,7 @@ export default function App() {
           <div className="flex items-center gap-6">
             <img src="/images/mmu-logo.svg" alt="MMU Logo" className="h-[18px] w-auto nav-item" />
             <div className="hidden lg:flex items-center gap-8">
-              <span className="nav-item">Get Started</span>
+              <span className="nav-item cursor-pointer" onClick={() => setCurrentPage('auth-signup')}>Get Started</span>
               <span className="nav-item cursor-pointer" onClick={() => setCurrentPage('team')}>About Us</span>
               <span className="nav-item cursor-pointer" onClick={() => document.getElementById('academic-help')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>StudyBuddy</span>
               <span className="nav-item cursor-pointer" onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>How it Works</span>
@@ -128,6 +131,7 @@ export default function App() {
           <div className="flex items-center gap-4 md:gap-6">
             <span className="text-[11px] md:text-[13px] font-medium opacity-60 hover:opacity-100 cursor-pointer transition-all">Ask Community</span>
             <button 
+              onClick={() => setCurrentPage('auth-login')}
               className="h-[28px] px-3 md:px-4 bg-apple-blue hover:brightness-110 text-white text-[11px] md:text-[12px] font-semibold rounded-full transition-all active:scale-95 shadow-sm"
             >
               Sign in
@@ -139,7 +143,27 @@ export default function App() {
       {/* Main Content — HIG Spatial Structure */}
       <main className="flex-grow w-full relative">
         <AnimatePresence mode="wait">
-          {currentPage === 'home' ? (
+          {currentPage === 'auth-login' || currentPage === 'auth-signup' ? (
+            <AuthPage 
+              key="auth"
+              type={currentPage === 'auth-login' ? 'login' : 'signup'}
+              onNavigate={(page) => setCurrentPage(page === 'login' ? 'auth-login' : 'auth-signup')}
+              onLogin={() => {
+                setPreviousAuthType('login');
+                setCurrentPage('subject-selection');
+              }}
+              onComplete={() => {
+                setPreviousAuthType('signup');
+                setCurrentPage('subject-selection');
+              }}
+            />
+          ) : currentPage === 'subject-selection' ? (
+            <SubjectSelection 
+              key="subject-selection"
+              onComplete={() => setCurrentPage('home')}
+              onPrevious={() => setCurrentPage(previousAuthType === 'login' ? 'auth-login' : 'auth-signup')}
+            />
+          ) : currentPage === 'home' ? (
             <motion.div
               key="home"
               initial={{ opacity: 0, y: 20 }}
@@ -191,7 +215,9 @@ export default function App() {
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-24">
                <motion.button 
                  whileHover={{ scale: 1.05 }}
-                 whileTap={{ scale: 0.95 }}                 onClick={() => setCurrentPage('discussion')}                 className="apple-button-primary w-full sm:w-auto min-w-[200px]"
+                 whileTap={{ scale: 0.95 }}
+                 onClick={() => setCurrentPage('auth-signup')}
+                 className="apple-button-primary w-full sm:w-auto min-w-[200px]"
                >
                  Get Started
                </motion.button>
