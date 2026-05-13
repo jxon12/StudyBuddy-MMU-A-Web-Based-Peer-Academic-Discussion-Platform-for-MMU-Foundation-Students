@@ -2,15 +2,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BookOpen, 
   MessageCircle, 
-  Plus, 
-  Bell,
+  Search,
   CheckCircle2,
   MoreHorizontal,
   ArrowLeft,
   Triangle,
   Star,
   Share2,
-  Search
+  Plus,
+  Bell,
+  User
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
@@ -382,61 +383,67 @@ const MOCK_POSTS: Post[] = [
 
 // --- Components ---
 
-const Navbar = ({ onPostClick, onSubjectsClick, currentView }: { 
-  onPostClick?: () => void; 
-  onSubjectsClick?: () => void;
-  currentView: 'feed' | 'subjects';
-}) => {
-  // Hide navbar when viewing subjects
-  if (currentView === 'subjects') {
-    return null;
-  }
-
+const TopNavigationBar = ({ onSubjectsClick }: { onSubjectsClick: () => void }) => {
   return (
-    <>
-      {/* Vertical Sidebar (Left) */}
-      <div className="fixed top-0 left-0 bottom-0 w-24 z-50 bg-transparent flex flex-col items-center pt-48 gap-10">
-        
-        {/* Nav Items */}
-        <div className="flex flex-col gap-4">
-          <button 
-            onClick={onSubjectsClick}
-            className={`p-3 rounded-2xl border transition-all group relative ${
-              currentView === 'subjects' 
-                ? 'bg-zinc-100 text-zinc-950 border-transparent shadow-[0_0_20px_rgba(255,255,255,0.1)]' 
-                : 'bg-transparent border-transparent text-zinc-500 hover:bg-white/[0.05]'
-            }`}
-          >
-            <BookOpen className="w-6 h-6" />
-            <div className="absolute left-[calc(100%+12px)] px-2.5 py-1.5 bg-zinc-100 text-zinc-950 text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-              Subjects
-            </div>
-          </button>
-
-          <button 
-             onClick={onPostClick}
-             className="bg-white text-zinc-950 p-3 rounded-2xl shadow-xl hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:-translate-y-0.5 transition-all active:scale-95 group relative"
-          >
-            <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform" />
-            <div className="absolute left-[calc(100%+12px)] px-2.5 py-1.5 bg-zinc-100 text-zinc-950 text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-              Post
-            </div>
-          </button>
-
-          <button className="p-3 rounded-2xl border border-transparent text-zinc-500 hover:bg-white/[0.05] transition-all group relative">
-            <Bell className="w-6 h-6" />
-            <div className="absolute top-3 right-3 w-2 h-2 bg-blue-500 rounded-full border-2 border-zinc-950" />
-            <div className="absolute left-[calc(100%+12px)] px-2.5 py-1.5 bg-zinc-100 text-zinc-950 text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-              Notifications
-            </div>
-          </button>
+    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl border-b border-white/10">
+      <div className="flex items-center justify-between px-8 py-4 h-20">
+        {/* Left: Logo */}
+        <div className="text-xl font-bold text-white tracking-tight">
+          StudyBuddy
         </div>
 
+        {/* Center: Search Bar */}
+        <div className="flex-1 mx-12 max-w-xl">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search questions or chapters..."
+              className="w-full h-11 pl-12 pr-4 bg-white/5 backdrop-blur-xl border border-white/20 rounded-full text-sm text-white placeholder:text-zinc-500 outline-none focus:border-white/40 focus:bg-white/10 transition-all"
+            />
+          </div>
+        </div>
+
+        {/* Right: Icons */}
+        <div className="flex items-center gap-4">
+          {/* Subjects Icon */}
+          <button 
+            onClick={onSubjectsClick}
+            className="p-2.5 rounded-full hover:bg-white/10 transition-colors text-zinc-400 hover:text-white group"
+            title="Subjects"
+          >
+            <BookOpen className="w-5 h-5" />
+          </button>
+
+          {/* Plus Icon */}
+          <button 
+            className="p-2.5 rounded-full hover:bg-white/10 transition-colors text-zinc-400 hover:text-white group"
+            title="Create post"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+
+          {/* Bell Icon */}
+          <button 
+            className="p-2.5 rounded-full hover:bg-white/10 transition-colors text-zinc-400 hover:text-white group relative"
+            title="Notifications"
+          >
+            <Bell className="w-5 h-5" />
+            <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+          </button>
+
+          {/* Profile Icon */}
+          <button 
+            className="p-2.5 rounded-full hover:bg-white/10 transition-colors text-zinc-400 hover:text-white group"
+            title="Profile"
+          >
+            <User className="w-5 h-5" />
+          </button>
+        </div>
       </div>
-    </>
+    </nav>
   );
 };
-
 
 const getSubjectTagStyles = (subjectName: string) => {
   const name = subjectName.toLowerCase();
@@ -511,7 +518,7 @@ const PostCard = ({ post }: PostCardProps) => {
       initial={{ opacity: 0, scale: 0.98 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
-      className="bg-white/[0.03] backdrop-blur-2xl p-7 rounded-[32px] border border-white/[0.08] mb-6 hover:shadow-2xl hover:border-white/[0.15] transition-all cursor-default group relative"
+      className="bg-white/[0.08] backdrop-blur-3xl p-7 rounded-[32px] border border-white/[0.15] mb-6 hover:shadow-2xl hover:border-white/[0.25] transition-all cursor-default group relative"
     >
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-center gap-4">
@@ -519,7 +526,6 @@ const PostCard = ({ post }: PostCardProps) => {
           <div>
             <div className="flex items-center gap-1.5">
               <h4 className="text-[15px] font-bold text-white tracking-tight">{post.author}</h4>
-              {post.isVerified && <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 fill-blue-400/10" />}
             </div>
             <p className="text-[12px] text-zinc-500 font-bold uppercase tracking-wider">{post.timestamp}</p>
           </div>
@@ -776,16 +782,20 @@ export default function App() {
   const activeSubjectData = activeSubject ? SUBJECTS.find(s => s.id === activeSubject) : null;
 
   return (
-    <div className="min-h-screen font-sans selection:bg-blue-500/30 overflow-x-hidden bg-zinc-950 text-zinc-100">
-      
-      <Navbar 
-        currentView={view}
-        onPostClick={() => setView('feed')}
-        onSubjectsClick={() => setView('subjects')} 
-      />
+    <div 
+      className="min-h-screen font-sans selection:bg-blue-500/30 overflow-x-hidden text-zinc-100"
+      style={{
+        backgroundImage: 'url(/images/nature.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      <TopNavigationBar onSubjectsClick={() => setView('subjects')} />
 
       {/* Background Mesh - Cinematic Luminous Glows */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-black/40" />
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/20 blur-[120px]" />
         <div className="absolute bottom-[20%] right-[-5%] w-[35%] h-[35%] rounded-full bg-purple-600/15 blur-[100px]" />
         <div className="absolute top-[40%] left-[60%] w-[30%] h-[30%] rounded-full bg-indigo-600/10 blur-[80px]" />
@@ -799,7 +809,7 @@ export default function App() {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 60, scale: 0.95 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="pt-32 pb-48 pl-32 pr-8 max-w-5xl mx-auto relative z-10"
+            className="pt-24 pb-48 px-8 max-w-5xl mx-auto relative z-10"
           >
             {/* Feed Heading - Simplified */}
             {activeSubjectData && (

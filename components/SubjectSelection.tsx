@@ -99,7 +99,7 @@ export const SubjectSelection: React.FC<SubjectSelectionProps> = ({ onComplete, 
         <div className="w-2/3 h-full bg-white/5 backdrop-blur-3xl p-12 flex flex-col relative z-20">
           <div className="mb-10 space-y-1">
             <h2 className="text-[24px] font-bold tracking-tight">Choose your subjects</h2>
-            <p className="text-[13px] opacity-40 font-medium">Foundation in IT</p>
+            <p className="text-[13px] opacity-40 font-medium">Foundation in computing</p>
           </div>
 
           <div className="flex-grow overflow-y-auto pr-4 custom-scrollbar">
