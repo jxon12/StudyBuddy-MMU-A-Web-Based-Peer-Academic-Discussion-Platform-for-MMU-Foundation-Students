@@ -7,6 +7,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'apple': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Helvetica Neue', 'sans-serif'],
+      },
       colors: {
         'apple-blue': '#0A84FF',
         'apple-coral': '#FF453A',

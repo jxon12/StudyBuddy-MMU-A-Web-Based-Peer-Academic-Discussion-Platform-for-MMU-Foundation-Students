@@ -187,7 +187,7 @@ export default function App() {
               onNavigate={(page) => setCurrentPage(page === 'login' ? 'auth-login' : 'auth-signup')}
               onLogin={() => {
                 setPreviousAuthType('login');
-                setCurrentPage('subject-selection');
+                setCurrentPage('discussion');
               }}
               onComplete={() => {
                 setPreviousAuthType('signup');

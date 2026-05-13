@@ -211,19 +211,22 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type, onNavigate, onLogin, o
               </div>
 
               <div className="space-y-1 group/input">
-                <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] px-1 group-focus-within/input:text-apple-blue transition-colors">Student Email</label>
+                <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] px-1 group-focus-within/input:text-apple-blue transition-colors">
+                  {type === 'login' ? 'Email' : 'Student Email'}
+                </label>
                 <input 
                   type="email"
-                  name="studentEmail"
-                  value={formData.studentEmail}
+                  name={type === 'login' ? 'email' : 'studentEmail'}
+                  value={type === 'login' ? formData.email : formData.studentEmail}
                   onChange={handleInputChange}
-                  placeholder="student@mmu.edu.my"
+                  placeholder={type === 'login' ? 'Enter your email' : 'student@mmu.edu.my'}
                   required
                   className={`w-full h-10 bg-transparent border-b text-white text-[15px] outline-none transition-all px-1 placeholder:opacity-10 ${
-                    errors.studentEmail ? 'border-red-500 focus:border-red-400' : 'border-white/10 focus:border-apple-blue'
+                    (type === 'login' ? errors.email : errors.studentEmail) ? 'border-red-500 focus:border-red-400' : 'border-white/10 focus:border-apple-blue'
                   }`}
                 />
-                {errors.studentEmail && <p className="text-[10px] text-red-400 mt-1">{errors.studentEmail}</p>}
+                {type === 'login' && errors.email && <p className="text-[10px] text-red-400 mt-1">{errors.email}</p>}
+                {type === 'signup' && errors.studentEmail && <p className="text-[10px] text-red-400 mt-1">{errors.studentEmail}</p>}
               </div>
 
               <div className="space-y-1 group/input">

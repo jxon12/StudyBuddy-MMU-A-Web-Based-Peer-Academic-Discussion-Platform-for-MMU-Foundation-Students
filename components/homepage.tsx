@@ -9,7 +9,8 @@ import {
   ArrowLeft,
   Triangle,
   Star,
-  Share2
+  Share2,
+  Search
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
@@ -37,7 +38,7 @@ interface Post {
 const SUBJECTS = [
   { id: 'english', name: 'LAE1113 Academic English', color: 'bg-[#AF52DE]', cover: 'https://i.pinimg.com/736x/91/d4/91/91d491485a1126a79219f01c444d53db.jpg', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
   { id: 'math', name: 'CMT 1134 Mathematics III', color: 'bg-[#5856D6]', cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
-  { id: 'digital', name: 'CDS1114\nIntro to Digital System', color: 'bg-[#7D7AFF]', cover: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
+  { id: 'digital', name: 'CDS1114 Intro to Digital System', color: 'bg-[#7D7AFF]', cover: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
   { id: 'physics', name: 'CPP1113 Principles of Physics', color: 'bg-[#BF5AF2]', cover: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
   { id: 'critical', name: 'LCT1113 Critical Thinking', color: 'bg-[#3634A3]', cover: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600', chapters: ['Logic', 'Arguments', 'Fallacies'] },
   { id: 'mini-it', name: 'CSP1123 Mini IT Project', color: 'bg-[#DA8FFF]', cover: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600', chapters: ['Project Planning', 'Development', 'Documentation'] },
@@ -48,7 +49,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'mi1',
     author: 'Brendan Tan',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Brendan',
+    avatar: 'https://i.pinimg.com/736x/44/26/04/44260448c1d15234d8341b0a4f869a6b.jpg',
     subject: 'CSP1123 Mini IT Project',
     chapter: 'Development',
     content: 'Successfully integrated our database with the frontend! Hardest part of the project so far. Anyone else using Firebase?',
@@ -58,8 +59,8 @@ const MOCK_POSTS: Post[] = [
   },
   {
     id: 'e1',
-    author: 'Nurul Huda',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nurul',
+    author: 'Ling Yi Qi',
+    avatar: 'https://i.pinimg.com/1200x/89/ee/ec/89eeec45982a6e3757d27082d68d03b8.jpg',
     subject: 'LAE1113 Academic English',
     chapter: 'Academic Reading',
     content: 'Struggling with scanning techniques for academic journals. Does anyone have tips for quickly identifying thesis statements in dense articles?',
@@ -70,7 +71,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'm1',
     author: 'Lim Wei Ming',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lim',
+    avatar: 'https://i.pinimg.com/736x/db/61/57/db6157a5818e0252f41a810d0a11e194.jpg',
     subject: 'CMT 1134 Mathematics III',
     chapter: 'Calculus',
     content: 'Solving the triple integrals in spherical coordinates. The Jacobian factor is always tricky—don\'t forget it!',
@@ -81,7 +82,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'd1',
     author: 'Ahmad Faiz',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmad',
+    avatar: 'https://i.pinimg.com/736x/40/3b/0f/403b0f6ffd13dc2c84c4e5b5ecb5c8d2.jpg',
     subject: 'CDS1114 Intro to Digital System',
     chapter: 'Gates',
     content: 'Can someone explain the universal property of NAND gates? Trying to implement a XOR using only NAND gates for the lab.',
@@ -92,7 +93,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'p1',
     author: 'Michael Chen',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael',
+    avatar: 'https://i.pinimg.com/736x/58/37/b8/5837b8491705a0c1fc454fb5a56110e0.jpg',
     subject: 'CPP1113 Principles of Physics',
     chapter: 'Mechanics',
     content: 'Need help understanding Newton\'s Third Law in circular motion. How does centripetal force factor in?',
@@ -103,7 +104,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'c1',
     author: 'Priya Sharma',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya',
+    avatar: 'https://i.pinimg.com/736x/ce/37/10/ce37104adb3634256957b3ab7273fc72.jpg',
     subject: 'LCT1113 Critical Thinking',
     chapter: 'Fallacies',
     content: 'Spotted a "Straw Man" argument in a recent news article. It\'s cool being able to identify these in the real world!',
@@ -115,7 +116,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'e2',
     author: 'Daniel Tan',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Daniel',
+    avatar: 'https://i.pinimg.com/736x/e7/ec/2c/e7ec2c8eb907e5d1569103503d5bd5ec.jpg',
     subject: 'LAE1113 Academic English',
     chapter: 'Writing Skills',
     content: 'Just finished my draft for the persuasive essay. Would anyone like to peer-review each other\'s work before submission tomorrow?',
@@ -126,7 +127,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'm2',
     author: 'Arun Kumar',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arun',
+    avatar: 'https://i.pinimg.com/1200x/d1/11/ba/d111ba73542116f35f268de3cb136c07.jpg',
     subject: 'CMT 1134 Mathematics III',
     chapter: 'Statistics',
     content: 'Does anyone have a cheat sheet for probability distributions? Getting confused between Poisson and Binomial for the upcoming quiz.',
@@ -137,7 +138,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'd2',
     author: 'Chloe Ng',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Chloe',
+    avatar: 'https://i.pinimg.com/736x/2f/5c/cd/2f5ccdbd8cd5f72e36ca86dbbe50908e.jpg',
     subject: 'CDS1114 Intro to Digital System',
     chapter: 'Binary Logic',
     content: 'Binary subtraction using 2\'s complement is giving me a headache. Why do we ignore the final carry again?',
@@ -148,7 +149,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'p2',
     author: 'Sarah Jenkins',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+    avatar: 'https://i.pinimg.com/736x/9c/cb/45/9ccb45fdfcbf860cb6a8371db6be4a13.jpg',
     subject: 'CPP1113 Principles of Physics',
     chapter: 'Thermodynamics',
     content: 'Entropy concept is so abstract. How do we relate it to disorder in everyday life examples for our reflection paper?',
@@ -159,7 +160,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'c2',
     author: 'Kevin Wong',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kevin',
+    avatar: 'https://i.pinimg.com/736x/d3/26/4e/d3264e87e065c4260b3478e37d5e18e3.jpg',
     subject: 'LCT1113 Critical Thinking',
     chapter: 'Arguments',
     content: 'What is the main difference between inductive and deductive reasoning again? My lecture notes seem to overlap them.',
@@ -170,7 +171,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'mi2',
     author: 'Zulkipli Ali',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Zul',
+    avatar: 'https://i.pinimg.com/736x/90/35/b8/9035b8c8df24d4f533abef7bb10ed0f0.jpg',
     subject: 'CSP1123 Mini IT Project',
     chapter: 'Documentation',
     content: 'The Gantt chart for our project plan is ready. Highly suggest using Trello or Notion for team coordination!',
@@ -181,7 +182,7 @@ const MOCK_POSTS: Post[] = [
   {
     id: 'e3',
     author: 'Siti Aminah',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Siti',
+    avatar: 'https://i.pinimg.com/1200x/11/e9/cf/11e9cfa768202b002b2f646f2838b3bb.jpg',
     subject: 'LAE1113 Academic English',
     chapter: 'Presentation',
     content: 'Tips for reducing anxiety during the oral presentation? This is my first time presenting in a large hall at MMU!',
@@ -564,7 +565,7 @@ const PostCard = ({ post }: PostCardProps) => {
 
       <div className="mb-6">
         <div className="flex gap-2 mb-5">
-          <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full ${subjectTagStyles}`}>
+          <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full font-apple ${subjectTagStyles}`}>
             {post.subject.match(/^[A-Z]{2,4}\s?\d{4}/)?.[0] || post.subject}
           </span>
           <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 bg-white/[0.05] px-3 py-1.5 rounded-full border border-white/[0.02]">
@@ -611,6 +612,12 @@ interface SubjectsPageProps {
 const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Filter subjects based on search query
+  const filteredSubjects = SUBJECTS.filter(subject =>
+    subject.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Smooth horizontal scroll with mouse wheel
   useEffect(() => {
@@ -636,6 +643,20 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[60] flex flex-col items-center justify-center overflow-hidden bg-zinc-950"
     >
+      {/* Video Background */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 z-0 w-full h-full object-cover opacity-75"
+      >
+        <source src="/videos/subject_video.mp4" type="video/mp4" />
+      </video>
+      
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 z-0 bg-black/30" />
+
       <button 
         onClick={onBack}
         className="absolute top-8 left-32 p-4 rounded-full shadow-2xl hover:shadow-white/5 transition-all active:scale-90 z-50 group backdrop-blur-2xl border bg-white/5 border-white/10"
@@ -643,12 +664,25 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
         <ArrowLeft className="w-6 h-6 transition-colors text-zinc-500 group-hover:text-white" />
       </button>
 
-      <div className="text-center mb-16 relative">
+      <div className="absolute top-8 right-12 w-80 z-40">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search subjects or ID..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-11 pl-12 pr-4 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-full text-sm text-white placeholder:text-zinc-500 outline-none focus:border-white/40 focus:bg-white/10 transition-all"
+          />
+        </div>
+      </div>
+
+      <div className="text-center mb-16 relative z-10">
         <motion.p 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="text-xl font-medium text-zinc-500"
+          className="text-2xl font-bold text-white drop-shadow-lg"
         >
           Explore More About MMU Subjects
         </motion.p>
@@ -656,10 +690,10 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
 
       <div 
         ref={scrollRef}
-        className="w-full h-[600px] flex items-center gap-12 overflow-x-auto no-scrollbar px-[10vw] cursor-grab active:cursor-grabbing pb-20"
+        className="w-full h-[600px] flex items-center gap-12 overflow-x-auto no-scrollbar px-[10vw] cursor-grab active:cursor-grabbing pb-20 relative z-10"
         style={{ scrollSnapType: 'x proximity' }}
       >
-        {SUBJECTS.map((subject, index) => {
+        {filteredSubjects.map((subject, index) => {
           // Calculate rotation and position for fanned-out look
           const rotation = (index - (SUBJECTS.length - 1) / 2) * 2;
           const isHovered = hoveredId === subject.id;
@@ -697,7 +731,7 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
                 
                 <div className="absolute inset-0 p-8 flex flex-col justify-end text-white text-left">
                   <div>
-                    <h3 className="text-2xl font-bold leading-tight tracking-tight whitespace-pre-line">
+                    <h3 className="text-2xl font-bold leading-tight tracking-tight whitespace-pre-line font-apple">
                       {subject.name}
                     </h3>
                   </div>
@@ -717,7 +751,7 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
                     exit={{ opacity: 0, y: 10 }}
                     className="absolute -bottom-16 left-0 right-0 text-center pointer-events-none"
                   >
-                    <span className="text-[14px] font-black uppercase tracking-[0.3em] text-white">
+                    <span className="text-[14px] font-black uppercase tracking-[0.3em] text-white font-apple">
                       {subject.name.replace('\n', ' ')}
                     </span>
                   </motion.div>
@@ -842,7 +876,7 @@ export default function App() {
       `}</style>
 
       {/* Ambient Background Elements - Secondary Glows */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[500px] -z-10 bg-[radial-gradient(circle_at_50%_0%,rgba(0,102,204,0.08)_0%,transparent_70%)]" />
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[500px] -z-10 bg-[radial-gradient(circle_at_30%_0%,rgba(0,102,204,0.08)_0%,transparent_70%)]" />
 
     </div>
   );
