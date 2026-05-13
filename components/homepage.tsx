@@ -38,10 +38,10 @@ interface Post {
 const SUBJECTS = [
   { id: 'english', name: 'LAE1113 Academic English', color: 'bg-[#AF52DE]', cover: 'https://i.pinimg.com/736x/91/d4/91/91d491485a1126a79219f01c444d53db.jpg', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
   { id: 'math', name: 'CMT 1134 Mathematics III', color: 'bg-[#5856D6]', cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
-  { id: 'digital', name: 'CDS1114\nIntro to Digital System', color: 'bg-[#7D7AFF]', cover: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
-  { id: 'physics', name: 'CPP1113 Principles of Physics', color: 'bg-[#BF5AF2]', cover: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
-  { id: 'critical', name: 'LCT1113 Critical Thinking', color: 'bg-[#3634A3]', cover: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600', chapters: ['Logic', 'Arguments', 'Fallacies'] },
-  { id: 'mini-it', name: 'CSP1123 Mini IT Project', color: 'bg-[#DA8FFF]', cover: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600', chapters: ['Project Planning', 'Development', 'Documentation'] },
+  { id: 'digital', name: 'CDS1114 Intro to Digital System', color: 'bg-[#7D7AFF]', cover: 'https://i.pinimg.com/1200x/1a/ba/fb/1abafb14825c44b36d26df4c296eaa14.jpg', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
+  { id: 'physics', name: 'CPP1113 Principles of Physics', color: 'bg-[#BF5AF2]', cover: 'https://i.pinimg.com/736x/36/9e/41/369e4128b77f1b098dd57abd412bf723.jpg', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
+  { id: 'critical', name: 'LCT1113 Critical Thinking', color: 'bg-[#3634A3]', cover: 'https://i.pinimg.com/736x/88/0b/09/880b09b7b25fdd1bab31bf75ef721382.jpg', chapters: ['Logic', 'Arguments', 'Fallacies'] },
+  { id: 'mini-it', name: 'CSP1123 Mini IT Project', color: 'bg-[#DA8FFF]', cover: 'https://i.pinimg.com/1200x/86/f3/97/86f397cce8974ec841776c26d2604295.jpg', chapters: ['Project Planning', 'Development', 'Documentation'] },
 ];
 
 const MOCK_POSTS: Post[] = [
@@ -669,7 +669,7 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
           <input
             type="text"
-            placeholder="Search subjects or ID..."
+            placeholder="Search subjects or code..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full h-11 pl-12 pr-4 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-full text-sm text-white placeholder:text-zinc-500 outline-none focus:border-white/40 focus:bg-white/10 transition-all"
