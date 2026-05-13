@@ -16,7 +16,9 @@ import {
   Play, 
   Moon,
   Sun,
-  User
+  User,
+  Plus,
+  Bell
 } from 'lucide-react';
 
 const ACCENT_COLORS = [
@@ -51,6 +53,8 @@ export default function App() {
         <div className="absolute top-[40%] left-[60%] w-[30%] h-[30%] rounded-full bg-apple-indigo/10 blur-[80px]" />
       </div>
       
+      {currentPage !== 'discussion' && (
+      <>
       {/* Global Navigation — Liquid Glass Tier 1 */}
       <header className="liquid-nav-global px-4 md:px-8">
         <div className="w-full max-w-5xl flex items-center justify-between">
@@ -121,7 +125,11 @@ export default function App() {
           </div>
         </div>
       </header>
+      </>
+      )}
 
+      {currentPage !== 'discussion' && (
+      <>
       {/* Local Navigation — Liquid Glass Tier 2 */}
       <nav className="liquid-nav-local px-4 md:px-8">
         <div className="w-full max-w-5xl flex items-center justify-between">
@@ -139,6 +147,35 @@ export default function App() {
           </div>
         </div>
       </nav>
+      </>
+      )}
+
+      {currentPage === 'discussion' && (
+      <nav className="liquid-nav-local px-4 md:px-8">
+        <div className="w-full max-w-5xl flex items-center justify-between">
+          <div className="text-[20px] md:text-[22px] font-semibold tracking-tight cursor-pointer" onClick={() => setCurrentPage('home')}>
+            StudyBuddy
+          </div>
+          <div className="flex-grow max-w-md mx-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-60" />
+              <input 
+                type="text" 
+                placeholder="Search questions or chapters..."
+                className="w-full h-10 pl-10 pr-4 bg-white/10 border border-white/20 rounded-full text-sm outline-none focus:border-apple-blue focus:bg-white/15 transition-all"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-4 md:gap-6">
+            <Plus className="w-5 h-5 cursor-pointer opacity-60 hover:opacity-100 transition-all" />
+            <Bell className="w-5 h-5 cursor-pointer opacity-60 hover:opacity-100 transition-all" />
+            <div className="w-8 h-8 rounded-full liquid-glass flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-all">
+              <User className="w-4 h-4 opacity-80" />
+            </div>
+          </div>
+        </div>
+      </nav>
+      )}
 
       {/* Main Content — HIG Spatial Structure */}
       <main className="flex-grow w-full relative">
@@ -160,7 +197,7 @@ export default function App() {
           ) : currentPage === 'subject-selection' ? (
             <SubjectSelection 
               key="subject-selection"
-              onComplete={() => setCurrentPage('home')}
+              onComplete={() => setCurrentPage('discussion')}
               onPrevious={() => setCurrentPage(previousAuthType === 'login' ? 'auth-login' : 'auth-signup')}
             />
           ) : currentPage === 'home' ? (
