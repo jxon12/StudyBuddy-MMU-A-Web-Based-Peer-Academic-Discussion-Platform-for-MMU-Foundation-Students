@@ -36,7 +36,7 @@ interface Post {
 // --- Mock Data ---
 
 const SUBJECTS = [
-  { id: 'english', name: 'LAE1113 Academic English', color: 'bg-[#AF52DE]', cover: 'https://i.pinimg.com/736x/91/6d/76/916d761e2e8ce1a515ec2234557c38e4.jpg', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
+  { id: 'english', name: 'LAE1113 Academic English', color: 'bg-[#AF52DE]', cover: 'https://i.pinimg.com/736x/91/d4/91/91d491485a1126a79219f01c444d53db.jpg', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
   { id: 'math', name: 'CMT 1134 Mathematics III', color: 'bg-[#5856D6]', cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
   { id: 'digital', name: 'CDS1114\nIntro to Digital System', color: 'bg-[#7D7AFF]', cover: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
   { id: 'physics', name: 'CPP1113 Principles of Physics', color: 'bg-[#BF5AF2]', cover: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
