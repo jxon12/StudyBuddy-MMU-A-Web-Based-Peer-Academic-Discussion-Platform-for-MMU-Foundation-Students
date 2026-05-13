@@ -9,7 +9,8 @@ import {
   MoreHorizontal,
   ArrowLeft,
   Triangle,
-  Star
+  Star,
+  Share2
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
@@ -36,72 +37,353 @@ interface Post {
 // --- Mock Data ---
 
 const SUBJECTS = [
-  { id: 'math', name: 'Mathematics', color: 'bg-blue-500', cover: 'https://images.unsplash.com/photo-1509228468518-180dd482180c?auto=format&fit=crop&q=80&w=600', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
-  { id: 'prog', name: 'Programming', color: 'bg-zinc-800', cover: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=600', chapters: ['Python Basics', 'Control Structures', 'Data Structures'] },
-  { id: 'phys', name: 'Physics', color: 'bg-purple-500', cover: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
-  { id: 'biz', name: 'Business', color: 'bg-green-500', cover: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600', chapters: ['Economics', 'Management', 'Marketing'] },
-  { id: 'crit', name: 'Critical Thinking', color: 'bg-orange-500', cover: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600', chapters: ['Logic', 'Arguments', 'Fallacies'] },
-  { id: 'eng', name: 'English', color: 'bg-pink-500', cover: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=600', chapters: ['Literature', 'Grammar', 'Composition'] },
-  { id: 'hist', name: 'Multimedia Fundamental', color: 'bg-yellow-600', cover: 'https://images.unsplash.com/photo-1461360228754-6e81c478c882?auto=format&fit=crop&q=80&w=600', chapters: ['Ancient Civilizations', 'Modern Era', 'World Wars'] },
+  { id: 'english', name: 'LAE1113 Academic English', color: 'bg-[#AF52DE]', cover: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=600', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
+  { id: 'math', name: 'CMT 1134 Mathematics III', color: 'bg-[#5856D6]', cover: 'https://images.unsplash.com/photo-1509228468518-180dd482180c?auto=format&fit=crop&q=80&w=600', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
+  { id: 'digital', name: 'CDS1114\nIntro to Digital System', color: 'bg-[#7D7AFF]', cover: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
+  { id: 'physics', name: 'CPP1113 Principles of Physics', color: 'bg-[#BF5AF2]', cover: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
+  { id: 'critical', name: 'LCT1113 Critical Thinking', color: 'bg-[#3634A3]', cover: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600', chapters: ['Logic', 'Arguments', 'Fallacies'] },
+  { id: 'mini-it', name: 'CSP1123 Mini IT Project', color: 'bg-[#DA8FFF]', cover: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600', chapters: ['Project Planning', 'Development', 'Documentation'] },
 ];
 
 const MOCK_POSTS: Post[] = [
+  // Shuffled for a more natural feed feel
   {
-    id: '1',
-    author: 'Ahmad Faiz',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmad',
-    subject: 'Programming',
-    chapter: 'Data Structures',
-    content: 'Does anyone have a clear explanation for the difference between a List and a Tuple in Python for MMU Chapter 5? Visual aids would be great!',
-    likes: 42,
-    replies: 12,
+    id: 'mi1',
+    author: 'Brendan Tan',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Brendan',
+    subject: 'CSP1123 Mini IT Project',
+    chapter: 'Development',
+    content: 'Successfully integrated our database with the frontend! Hardest part of the project so far. Anyone else using Firebase?',
+    likes: 78,
+    replies: 30,
     timestamp: '2h ago',
     isVerified: true
   },
   {
-    id: '2',
+    id: 'e1',
+    author: 'Nurul Huda',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nurul',
+    subject: 'LAE1113 Academic English',
+    chapter: 'Academic Reading',
+    content: 'Struggling with scanning techniques for academic journals. Does anyone have tips for quickly identifying thesis statements in dense articles?',
+    likes: 12,
+    replies: 5,
+    timestamp: '1h ago',
+    isVerified: true
+  },
+  {
+    id: 'm1',
     author: 'Lim Wei Ming',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lim',
-    subject: 'Mathematics',
+    subject: 'CMT 1134 Mathematics III',
     chapter: 'Calculus',
-    content: 'Solving the differentiation task for Quiz 3. Remember to apply the chain rule correctly! Check out my derivation below.',
-    likes: 85,
-    replies: 8,
-    timestamp: '5h ago'
+    content: 'Solving the triple integrals in spherical coordinates. The Jacobian factor is always tricky—don\'t forget it!',
+    likes: 45,
+    replies: 7,
+    timestamp: '2h ago',
+    isVerified: true
   },
   {
-    id: '3',
-    author: 'Sarah Jenkins',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
-    subject: 'Business',
-    chapter: 'Economics',
-    content: 'Confused about the Law of Diminishing Returns. My lecture notes are a bit vague. Anyone willing to jump on a study call?',
-    likes: 15,
-    replies: 24,
-    timestamp: '1d ago'
+    id: 'd1',
+    author: 'Ahmad Faiz',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmad',
+    subject: 'CDS1114 Intro to Digital System',
+    chapter: 'Gates',
+    content: 'Can someone explain the universal property of NAND gates? Trying to implement a XOR using only NAND gates for the lab.',
+    likes: 28,
+    replies: 12,
+    timestamp: '3h ago',
+    isVerified: true
   },
   {
-    id: '4',
+    id: 'p1',
     author: 'Michael Chen',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael',
-    subject: 'Physics',
+    subject: 'CPP1113 Principles of Physics',
     chapter: 'Mechanics',
-    content: 'Need help understanding Newton\'s Third Law. Can someone explain how action-reaction pairs work in real-world scenarios?',
-    likes: 28,
-    replies: 15,
+    content: 'Need help understanding Newton\'s Third Law in circular motion. How does centripetal force factor in?',
+    likes: 38,
+    replies: 9,
     timestamp: '4h ago',
     isVerified: true
   },
   {
-    id: '5',
+    id: 'c1',
     author: 'Priya Sharma',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya',
-    subject: 'Critical',
+    subject: 'LCT1113 Critical Thinking',
+    chapter: 'Fallacies',
+    content: 'Spotted a "Straw Man" argument in a recent news article. It\'s cool being able to identify these in the real world!',
+    likes: 64,
+    replies: 8,
+    timestamp: '10h ago',
+    isVerified: true
+  },
+  {
+    id: 'e2',
+    author: 'Daniel Tan',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Daniel',
+    subject: 'LAE1113 Academic English',
+    chapter: 'Writing Skills',
+    content: 'Just finished my draft for the persuasive essay. Would anyone like to peer-review each other\'s work before submission tomorrow?',
+    likes: 8,
+    replies: 14,
+    timestamp: '4h ago'
+  },
+  {
+    id: 'm2',
+    author: 'Arun Kumar',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arun',
+    subject: 'CMT 1134 Mathematics III',
+    chapter: 'Statistics',
+    content: 'Does anyone have a cheat sheet for probability distributions? Getting confused between Poisson and Binomial for the upcoming quiz.',
+    likes: 32,
+    replies: 18,
+    timestamp: '5h ago'
+  },
+  {
+    id: 'd2',
+    author: 'Chloe Ng',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Chloe',
+    subject: 'CDS1114 Intro to Digital System',
+    chapter: 'Binary Logic',
+    content: 'Binary subtraction using 2\'s complement is giving me a headache. Why do we ignore the final carry again?',
+    likes: 19,
+    replies: 22,
+    timestamp: '7h ago'
+  },
+  {
+    id: 'p2',
+    author: 'Sarah Jenkins',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+    subject: 'CPP1113 Principles of Physics',
+    chapter: 'Thermodynamics',
+    content: 'Entropy concept is so abstract. How do we relate it to disorder in everyday life examples for our reflection paper?',
+    likes: 22,
+    replies: 15,
+    timestamp: '9h ago'
+  },
+  {
+    id: 'c2',
+    author: 'Kevin Wong',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kevin',
+    subject: 'LCT1113 Critical Thinking',
+    chapter: 'Arguments',
+    content: 'What is the main difference between inductive and deductive reasoning again? My lecture notes seem to overlap them.',
+    likes: 31,
+    replies: 13,
+    timestamp: '12h ago'
+  },
+  {
+    id: 'mi2',
+    author: 'Zulkipli Ali',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Zul',
+    subject: 'CSP1123 Mini IT Project',
+    chapter: 'Documentation',
+    content: 'The Gantt chart for our project plan is ready. Highly suggest using Trello or Notion for team coordination!',
+    likes: 29,
+    replies: 11,
+    timestamp: '6h ago'
+  },
+  {
+    id: 'e3',
+    author: 'Siti Aminah',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Siti',
+    subject: 'LAE1113 Academic English',
+    chapter: 'Presentation',
+    content: 'Tips for reducing anxiety during the oral presentation? This is my first time presenting in a large hall at MMU!',
+    likes: 25,
+    replies: 10,
+    timestamp: '6h ago'
+  },
+  {
+    id: 'm3',
+    author: 'Jason Low',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jason',
+    subject: 'CMT 1134 Mathematics III',
+    chapter: 'Linear Algebra',
+    content: 'Finally understood Eigenvalues! It clicked when I visualized them as scaling factors. Happy to help if someone is struggling.',
+    likes: 56,
+    replies: 4,
+    timestamp: '8h ago'
+  },
+  {
+    id: 'd3',
+    author: 'Ravi Teja',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ravi',
+    subject: 'CDS1114 Intro to Digital System',
+    chapter: 'Circuit Design',
+    content: 'Look at my Karnaugh map simplification for Exercise 4. Did I miss any groupings? The 4x4 grid is huge!',
+    likes: 14,
+    replies: 6,
+    timestamp: '1d ago'
+  },
+  {
+    id: 'p3',
+    author: 'Tan Mei Ling',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mei',
+    subject: 'CPP1113 Principles of Physics',
+    chapter: 'Electricity',
+    content: 'Confusion with Kirchhoff\'s Voltage Law when multiple power sources are present. Anyone can check my loop equations?',
+    likes: 17,
+    replies: 21,
+    timestamp: '2d ago'
+  },
+  {
+    id: 'c3',
+    author: 'Aisha Razak',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Aisha',
+    subject: 'LCT1113 Critical Thinking',
     chapter: 'Logic',
-    content: 'Just completed the critical thinking module assignment. Happy to share my approach if anyone wants to compare notes!',
-    likes: 52,
+    content: 'Does anyone want to practice syllogisms? I found a website with cool practice sets for our upcoming test.',
+    likes: 42,
+    replies: 5,
+    timestamp: '1d ago'
+  },
+  {
+    id: 'mi3',
+    author: 'Emily Watson',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emily',
+    subject: 'CSP1123 Mini IT Project',
+    chapter: 'Project Planning',
+    content: 'Struggling to define our project scope. We keep adding features! How are you guys managing "Feature Creep"?',
+    likes: 45,
+    replies: 25,
+    timestamp: '1d ago'
+  },
+  // Adding 2 more for each subject to reach 5
+  {
+    id: 'e4',
+    author: 'James Tan',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=James',
+    subject: 'LAE1113 Academic English',
+    chapter: 'Writing Skills',
+    content: 'Tips for APA referencing? I always get the indentation and italics wrong for the bibliography section.',
+    likes: 15,
+    replies: 8,
+    timestamp: '2d ago'
+  },
+  {
+    id: 'e5',
+    author: 'Liza Wong',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Liza',
+    subject: 'LAE1113 Academic English',
+    chapter: 'Presentation',
+    content: 'Anyone want to practice our final presentation together? I have a small classroom booked for tomorrow afternoon.',
+    likes: 33,
+    replies: 12,
+    timestamp: '3d ago'
+  },
+  {
+    id: 'm4',
+    author: 'Rajesh G.',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rajesh',
+    subject: 'CMT 1134 Mathematics III',
+    chapter: 'Statistics',
+    content: 'Normal distribution table vs calculator—which one is faster for the exam? I find the table more reliable but slow.',
+    likes: 21,
+    replies: 15,
+    timestamp: '15h ago'
+  },
+  {
+    id: 'm5',
+    author: 'Su Lin',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sulin',
+    subject: 'CMT 1134 Mathematics III',
+    chapter: 'Linear Algebra',
+    content: 'Vector space axioms are confusing. How many do we actually need to prove in a standard test environment?',
+    likes: 19,
+    replies: 6,
+    timestamp: '1d ago'
+  },
+  {
+    id: 'd4',
+    author: 'Taufiq H.',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Taufiq',
+    subject: 'CDS1114 Intro to Digital System',
+    chapter: 'Circuit Design',
+    content: 'Difference between Mealy and Moore machines? My state diagram keeps looking like a tangled mess. Help!',
+    likes: 37,
+    replies: 11,
+    timestamp: '5h ago'
+  },
+  {
+    id: 'd5',
+    author: 'Ying Yue',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ying',
+    subject: 'CDS1114 Intro to Digital System',
+    chapter: 'Binary Logic',
+    content: 'Floating point representation (IEEE 754) is coming out for the quiz. Make sure you know the exponent bias!',
+    likes: 24,
     replies: 9,
-    timestamp: '3h ago'
+    timestamp: '2d ago'
+  },
+  {
+    id: 'p4',
+    author: 'Vikram S.',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Vikram',
+    subject: 'CPP1113 Principles of Physics',
+    chapter: 'Mechanics',
+    content: 'Projectile motion at an angle. Is the vertical velocity always zero at the peak height? My calculations say yes.',
+    likes: 29,
+    replies: 4,
+    timestamp: '10h ago'
+  },
+  {
+    id: 'p5',
+    author: 'Hana Z.',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Hana',
+    subject: 'CPP1113 Principles of Physics',
+    chapter: 'Thermodynamics',
+    content: 'Heat engines and efficiency. Why is 100% efficiency impossible? Carnot cycle explained simply please.',
+    likes: 41,
+    replies: 18,
+    timestamp: '1d ago'
+  },
+  {
+    id: 'c4',
+    author: 'Ivan K.',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ivan',
+    subject: 'LCT1113 Critical Thinking',
+    chapter: 'Logic',
+    content: 'Truth tables with 3 variables (p, q, r). 8 rows is a lot of manual work. Any shortcuts for the final exam?',
+    likes: 18,
+    replies: 22,
+    timestamp: '14h ago'
+  },
+  {
+    id: 'c5',
+    author: 'Bella M.',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bella',
+    subject: 'LCT1113 Critical Thinking',
+    chapter: 'Arguments',
+    content: 'Recognizing implicit premises. This is the hardest part of argument mapping for me. Any good examples?',
+    likes: 26,
+    replies: 5,
+    timestamp: '2d ago'
+  },
+  {
+    id: 'mi4',
+    author: 'Chris L.',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Chris',
+    subject: 'CSP1123 Mini IT Project',
+    chapter: 'Documentation',
+    content: 'How detailed should the User Manual be? Do we need screenshots for every single button or just main flows?',
+    likes: 31,
+    replies: 9,
+    timestamp: '1d ago'
+  },
+  {
+    id: 'mi5',
+    author: 'Maya N.',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Maya',
+    subject: 'CSP1123 Mini IT Project',
+    chapter: 'Development',
+    content: 'GitHub merge conflicts are the worst during final submission week. Team, please pull before you push!',
+    likes: 85,
+    replies: 14,
+    timestamp: '2d ago',
+    isVerified: true
   },
 ];
 
@@ -121,53 +403,86 @@ const Navbar = ({ onPostClick, onSubjectsClick, currentView }: {
 
   return (
     <>
-      {/* Search Bar - Moved Down */}
-      <div className="relative left-0 right-0 z-50 flex items-center justify-center px-4 pointer-events-none pt-24 pb-8">
-        <div className={`pointer-events-auto glass border border-black/[0.03] rounded-full px-4 py-2.5 shadow-sm flex items-center gap-3 transition-all duration-500 ease-in-out ${isSearchFocused ? 'w-[600px]' : 'w-[500px]'}`}>
-          <Search className={`w-4 h-4 transition-colors ${isSearchFocused ? 'text-zinc-900' : 'text-zinc-400'}`} />
+      {/* 1. Global Search Bar (Top Center) */}
+      <div className="fixed top-4 left-0 right-0 z-50 flex justify-center py-12 px-4 pointer-events-none">
+        <div className={`pointer-events-auto backdrop-blur-2xl border border-white/[0.05] rounded-full px-4 py-2.5 shadow-2xl flex items-center gap-3 transition-all duration-500 ease-in-out ${isSearchFocused ? 'w-[600px] bg-white/[0.08]' : 'w-[400px] bg-white/[0.03]'}`}>
+          <Search className={`w-4 h-4 transition-colors ${isSearchFocused ? 'text-white' : 'text-zinc-500'}`} />
           <input 
             type="text" 
-            placeholder="Search..." 
+            placeholder="Search questions or chapters..." 
             onFocus={() => setIsSearchFocused(true)}
             onBlur={() => setIsSearchFocused(false)}
-            className="bg-transparent border-none text-[13px] font-semibold focus:outline-none w-full placeholder:text-zinc-300"
+            className="bg-transparent border-none text-[13px] font-semibold focus:outline-none w-full placeholder:text-zinc-600 text-white"
           />
         </div>
       </div>
+      {/* 2. Vertical Sidebar (Left) */}
+      <div className="fixed top-0 left-0 bottom-0 w-24 z-50 bg-transparent flex flex-col items-center pt-48 gap-10">
+        
+        {/* Nav Items */}
+        <div className="flex flex-col gap-4">
+          <button 
+            onClick={onSubjectsClick}
+            className={`p-3 rounded-2xl border transition-all group relative ${
+              currentView === 'subjects' 
+                ? 'bg-zinc-100 text-zinc-950 border-transparent shadow-[0_0_20px_rgba(255,255,255,0.1)]' 
+                : 'bg-transparent border-transparent text-zinc-500 hover:bg-white/[0.05]'
+            }`}
+          >
+            <BookOpen className="w-6 h-6" />
+            <div className="absolute left-[calc(100%+12px)] px-2.5 py-1.5 bg-zinc-100 text-zinc-950 text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              Subjects
+            </div>
+          </button>
 
-      {/* Left Sidebar Navigation - Vertical Column Grid */}
-      <div className="fixed left-6 top-20 z-50 flex flex-col gap-3 pointer-events-none w-20">
-        {/* Subjects Button */}
-        <button 
-          id="nav-subjects"
-          onClick={onSubjectsClick}
-          className={`pointer-events-auto glass border border-black/[0.03] rounded-lg px-3 py-3 shadow-sm flex flex-col items-center justify-center gap-1.5 transition-all group h-20 ${
-            currentView === 'subjects' ? 'bg-zinc-900 text-white border-zinc-800' : 'hover:bg-white'
-          }`}
-        >
-          <BookOpen className={`w-5 h-5 ${currentView === 'subjects' ? 'text-white' : 'text-zinc-500 group-hover:text-zinc-900'} transition-colors`} />
-          <span className={`text-[11px] font-bold text-center ${currentView === 'subjects' ? 'text-white' : 'text-zinc-900'}`}>Subjects</span>
-        </button>
+          <button 
+             onClick={onPostClick}
+             className="bg-white text-zinc-950 p-3 rounded-2xl shadow-xl hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:-translate-y-0.5 transition-all active:scale-95 group relative"
+          >
+            <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform" />
+            <div className="absolute left-[calc(100%+12px)] px-2.5 py-1.5 bg-zinc-100 text-zinc-950 text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              Post
+            </div>
+          </button>
 
-        {/* Post Button */}
-        <button 
-          id="nav-post"
-          onClick={onPostClick}
-          className="pointer-events-auto bg-zinc-900 text-white rounded-lg px-3 py-3 shadow-md flex flex-col items-center justify-center gap-1.5 hover:bg-zinc-800 transition-all active:scale-95 group h-20"
-        >
-          <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-          <span className="text-[11px] font-bold text-center">Post</span>
-        </button>
+          <button className="p-3 rounded-2xl border border-transparent text-zinc-500 hover:bg-white/[0.05] transition-all group relative">
+            <Bell className="w-6 h-6" />
+            <div className="absolute top-3 right-3 w-2 h-2 bg-blue-500 rounded-full border-2 border-zinc-950" />
+            <div className="absolute left-[calc(100%+12px)] px-2.5 py-1.5 bg-zinc-100 text-zinc-950 text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              Notifications
+            </div>
+          </button>
+        </div>
 
-        {/* Notifications Button */}
-        <button id="nav-notifications" className="pointer-events-auto glass border border-black/[0.03] rounded-lg px-3 py-3 shadow-sm group relative hover:bg-white transition-all flex flex-col items-center justify-center gap-1.5 h-20">
-          <Bell className="w-5 h-5 text-zinc-500 group-hover:text-zinc-900 transition-colors" />
-          <span className="text-[11px] font-bold text-zinc-900 text-center">Notify</span>
-          <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-blue-500 rounded-full border border-white" />
-        </button>
       </div>
     </>
   );
+};
+
+
+const getSubjectTagStyles = (subjectName: string) => {
+  const name = subjectName.toLowerCase();
+  
+  if (name.includes('lae1113') || name.includes('english')) {
+    return "text-purple-400 bg-purple-400/10 border border-purple-400/20";
+  }
+  if (name.includes('cmt 1134') || name.includes('mathematics')) {
+    return "text-blue-400 bg-blue-400/10 border border-blue-400/20";
+  }
+  if (name.includes('cds1114') || name.includes('digital')) {
+    return "text-indigo-400 bg-indigo-400/10 border border-indigo-400/20";
+  }
+  if (name.includes('cpp1113') || name.includes('physics')) {
+    return "text-violet-400 bg-violet-400/10 border border-violet-400/20";
+  }
+  if (name.includes('lct1113') || name.includes('critical')) {
+    return "text-emerald-400 bg-emerald-400/10 border border-emerald-400/20";
+  }
+  if (name.includes('csp1123') || name.includes('mini it')) {
+    return "text-rose-400 bg-rose-400/10 border border-rose-400/20";
+  }
+  
+  return "text-zinc-500 bg-white/5 border border-white/10";
 };
 
 interface PostCardProps {
@@ -175,59 +490,138 @@ interface PostCardProps {
   key?: string;
 }
 
-const PostCard = ({ post }: PostCardProps) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.98 }}
-    whileInView={{ opacity: 1, scale: 1 }}
-    viewport={{ once: true }}
-    className="bg-white/80 backdrop-blur-md p-7 rounded-[32px] border border-black/[0.05] mb-6 hover:shadow-xl hover:border-black/[0.1] transition-all cursor-default group"
-  >
-    <div className="flex items-start justify-between mb-6">
-      <div className="flex items-center gap-4">
-        <img src={post.avatar} alt={post.author} className="w-12 h-12 rounded-full border border-black/5" referrerPolicy="no-referrer" />
-        <div>
-          <div className="flex items-center gap-1.5">
-            <h4 className="text-[15px] font-bold text-zinc-900 tracking-tight">{post.author}</h4>
-            {post.isVerified && <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 fill-blue-500/10" />}
+const PostCard = ({ post }: PostCardProps) => {
+  const [upvoted, setUpvoted] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [likes, setLikes] = useState(post.likes);
+  const [showMenu, setShowMenu] = useState(false);
+  const [shared, setShared] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleUpvote = () => {
+    if (upvoted) {
+      setLikes(prev => prev - 1);
+    } else {
+      setLikes(prev => prev + 1);
+    }
+    setUpvoted(!upvoted);
+  };
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShared(true);
+    setTimeout(() => {
+      setShared(false);
+      setShowMenu(false);
+    }, 2000);
+  };
+
+  const subjectTagStyles = getSubjectTagStyles(post.subject);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      className="bg-white/[0.03] backdrop-blur-2xl p-7 rounded-[32px] border border-white/[0.08] mb-6 hover:shadow-2xl hover:border-white/[0.15] transition-all cursor-default group relative"
+    >
+      <div className="flex items-start justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <img src={post.avatar} alt={post.author} className="w-12 h-12 rounded-full border border-white/10" referrerPolicy="no-referrer" />
+          <div>
+            <div className="flex items-center gap-1.5">
+              <h4 className="text-[15px] font-bold text-white tracking-tight">{post.author}</h4>
+              {post.isVerified && <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 fill-blue-400/10" />}
+            </div>
+            <p className="text-[12px] text-zinc-500 font-bold uppercase tracking-wider">{post.timestamp}</p>
           </div>
-          <p className="text-[12px] text-zinc-400 font-bold uppercase tracking-wider">{post.timestamp}</p>
+        </div>
+        
+        <div className="relative" ref={menuRef}>
+          <button 
+            onClick={() => setShowMenu(!showMenu)}
+            className={`p-2.5 rounded-full transition-colors ${showMenu ? 'bg-white/10' : 'hover:bg-white/5'}`}
+          >
+            <MoreHorizontal className="w-4 h-4 text-zinc-500" />
+          </button>
+          
+          <AnimatePresence>
+            {showMenu && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                className="absolute right-0 mt-2 w-48 bg-zinc-900/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/[0.08] p-2 z-50 origin-top-right overflow-hidden"
+              >
+                <button 
+                  onClick={handleShare}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 rounded-xl transition-all text-left group/item"
+                >
+                  {shared ? (
+                    <div className="flex items-center gap-2 text-green-400 w-full">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span className="text-[13px] font-bold">Link Copied!</span>
+                    </div>
+                  ) : (
+                    <>
+                      <Share2 className="w-4 h-4 text-zinc-400 group-hover/item:text-white transition-colors" />
+                      <span className="text-[13px] font-bold text-zinc-400 group-hover/item:text-white transition-colors">Share Post</span>
+                    </>
+                  )}
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-      <button className="p-2.5 hover:bg-zinc-50 rounded-full transition-colors">
-        <MoreHorizontal className="w-4 h-4 text-zinc-300" />
-      </button>
-    </div>
 
-    <div className="mb-6">
-      <div className="flex gap-2 mb-5">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50/50 px-3 py-1.5 rounded-full">
-          {post.subject}
-        </span>
-        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 bg-zinc-50 px-3 py-1.5 rounded-full border border-black/[0.01]">
-          Chapter {post.chapter}
-        </span>
+      <div className="mb-6">
+        <div className="flex gap-2 mb-5">
+          <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full ${subjectTagStyles}`}>
+            {post.subject.match(/^[A-Z]{2,4}\s?\d{4}/)?.[0] || post.subject}
+          </span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 bg-white/[0.05] px-3 py-1.5 rounded-full border border-white/[0.02]">
+            Chapter {post.chapter}
+          </span>
+        </div>
+        <p className="text-[17px] text-zinc-200 leading-relaxed font-medium">
+          {post.content}
+        </p>
       </div>
-      <p className="text-[17px] text-zinc-800 leading-relaxed font-medium">
-        {post.content}
-      </p>
-    </div>
 
-    <div className="flex items-center gap-8 pt-6 border-t border-black/[0.01]">
-      <button className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 transition-colors group">
-        <Triangle className="w-4 h-4 group-hover:scale-110 transition-transform" />
-        <span className="text-[14px] font-bold">{post.likes} Upvoted</span>
-      </button>
-      <button className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 transition-colors group">
-        <MessageCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
-        <span className="text-[14px] font-bold">{post.replies} Replies</span>
-      </button>
-      <button className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 transition-colors group">
-        <Star className="w-4 h-4 group-hover:scale-110 transition-transform" />
-        <span className="text-[14px] font-bold">Save</span>
-      </button>
-    </div>
-  </motion.div>
-);
+      <div className="flex items-center gap-8 pt-6 border-t border-white/[0.05]">
+        <button 
+          onClick={toggleUpvote}
+          className={`flex items-center gap-2 transition-colors group ${upvoted ? 'text-white' : 'text-zinc-500 hover:text-white'}`}
+        >
+          <Triangle className={`w-4 h-4 transition-all ${upvoted ? 'text-white fill-white' : 'group-hover:scale-110'}`} />
+          <span className="text-[14px] font-bold">{likes} Upvoted</span>
+        </button>
+        <button className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors group">
+          <MessageCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          <span className="text-[14px] font-bold">{post.replies} Replies</span>
+        </button>
+        <button 
+          onClick={() => setSaved(!saved)}
+          className={`flex items-center gap-2 transition-colors group ${saved ? 'text-yellow-500' : 'text-zinc-500 hover:text-white'}`}
+        >
+          <Star className={`w-4 h-4 transition-all ${saved ? 'fill-yellow-500' : 'group-hover:scale-110'}`} />
+          <span className="text-[14px] font-bold">{saved ? 'Saved' : 'Save'}</span>
+        </button>
+      </div>
+    </motion.div>
+  );
+};
 
 // --- New Subjects Page Component ---
 
@@ -263,13 +657,13 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-[#f8f8f8] z-[60] flex flex-col items-center justify-center overflow-hidden"
+      className="fixed inset-0 z-[60] flex flex-col items-center justify-center overflow-hidden bg-zinc-950"
     >
       <button 
         onClick={onBack}
-        className="absolute top-8 left-8 p-4 bg-white rounded-full shadow-lg hover:shadow-xl transition-all active:scale-90 z-50 group border border-black/5"
+        className="absolute top-8 left-32 p-4 rounded-full shadow-2xl hover:shadow-white/5 transition-all active:scale-90 z-50 group backdrop-blur-2xl border bg-white/5 border-white/10"
       >
-        <ArrowLeft className="w-6 h-6 text-zinc-500 group-hover:text-zinc-900 transition-colors" />
+        <ArrowLeft className="w-6 h-6 transition-colors text-zinc-500 group-hover:text-white" />
       </button>
 
       <div className="text-center mb-16 relative">
@@ -277,7 +671,7 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="text-xl font-medium text-zinc-400"
+          className="text-xl font-medium text-zinc-500"
         >
           Explore More About MMU Subjects
         </motion.p>
@@ -285,12 +679,12 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
 
       <div 
         ref={scrollRef}
-        className="w-full h-[600px] flex items-center gap-0 overflow-x-auto no-scrollbar px-[20vw] cursor-grab active:cursor-grabbing pb-20"
+        className="w-full h-[600px] flex items-center gap-12 overflow-x-auto no-scrollbar px-[10vw] cursor-grab active:cursor-grabbing pb-20"
         style={{ scrollSnapType: 'x proximity' }}
       >
         {SUBJECTS.map((subject, index) => {
           // Calculate rotation and position for fanned-out look
-          const rotation = (index - (SUBJECTS.length - 1) / 2) * 8;
+          const rotation = (index - (SUBJECTS.length - 1) / 2) * 2;
           const isHovered = hoveredId === subject.id;
 
           return (
@@ -307,26 +701,26 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
               onMouseEnter={() => setHoveredId(subject.id)}
               onMouseLeave={() => setHoveredId(null)}
               onClick={() => onSelectSubject(subject.id)}
-              className="relative flex-shrink-0 w-[240px] h-[360px] -ml-[100px] first:ml-0 transition-all duration-300 ease-out"
+              className="relative flex-shrink-0 w-[240px] h-[360px] transition-all duration-300 ease-out"
               style={{ perspective: '1000px' }}
             >
               {/* Book Shadow */}
-              <div className="absolute inset-x-8 -bottom-10 h-8 bg-black/10 rounded-full blur-2xl" />
+              <div className="absolute inset-x-8 -bottom-10 h-8 rounded-full blur-2xl bg-black/40" />
 
               {/* Book Cover */}
               <div 
-                className={`w-full h-full rounded-[24px] overflow-hidden shadow-2xl relative border-l-8 border-black/10 transition-all ${subject.color}`}
+                className={`w-full h-full rounded-[24px] overflow-hidden shadow-2xl relative border-l-8 transition-all border-black/20 ${subject.color}`}
               >
                 <img 
                   src={subject.cover} 
                   alt={subject.name} 
-                  className="w-full h-full object-cover mix-blend-overlay opacity-60" 
+                  className="w-full h-full object-cover mix-blend-overlay opacity-60"
                   referrerPolicy="no-referrer"
                 />
                 
-                <div className="absolute inset-0 p-8 flex flex-col justify-end text-white">
+                <div className="absolute inset-0 p-8 flex flex-col justify-end text-white text-left">
                   <div>
-                    <h3 className="text-2xl font-bold leading-none tracking-tight">
+                    <h3 className="text-2xl font-bold leading-tight tracking-tight whitespace-pre-line">
                       {subject.name}
                     </h3>
                   </div>
@@ -346,8 +740,8 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
                     exit={{ opacity: 0, y: 10 }}
                     className="absolute -bottom-16 left-0 right-0 text-center pointer-events-none"
                   >
-                    <span className="text-[14px] font-black uppercase tracking-[0.3em] text-zinc-900">
-                      {subject.name}
+                    <span className="text-[14px] font-black uppercase tracking-[0.3em] text-white">
+                      {subject.name.replace('\n', ' ')}
                     </span>
                   </motion.div>
                 )}
@@ -358,7 +752,7 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
       </div>
 
       {/* Background Graphic */}
-      <h2 className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[15vw] font-black text-black/[0.02] pointer-events-none whitespace-nowrap select-none">
+      <h2 className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[15vw] font-black pointer-events-none whitespace-nowrap select-none text-white/[0.02]">
         SUBJECTS
       </h2>
     </motion.div>
@@ -371,13 +765,20 @@ export default function App() {
   const activeSubjectData = activeSubject ? SUBJECTS.find(s => s.id === activeSubject) : null;
 
   return (
-    <div className="min-h-screen bg-[#fafafa] font-sans selection:bg-zinc-200 overflow-x-hidden">
+    <div className="min-h-screen font-sans selection:bg-blue-500/30 overflow-x-hidden bg-zinc-950 text-zinc-100">
       
       <Navbar 
         currentView={view}
         onPostClick={() => setView('feed')}
         onSubjectsClick={() => setView('subjects')} 
       />
+
+      {/* Background Mesh - Cinematic Luminous Glows */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/20 blur-[120px]" />
+        <div className="absolute bottom-[20%] right-[-5%] w-[35%] h-[35%] rounded-full bg-purple-600/15 blur-[100px]" />
+        <div className="absolute top-[40%] left-[60%] w-[30%] h-[30%] rounded-full bg-indigo-600/10 blur-[80px]" />
+      </div>
 
       <AnimatePresence mode="wait">
         {view === 'feed' ? (
@@ -387,37 +788,49 @@ export default function App() {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 60, scale: 0.95 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="pt-20 pb-48 px-6 max-w-2xl mx-auto relative z-10"
+            className="pt-32 pb-48 pl-32 pr-8 max-w-5xl mx-auto relative z-10"
           >
-            {/* Feed Heading */}
-            <div className="mb-10 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                {activeSubjectData && (
+            {/* Feed Heading - Simplified */}
+            {activeSubjectData && (
+              <div className="mb-8">
+                <div className="flex items-center gap-4">
                   <button 
                     onClick={() => setActiveSubject(null)}
-                    className="p-3 rounded-full hover:bg-zinc-100 transition-colors"
+                    className="p-3 rounded-full transition-colors hover:bg-white/5"
                   >
-                    <ArrowLeft className="w-5 h-5 text-zinc-600 hover:text-zinc-900" />
+                    <ArrowLeft className="w-5 h-5 text-zinc-500 hover:text-white" />
                   </button>
-                )}
-                <div>
-                  <h2 className="text-3xl font-bold text-zinc-900 tracking-tight">
-                    {activeSubjectData ? `${activeSubjectData.name} Hub` : 'Discover Discussions'}
-                  </h2>
-                  <p className="text-zinc-400 font-medium">{activeSubjectData ? 'Recently shared chapters and discussions' : 'Explore posts from different subjects'}</p>
+                  <div>
+                    <h2 className="text-3xl font-bold tracking-tight text-white whitespace-pre-line">
+                      {activeSubjectData.name}
+                    </h2>
+                    <p className="font-medium text-zinc-500">Recently shared chapters and discussions</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
             
             {/* Discussion Feed */}
             <div className="space-y-4">
               <AnimatePresence mode="popLayout">
                 {MOCK_POSTS
                   .filter(p => {
-                    if (!activeSubjectData) return true; // Show all posts if no subject selected
-                    const postSubject = p.subject.toLowerCase();
-                    const activeSubjectLabel = activeSubjectData.name.toLowerCase();
-                    return postSubject.includes(activeSubjectLabel) || activeSubjectLabel.includes(postSubject);
+                    if (!activeSubject) return true;
+                    if (!activeSubjectData) return true;
+                    
+                    const pName = p.subject.toLowerCase();
+                    const sName = activeSubjectData.name.toLowerCase();
+                    
+                    // Match course code if possible (e.g., CDS1114)
+                    const pCode = pName.match(/[a-z]{2,4}\s?\d{4}/)?.[0];
+                    const sCode = sName.match(/[a-z]{2,4}\s?\d{4}/)?.[0];
+                    
+                    if (pCode && sCode && pCode === sCode) return true;
+                    
+                    // Fallback to fuzzy substring match
+                    const cleanP = pName.replace(/\s+/g, ' ').trim();
+                    const cleanS = sName.replace(/\s+/g, ' ').trim();
+                    return cleanP.includes(cleanS) || cleanS.includes(cleanP);
                   })
                   .map((post) => (
                   <PostCard key={post.id} post={post} />
@@ -451,8 +864,8 @@ export default function App() {
         }
       `}</style>
 
-      {/* Ambient Background Elements */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[500px] -z-10 bg-[radial-gradient(circle_at_50%_0%,rgba(0,102,204,0.04)_0%,transparent_70%)]" />
+      {/* Ambient Background Elements - Secondary Glows */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[500px] -z-10 bg-[radial-gradient(circle_at_50%_0%,rgba(0,102,204,0.08)_0%,transparent_70%)]" />
 
     </div>
   );
