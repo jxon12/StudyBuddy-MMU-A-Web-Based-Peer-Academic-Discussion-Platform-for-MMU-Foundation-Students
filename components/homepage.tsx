@@ -527,7 +527,7 @@ const PostCard = ({ post }: PostCardProps) => {
             <div className="flex items-center gap-1.5">
               <h4 className="text-[15px] font-bold text-white tracking-tight">{post.author}</h4>
             </div>
-            <p className="text-[12px] text-zinc-500 font-bold uppercase tracking-wider">{post.timestamp}</p>
+            <p className="text-[12px] text-white font-bold uppercase tracking-wider">{post.timestamp}</p>
           </div>
         </div>
         
@@ -574,7 +574,7 @@ const PostCard = ({ post }: PostCardProps) => {
           <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full font-apple ${subjectTagStyles}`}>
             {post.subject.match(/^[A-Z]{2,4}\s?\d{4}/)?.[0] || post.subject}
           </span>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 bg-white/[0.05] px-3 py-1.5 rounded-full border border-white/[0.02]">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-white bg-white/[0.05] px-3 py-1.5 rounded-full border border-white/[0.02]">
             Chapter {post.chapter}
           </span>
         </div>
@@ -586,18 +586,18 @@ const PostCard = ({ post }: PostCardProps) => {
       <div className="flex items-center gap-8 pt-6 border-t border-white/[0.05]">
         <button 
           onClick={toggleUpvote}
-          className={`flex items-center gap-2 transition-colors group ${upvoted ? 'text-white' : 'text-zinc-500 hover:text-white'}`}
+          className={`flex items-center gap-2 transition-colors group ${upvoted ? 'text-white' : 'text-white hover:text-white'}`}
         >
           <Triangle className={`w-4 h-4 transition-all ${upvoted ? 'text-white fill-white' : 'group-hover:scale-110'}`} />
           <span className="text-[14px] font-bold">{likes} Upvoted</span>
         </button>
-        <button className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors group">
+        <button className="flex items-center gap-2 text-white hover:text-white transition-colors group">
           <MessageCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
           <span className="text-[14px] font-bold">{post.replies} Replies</span>
         </button>
         <button 
           onClick={() => setSaved(!saved)}
-          className={`flex items-center gap-2 transition-colors group ${saved ? 'text-yellow-500' : 'text-zinc-500 hover:text-white'}`}
+          className={`flex items-center gap-2 transition-colors group ${saved ? 'text-yellow-500' : 'text-white hover:text-white'}`}
         >
           <Star className={`w-4 h-4 transition-all ${saved ? 'fill-yellow-500' : 'group-hover:scale-110'}`} />
           <span className="text-[14px] font-bold">{saved ? 'Saved' : 'Save'}</span>
