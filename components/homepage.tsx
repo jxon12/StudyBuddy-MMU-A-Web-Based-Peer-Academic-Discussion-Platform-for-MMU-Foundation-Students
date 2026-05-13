@@ -2,7 +2,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BookOpen, 
   MessageCircle, 
-  Search, 
   Plus, 
   Bell,
   CheckCircle2,
@@ -36,8 +35,8 @@ interface Post {
 // --- Mock Data ---
 
 const SUBJECTS = [
-  { id: 'english', name: 'LAE1113 Academic English', color: 'bg-[#AF52DE]', cover: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=600', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
-  { id: 'math', name: 'CMT 1134 Mathematics III', color: 'bg-[#5856D6]', cover: 'https://images.unsplash.com/photo-1509228468518-180dd482180c?auto=format&fit=crop&q=80&w=600', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
+  { id: 'english', name: 'LAE1113 Academic English', color: 'bg-[#AF52DE]', cover: 'https://i.pinimg.com/736x/91/6d/76/916d761e2e8ce1a515ec2234557c38e4.jpg', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
+  { id: 'math', name: 'CMT 1134 Mathematics III', color: 'bg-[#5856D6]', cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
   { id: 'digital', name: 'CDS1114\nIntro to Digital System', color: 'bg-[#7D7AFF]', cover: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
   { id: 'physics', name: 'CPP1113 Principles of Physics', color: 'bg-[#BF5AF2]', cover: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
   { id: 'critical', name: 'LCT1113 Critical Thinking', color: 'bg-[#3634A3]', cover: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600', chapters: ['Logic', 'Arguments', 'Fallacies'] },
@@ -387,8 +386,6 @@ const Navbar = ({ onPostClick, onSubjectsClick, currentView }: {
   onSubjectsClick?: () => void;
   currentView: 'feed' | 'subjects';
 }) => {
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
-
   // Hide navbar when viewing subjects
   if (currentView === 'subjects') {
     return null;
@@ -396,20 +393,7 @@ const Navbar = ({ onPostClick, onSubjectsClick, currentView }: {
 
   return (
     <>
-      {/* 1. Global Search Bar (Top Center) */}
-      <div className="fixed top-4 left-0 right-0 z-50 flex justify-center py-12 px-4 pointer-events-none">
-        <div className={`pointer-events-auto backdrop-blur-2xl border border-white/[0.05] rounded-full px-4 py-2.5 shadow-2xl flex items-center gap-3 transition-all duration-500 ease-in-out ${isSearchFocused ? 'w-[600px] bg-white/[0.08]' : 'w-[400px] bg-white/[0.03]'}`}>
-          <Search className={`w-4 h-4 transition-colors ${isSearchFocused ? 'text-white' : 'text-zinc-500'}`} />
-          <input 
-            type="text" 
-            placeholder="Search questions or chapters..." 
-            onFocus={() => setIsSearchFocused(true)}
-            onBlur={() => setIsSearchFocused(false)}
-            className="bg-transparent border-none text-[13px] font-semibold focus:outline-none w-full placeholder:text-zinc-600 text-white"
-          />
-        </div>
-      </div>
-      {/* 2. Vertical Sidebar (Left) */}
+      {/* Vertical Sidebar (Left) */}
       <div className="fixed top-0 left-0 bottom-0 w-24 z-50 bg-transparent flex flex-col items-center pt-48 gap-10">
         
         {/* Nav Items */}
