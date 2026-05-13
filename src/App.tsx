@@ -6,6 +6,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Team } from '../components/team';
+import { Homepage } from '../components/homepage';
+import { FAQScreen } from '../components/FAQs';
 import { 
   Search, 
   ChevronDown, 
@@ -25,7 +27,7 @@ const ACCENT_COLORS = [
 ];
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion' | 'faqs'>('home');
   const [accentColor] = useState(ACCENT_COLORS[0]);
   const [showDocsMenu, setShowDocsMenu] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -326,6 +328,8 @@ export default function App() {
             </motion.div>
           ) : currentPage === 'discussion' ? (
             <Homepage />
+          ) : currentPage === 'faqs' ? (
+            <FAQScreen onBack={() => setCurrentPage('home')} />
           ) : (
             <Team onBackToHome={() => setCurrentPage('home')} />
           )}
@@ -346,7 +350,7 @@ export default function App() {
             <h4 className="text-[13px] font-bold opacity-30 uppercase tracking-widest">Platform</h4>
             <div className="flex flex-col gap-2">
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Features</span>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer" onClick={() => document.getElementById('how-it-works-heading')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>How It Works</span>
+              <span className="nav-item cursor-pointer" onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>How it works</span>
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Leaderboard</span>
             </div>
           </div>
@@ -356,7 +360,7 @@ export default function App() {
             <div className="flex flex-col gap-2">
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Subjects</span>
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Course</span>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">FAQs</span>
+              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer" onClick={() => setCurrentPage('faqs')}>FAQs</span>
             </div>
           </div>
 
