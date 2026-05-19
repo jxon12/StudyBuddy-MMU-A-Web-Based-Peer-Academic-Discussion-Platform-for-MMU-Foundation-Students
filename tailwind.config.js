@@ -9,6 +9,8 @@ export default {
     extend: {
       fontFamily: {
         'apple': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Helvetica Neue', 'sans-serif'],
+        'playfair': ['Playfair Display', 'serif'],
+        'retropix': ['Retropix', 'sans-serif'],
       },
       colors: {
         'apple-blue': '#0A84FF',
