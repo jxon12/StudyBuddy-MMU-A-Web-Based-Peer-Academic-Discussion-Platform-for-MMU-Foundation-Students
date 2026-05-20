@@ -83,7 +83,7 @@ export const SubjectSelection: React.FC<SubjectSelectionProps> = ({ onComplete, 
             <img src="/images/mmu-logo.svg" alt="MMU Logo" className="h-12 w-auto" />
             
             <div className="space-y-4">
-              <h1 className="text-[32px] font-bold tracking-tight text-white/80">Onboarding</h1>
+              <h1 className="text-[32px] font-bold tracking-tight text-white/100">Onboarding</h1>
               <p className="text-[15px] opacity-60 font-medium leading-relaxed">
                 Customize your academic space. Select up to 6 subjects to populate your personalized feed and study groups.
               </p>

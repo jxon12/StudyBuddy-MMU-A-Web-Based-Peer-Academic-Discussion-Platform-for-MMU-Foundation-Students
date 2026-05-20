@@ -14,6 +14,7 @@ import {
   User
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import './LiquidGlassCard.css';
 
 /**
  * @license
@@ -39,7 +40,7 @@ interface Post {
 const SUBJECTS = [
   { id: 'english', name: 'LAE1113 Academic English', color: 'bg-[#AF52DE]', cover: 'https://i.pinimg.com/736x/91/d4/91/91d491485a1126a79219f01c444d53db.jpg', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
   { id: 'math', name: 'CMT 1134 Mathematics III', color: 'bg-[#5856D6]', cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
-  { id: 'digital', name: 'CDS1114 Intro to Digital System', color: 'bg-[#7D7AFF]', cover: 'https://i.pinimg.com/1200x/1a/ba/fb/1abafb14825c44b36d26df4c296eaa14.jpg', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
+  { id: 'digital', name: 'CDS1114 Intro to Digital System', color: 'bg-[#7D7AFF]', cover: 'https://i.pinimg.com/1200x/51/83/7e/51837ef0af4628e182418b627f93268d.jpg', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
   { id: 'physics', name: 'CPP1113 Principles of Physics', color: 'bg-[#BF5AF2]', cover: 'https://i.pinimg.com/736x/36/9e/41/369e4128b77f1b098dd57abd412bf723.jpg', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
   { id: 'critical', name: 'LCT1113 Critical Thinking', color: 'bg-[#3634A3]', cover: 'https://i.pinimg.com/736x/88/0b/09/880b09b7b25fdd1bab31bf75ef721382.jpg', chapters: ['Logic', 'Arguments', 'Fallacies'] },
   { id: 'mini-it', name: 'CSP1123 Mini IT Project', color: 'bg-[#DA8FFF]', cover: 'https://i.pinimg.com/1200x/86/f3/97/86f397cce8974ec841776c26d2604295.jpg', chapters: ['Project Planning', 'Development', 'Documentation'] },
@@ -388,18 +389,18 @@ const TopNavigationBar = ({ onSubjectsClick }: { onSubjectsClick: () => void }) 
     <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl border-b border-white/10">
       <div className="flex items-center justify-between px-8 py-4 h-20">
         {/* Left: Logo */}
-        <div className="text-xl font-bold text-white tracking-tight">
+        <div className="text-xl font-bold text-white tracking-tight font-retropix">
           StudyBuddy
         </div>
 
         {/* Center: Search Bar */}
         <div className="flex-1 mx-12 max-w-xl">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white pointer-events-none" />
             <input
               type="text"
               placeholder="Search questions or chapters..."
-              className="w-full h-11 pl-12 pr-4 bg-white/5 backdrop-blur-xl border border-white/20 rounded-full text-sm text-white placeholder:text-zinc-500 outline-none focus:border-white/40 focus:bg-white/10 transition-all"
+              className="w-full h-11 pl-12 pr-4 bg-white/5 backdrop-blur-xl border border-white/20 rounded-full text-sm text-white placeholder:text-white outline-none focus:border-white/40 focus:bg-white/10 transition-all"
             />
           </div>
         </div>
@@ -518,16 +519,16 @@ const PostCard = ({ post }: PostCardProps) => {
       initial={{ opacity: 0, scale: 0.98 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
-      className="bg-white/[0.08] backdrop-blur-3xl p-7 rounded-[32px] border border-white/[0.15] mb-6 hover:shadow-2xl hover:border-white/[0.25] transition-all cursor-default group relative"
+      className="liquid-glass-card p-8 mb-6 cursor-default group relative overflow-hidden"
     >
-      <div className="flex items-start justify-between mb-6">
+      <div className="relative z-10 flex items-start justify-between mb-6">
         <div className="flex items-center gap-4">
           <img src={post.avatar} alt={post.author} className="w-12 h-12 rounded-full border border-white/10" referrerPolicy="no-referrer" />
           <div>
             <div className="flex items-center gap-1.5">
               <h4 className="text-[15px] font-bold text-white tracking-tight">{post.author}</h4>
             </div>
-            <p className="text-[12px] text-zinc-500 font-bold uppercase tracking-wider">{post.timestamp}</p>
+            <p className="text-[12px] text-white font-bold uppercase tracking-wider">{post.timestamp}</p>
           </div>
         </div>
         
@@ -558,8 +559,8 @@ const PostCard = ({ post }: PostCardProps) => {
                     </div>
                   ) : (
                     <>
-                      <Share2 className="w-4 h-4 text-zinc-400 group-hover/item:text-white transition-colors" />
-                      <span className="text-[13px] font-bold text-zinc-400 group-hover/item:text-white transition-colors">Share Post</span>
+                      <Share2 className="w-4 h-4 text-white group-hover/item:text-white transition-colors" />
+                      <span className="text-[13px] font-bold text-white group-hover/item:text-white transition-colors">Share Post</span>
                     </>
                   )}
                 </button>
@@ -569,35 +570,35 @@ const PostCard = ({ post }: PostCardProps) => {
         </div>
       </div>
 
-      <div className="mb-6">
+      <div className="relative z-10 mb-6">
         <div className="flex gap-2 mb-5">
           <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full font-apple ${subjectTagStyles}`}>
             {post.subject.match(/^[A-Z]{2,4}\s?\d{4}/)?.[0] || post.subject}
           </span>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 bg-white/[0.05] px-3 py-1.5 rounded-full border border-white/[0.02]">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-white bg-white/[0.05] px-3 py-1.5 rounded-full border border-white/[0.02]">
             Chapter {post.chapter}
           </span>
         </div>
-        <p className="text-[17px] text-zinc-200 leading-relaxed font-medium">
+        <p className="text-[17px] text-white leading-relaxed font-medium">
           {post.content}
         </p>
       </div>
 
-      <div className="flex items-center gap-8 pt-6 border-t border-white/[0.05]">
+      <div className="relative z-10 flex items-center gap-8 pt-6 border-t border-white/[0.05]">
         <button 
           onClick={toggleUpvote}
-          className={`flex items-center gap-2 transition-colors group ${upvoted ? 'text-white' : 'text-zinc-500 hover:text-white'}`}
+          className={`flex items-center gap-2 transition-colors group ${upvoted ? 'text-white' : 'text-white hover:text-white'}`}
         >
           <Triangle className={`w-4 h-4 transition-all ${upvoted ? 'text-white fill-white' : 'group-hover:scale-110'}`} />
           <span className="text-[14px] font-bold">{likes} Upvoted</span>
         </button>
-        <button className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors group">
+        <button className="flex items-center gap-2 text-white hover:text-white transition-colors group">
           <MessageCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
           <span className="text-[14px] font-bold">{post.replies} Replies</span>
         </button>
         <button 
           onClick={() => setSaved(!saved)}
-          className={`flex items-center gap-2 transition-colors group ${saved ? 'text-yellow-500' : 'text-zinc-500 hover:text-white'}`}
+          className={`flex items-center gap-2 transition-colors group ${saved ? 'text-yellow-500' : 'text-white hover:text-white'}`}
         >
           <Star className={`w-4 h-4 transition-all ${saved ? 'fill-yellow-500' : 'group-hover:scale-110'}`} />
           <span className="text-[14px] font-bold">{saved ? 'Saved' : 'Save'}</span>
