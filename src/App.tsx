@@ -9,6 +9,10 @@ import { Team } from '../components/team';
 import Homepage from '../components/homepage';
 import { AuthPage } from '../components/AuthPage';
 import { SubjectSelection } from '../components/SubjectSelection';
+import { FAQPage } from '../components/FAQs';
+import { TermsPage } from '../components/TermsAndCondition';
+import { PrivacyPage } from '../components/Privacy';
+import { MissionPage } from '../components/Mission';
 import { 
   Search, 
   ChevronDown, 
@@ -30,10 +34,11 @@ const ACCENT_COLORS = [
 ];
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion' | 'auth-login' | 'auth-signup' | 'subject-selection'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion' | 'faqs' | 'terms' | 'privacy' | 'mission' | 'auth-login' | 'auth-signup' | 'subject-selection'>('home');
   const [previousAuthType, setPreviousAuthType] = useState<'login' | 'signup'>('login');
   const [accentColor] = useState(ACCENT_COLORS[0]);
   const [showDocsMenu, setShowDocsMenu] = useState(false);
+  const [pendingScrollSection, setPendingScrollSection] = useState<string | null>(null);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
@@ -43,6 +48,26 @@ export default function App() {
   }, [theme, accentColor]);
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+
+  const navigateToHomeSection = (sectionId: string) => {
+    if (currentPage !== 'home') {
+      setPendingScrollSection(sectionId);
+      setCurrentPage('home');
+      return;
+    }
+
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  useEffect(() => {
+    if (!pendingScrollSection || currentPage !== 'home') return;
+
+    const element = document.getElementById(pendingScrollSection);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setPendingScrollSection(null);
+    }
+  }, [currentPage, pendingScrollSection]);
 
   return (
     <div className={`min-h-screen relative flex flex-col items-center selection:bg-apple-blue/30 overflow-x-hidden ${theme}`}>
@@ -64,7 +89,7 @@ export default function App() {
               <span className="nav-item cursor-pointer" onClick={() => setCurrentPage('auth-signup')}>Get Started</span>
               <span className="nav-item cursor-pointer" onClick={() => setCurrentPage('team')}>About Us</span>
               <span className="nav-item cursor-pointer" onClick={() => document.getElementById('academic-help')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>StudyBuddy</span>
-              <span className="nav-item cursor-pointer" onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>How it Works</span>
+              <span className="nav-item cursor-pointer" onClick={() => navigateToHomeSection('how-it-works')}>How it Works</span>
               <div 
                 className="relative"
                 onMouseEnter={() => setShowDocsMenu(true)}
@@ -408,6 +433,14 @@ export default function App() {
             </motion.div>
           ) : currentPage === 'discussion' ? (
             <Homepage />
+          ) : currentPage === 'faqs' ? (
+            <FAQPage />
+          ) : currentPage === 'terms' ? (
+            <TermsPage />
+          ) : currentPage === 'privacy' ? (
+            <PrivacyPage />
+          ) : currentPage === 'mission' ? (
+            <MissionPage onGetInvolved={() => setCurrentPage('auth-signup')} />
           ) : (
             <Team onBackToHome={() => setCurrentPage('home')} />
           )}
@@ -428,7 +461,13 @@ export default function App() {
             <h4 className="text-[13px] font-bold opacity-30 uppercase tracking-widest">Platform</h4>
             <div className="flex flex-col gap-2">
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Features</span>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">How It Works</span>
+              <button
+                type="button"
+                onClick={() => navigateToHomeSection('how-it-works')}
+                className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                How It Works
+              </button>
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Leaderboard</span>
             </div>
           </div>
@@ -438,14 +477,29 @@ export default function App() {
             <div className="flex flex-col gap-2">
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Subjects</span>
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Course</span>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">FAQs</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentPage('faqs');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                FAQs
+              </button>
             </div>
           </div>
 
           <div className="space-y-4">
             <h4 className="text-[13px] font-bold opacity-30 uppercase tracking-widest">About</h4>
             <div className="flex flex-col gap-2">
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Our Mission</span>
+              <button
+                type="button"
+                onClick={() => { setCurrentPage('mission'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                Our Mission
+              </button>
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer" onClick={() => setCurrentPage('team')}>Team</span>
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Feedback</span>
             </div>
@@ -458,8 +512,20 @@ export default function App() {
               © 2026 STUDYBUDDY MMU COMMUNITY • BUILT FOR MMU FCI FOUNDATION STUDENTS
             </div>
             <div className="flex gap-6">
-               <span className="text-[11px] font-medium opacity-50 hover:opacity-100 transition-all cursor-pointer">Terms & Conditions</span>
-               <span className="text-[11px] font-medium opacity-50 hover:opacity-100 transition-all cursor-pointer">Privacy Policy</span>
+               <button
+                 type="button"
+                 onClick={() => { setCurrentPage('terms'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                 className="text-[11px] font-medium opacity-50 hover:opacity-100 transition-all cursor-pointer"
+               >
+                 Terms & Conditions
+               </button>
+               <button
+                 type="button"
+                 onClick={() => { setCurrentPage('privacy'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                 className="text-[11px] font-medium opacity-50 hover:opacity-100 transition-all cursor-pointer"
+               >
+                 Privacy Policy
+               </button>
             </div>
           </div>
 
