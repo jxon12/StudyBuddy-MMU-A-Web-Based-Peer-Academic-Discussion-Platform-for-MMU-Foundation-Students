@@ -38,13 +38,6 @@ export function TermsPage() {
       className="pt-[180px] pb-32 px-4 max-w-5xl mx-auto w-full"
     >
       <div className="text-center mb-20">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-16 h-16 rounded-[20px] bg-apple-blue/10 flex items-center justify-center mx-auto text-apple-blue mb-6"
-        >
-          <Shield className="w-8 h-8" />
-        </motion.div>
         <h1 className="text-[48px] md:text-[56px] font-bold tracking-tight mb-4 leading-tight">
           Terms & Conditions
         </h1>
@@ -91,20 +84,15 @@ export function TermsPage() {
               The codebase, features, and identity of StudyBuddy are simulations created to solve specific academic pain points for 
               Foundation students at MMU.
             </p>
-            <div className="pt-4 flex flex-wrap gap-4">
-               <div className="px-4 py-2 rounded-full liquid-glass text-[13px] font-semibold opacity-80 italic">
-                 Project ID: SB-MMU-2026
-               </div>
-               <div className="px-4 py-2 rounded-full liquid-glass text-[13px] font-semibold opacity-80 italic">
-                 Build: v0.4.2-alpha
-               </div>
-            </div>
           </div>
           <div className="w-full md:w-[300px] aspect-square rounded-[32px] liquid-glass flex items-center justify-center overflow-hidden relative group">
-             <div className="absolute inset-0 bg-apple-blue/5 group-hover:bg-apple-blue/10 transition-colors" />
+             <img
+               src="/images/ebee-mascot.jpg"
+               alt="MMU campus"
+               className="absolute inset-0 w-full h-full object-cover opacity-80"
+             />
+             <div className="absolute inset-0 bg-transparent transition-colors" />
              <div className="text-center relative z-10 px-6">
-                <div className="text-[44px] font-extrabold text-apple-blue opacity-20 mb-2">MMU</div>
-                <div className="text-[14px] font-bold tracking-tighter opacity-40 uppercase">Civic Intelligence Project</div>
              </div>
           </div>
         </div>

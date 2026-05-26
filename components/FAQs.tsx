@@ -82,7 +82,7 @@ function FAQItem({ question, answer, isOpen, onClick, index }: { question: strin
   );
 }
 
-export function FAQPage() {
+export function FAQPage({ onNavigate }: { onNavigate?: (page: string) => void }) {
   const [activeCategory, setActiveCategory] = useState('all');
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
@@ -186,9 +186,14 @@ export function FAQPage() {
                 Can't find the answer you're looking for? Our student support team is always ready to help you navigate StudyBuddy.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button className="apple-button-primary min-w-[220px]">Contact Support</button>
-              <button className="apple-button-secondary min-w-[220px]">Visit Help Center</button>
+              <button
+                className="apple-button-secondary min-w-[220px]"
+                onClick={() => { onNavigate?.('feedback'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              >
+                Feedback
+              </button>
             </div>
           </div>
         </div>

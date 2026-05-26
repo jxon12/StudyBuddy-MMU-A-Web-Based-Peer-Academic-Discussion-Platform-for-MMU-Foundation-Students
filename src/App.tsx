@@ -13,6 +13,8 @@ import { FAQPage } from '../components/FAQs';
 import { TermsPage } from '../components/TermsAndCondition';
 import { PrivacyPage } from '../components/Privacy';
 import { MissionPage } from '../components/Mission';
+import { Leaderboard } from '../components/Leaderboard';
+import { FeedbackPage } from '../components/Feedback';
 import { 
   Search, 
   ChevronDown, 
@@ -20,9 +22,7 @@ import {
   Play, 
   Moon,
   Sun,
-  User,
-  Plus,
-  Bell
+  User
 } from 'lucide-react';
 
 const ACCENT_COLORS = [
@@ -34,7 +34,7 @@ const ACCENT_COLORS = [
 ];
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion' | 'faqs' | 'terms' | 'privacy' | 'mission' | 'auth-login' | 'auth-signup' | 'subject-selection'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion' | 'faqs' | 'terms' | 'privacy' | 'mission' | 'leaderboard' | 'feedback' | 'auth-login' | 'auth-signup' | 'subject-selection'>('home');
   const [previousAuthType, setPreviousAuthType] = useState<'login' | 'signup'>('login');
   const [accentColor] = useState(ACCENT_COLORS[0]);
   const [showDocsMenu, setShowDocsMenu] = useState(false);
@@ -162,7 +162,18 @@ export default function App() {
             StudyBuddy
           </div>
           <div className="flex items-center gap-4 md:gap-6">
-            <span className="text-[11px] md:text-[13px] font-medium opacity-60 hover:opacity-100 cursor-pointer transition-all">Ask Community</span>
+            <span className="text-[11px] md:text-[13px] font-medium opacity-60 hover:opacity-100 cursor-pointer transition-all" onClick={() => {
+              setCurrentPage('leaderboard');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}>
+              Leaderboard
+            </span>
+            <span className="text-[11px] md:text-[13px] font-medium opacity-60 hover:opacity-100 cursor-pointer transition-all" onClick={() => {
+              setCurrentPage('discussion');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}>
+              Ask Community
+            </span>
             <button 
               onClick={() => setCurrentPage('auth-login')}
               className="h-[28px] px-3 md:px-4 bg-apple-blue hover:brightness-110 text-white text-[11px] md:text-[12px] font-semibold rounded-full transition-all active:scale-95 shadow-sm"
@@ -202,6 +213,10 @@ export default function App() {
               onComplete={() => setCurrentPage('discussion')}
               onPrevious={() => setCurrentPage(previousAuthType === 'login' ? 'auth-login' : 'auth-signup')}
             />
+          ) : currentPage === 'feedback' ? (
+            <FeedbackPage key="feedback" />
+          ) : currentPage === 'leaderboard' ? (
+            <Leaderboard key="leaderboard" />
           ) : currentPage === 'home' ? (
             <motion.div
               key="home"
@@ -411,7 +426,7 @@ export default function App() {
           ) : currentPage === 'discussion' ? (
             <Homepage />
           ) : currentPage === 'faqs' ? (
-            <FAQPage />
+            <FAQPage onNavigate={(page) => { setCurrentPage(page as any); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           ) : currentPage === 'terms' ? (
             <TermsPage />
           ) : currentPage === 'privacy' ? (
@@ -445,7 +460,16 @@ export default function App() {
               >
                 How It Works
               </button>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Leaderboard</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentPage('leaderboard');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                Leaderboard
+              </button>
             </div>
           </div>
 
@@ -478,7 +502,13 @@ export default function App() {
                 Our Mission
               </button>
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer" onClick={() => setCurrentPage('team')}>Team</span>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Feedback</span>
+              <button
+                type="button"
+                onClick={() => { setCurrentPage('feedback'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                Feedback
+              </button>
             </div>
           </div>
         </div>
