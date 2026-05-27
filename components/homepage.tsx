@@ -2,17 +2,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BookOpen, 
   MessageCircle, 
-  Plus, 
-  Bell,
+  Search,
   CheckCircle2,
   MoreHorizontal,
   ArrowLeft,
   Triangle,
   Star,
   Share2,
-  Search
+  Plus,
+  Bell,
+  User
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import './LiquidGlassCard.css';
 
 /**
  * @license
@@ -36,17 +38,19 @@ interface Post {
 // --- Mock Data ---
 
 const SUBJECTS = [
-  { id: 'english', name: 'English', color: 'bg-[#AF52DE]', cover: 'https://i.pinimg.com/736x/91/d4/91/91d491485a1126a79219f01c444d53db.jpg', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
-  { id: 'math', name: 'Mathematics', color: 'bg-[#5856D6]', cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
-  { id: 'technical', name: 'Technical', color: 'bg-[#7D7AFF]', cover: 'https://i.pinimg.com/1200x/1a/ba/fb/1abafb14825c44b36d26df4c296eaa14.jpg', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
-  { id: 'critical', name: 'Critical Thinking', color: 'bg-[#3634A3]', cover: 'https://i.pinimg.com/736x/05/d7/9b/05d79bc6a859a129a7a2ee8504a601ff.jpg', chapters: ['Logic', 'Arguments', 'Fallacies'] },
+  { id: 'english', name: 'LAE1113 Academic English', color: 'bg-[#AF52DE]', cover: 'https://i.pinimg.com/736x/91/d4/91/91d491485a1126a79219f01c444d53db.jpg', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
+  { id: 'math', name: 'CMT 1134 Mathematics III', color: 'bg-[#5856D6]', cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
+  { id: 'digital', name: 'CDS1114 Intro to Digital System', color: 'bg-[#7D7AFF]', cover: 'https://i.pinimg.com/1200x/51/83/7e/51837ef0af4628e182418b627f93268d.jpg', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
+  { id: 'physics', name: 'CPP1113 Principles of Physics', color: 'bg-[#BF5AF2]', cover: 'https://i.pinimg.com/736x/36/9e/41/369e4128b77f1b098dd57abd412bf723.jpg', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
+  { id: 'critical', name: 'LCT1113 Critical Thinking', color: 'bg-[#3634A3]', cover: 'https://i.pinimg.com/736x/88/0b/09/880b09b7b25fdd1bab31bf75ef721382.jpg', chapters: ['Logic', 'Arguments', 'Fallacies'] },
+  { id: 'mini-it', name: 'CSP1123 Mini IT Project', color: 'bg-[#DA8FFF]', cover: 'https://i.pinimg.com/1200x/86/f3/97/86f397cce8974ec841776c26d2604295.jpg', chapters: ['Project Planning', 'Development', 'Documentation'] },
 ];
 
 const MOCK_POSTS: Post[] = [
   // Shuffled for a more natural feed feel
   {
     id: 'mi1',
-    author: 'Brandon Tan',
+    author: 'Brendan Tan',
     avatar: 'https://i.pinimg.com/736x/44/26/04/44260448c1d15234d8341b0a4f869a6b.jpg',
     subject: 'CSP1123 Mini IT Project',
     chapter: 'Development',
@@ -380,61 +384,67 @@ const MOCK_POSTS: Post[] = [
 
 // --- Components ---
 
-const Navbar = ({ onPostClick, onSubjectsClick, currentView }: { 
-  onPostClick?: () => void; 
-  onSubjectsClick?: () => void;
-  currentView: 'feed' | 'subjects';
-}) => {
-  // Hide navbar when viewing subjects
-  if (currentView === 'subjects') {
-    return null;
-  }
-
+const TopNavigationBar = ({ onSubjectsClick }: { onSubjectsClick: () => void }) => {
   return (
-    <>
-      {/* Vertical Sidebar (Left) */}
-      <div className="fixed top-0 left-0 bottom-0 w-24 z-50 bg-transparent flex flex-col items-center pt-48 gap-10">
-        
-        {/* Nav Items */}
-        <div className="flex flex-col gap-4">
-          <button 
-            onClick={onSubjectsClick}
-            className={`p-3 rounded-2xl border transition-all group relative ${
-              currentView === 'subjects' 
-                ? 'bg-zinc-100 text-zinc-950 border-transparent shadow-[0_0_20px_rgba(255,255,255,0.1)]' 
-                : 'bg-transparent border-transparent text-zinc-500 hover:bg-white/[0.05]'
-            }`}
-          >
-            <BookOpen className="w-6 h-6" />
-            <div className="absolute left-[calc(100%+12px)] px-2.5 py-1.5 bg-zinc-100 text-zinc-950 text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-              Subjects
-            </div>
-          </button>
-
-          <button 
-             onClick={onPostClick}
-             className="bg-white text-zinc-950 p-3 rounded-2xl shadow-xl hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:-translate-y-0.5 transition-all active:scale-95 group relative"
-          >
-            <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform" />
-            <div className="absolute left-[calc(100%+12px)] px-2.5 py-1.5 bg-zinc-100 text-zinc-950 text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-              Post
-            </div>
-          </button>
-
-          <button className="p-3 rounded-2xl border border-transparent text-zinc-500 hover:bg-white/[0.05] transition-all group relative">
-            <Bell className="w-6 h-6" />
-            <div className="absolute top-3 right-3 w-2 h-2 bg-blue-500 rounded-full border-2 border-zinc-950" />
-            <div className="absolute left-[calc(100%+12px)] px-2.5 py-1.5 bg-zinc-100 text-zinc-950 text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-              Notifications
-            </div>
-          </button>
+    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl border-b border-white/10">
+      <div className="flex items-center justify-between px-8 py-4 h-20">
+        {/* Left: Logo */}
+        <div className="text-xl font-bold text-white tracking-tight font-retropix">
+          StudyBuddy
         </div>
 
+        {/* Center: Search Bar */}
+        <div className="flex-1 mx-12 max-w-xl">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search questions or chapters..."
+              className="w-full h-11 pl-12 pr-4 bg-white/5 backdrop-blur-xl border border-white/20 rounded-full text-sm text-white placeholder:text-white outline-none focus:border-white/40 focus:bg-white/10 transition-all"
+            />
+          </div>
+        </div>
+
+        {/* Right: Icons */}
+        <div className="flex items-center gap-4">
+          {/* Subjects Icon */}
+          <button 
+            onClick={onSubjectsClick}
+            className="p-2.5 rounded-full hover:bg-white/10 transition-colors text-zinc-400 hover:text-white group"
+            title="Subjects"
+          >
+            <BookOpen className="w-5 h-5" />
+          </button>
+
+          {/* Plus Icon */}
+          <button 
+            className="p-2.5 rounded-full hover:bg-white/10 transition-colors text-zinc-400 hover:text-white group"
+            title="Create post"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+
+          {/* Bell Icon */}
+          <button 
+            className="p-2.5 rounded-full hover:bg-white/10 transition-colors text-zinc-400 hover:text-white group relative"
+            title="Notifications"
+          >
+            <Bell className="w-5 h-5" />
+            <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+          </button>
+
+          {/* Profile Icon */}
+          <button 
+            className="p-2.5 rounded-full hover:bg-white/10 transition-colors text-zinc-400 hover:text-white group"
+            title="Profile"
+          >
+            <User className="w-5 h-5" />
+          </button>
+        </div>
       </div>
-    </>
+    </nav>
   );
 };
-
 
 const getSubjectTagStyles = (subjectName: string) => {
   const name = subjectName.toLowerCase();
@@ -509,17 +519,16 @@ const PostCard = ({ post }: PostCardProps) => {
       initial={{ opacity: 0, scale: 0.98 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
-      className="bg-white/[0.03] backdrop-blur-2xl p-7 rounded-[32px] border border-white/[0.08] mb-6 hover:shadow-2xl hover:border-white/[0.15] transition-all cursor-default group relative"
+      className="liquid-glass-card p-8 mb-6 cursor-default group relative overflow-hidden"
     >
-      <div className="flex items-start justify-between mb-6">
+      <div className="relative z-10 flex items-start justify-between mb-6">
         <div className="flex items-center gap-4">
           <img src={post.avatar} alt={post.author} className="w-12 h-12 rounded-full border border-white/10" referrerPolicy="no-referrer" />
           <div>
             <div className="flex items-center gap-1.5">
               <h4 className="text-[15px] font-bold text-white tracking-tight">{post.author}</h4>
-              {post.isVerified && <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 fill-blue-400/10" />}
             </div>
-            <p className="text-[12px] text-zinc-500 font-bold uppercase tracking-wider">{post.timestamp}</p>
+            <p className="text-[12px] text-white font-bold uppercase tracking-wider">{post.timestamp}</p>
           </div>
         </div>
         
@@ -550,8 +559,8 @@ const PostCard = ({ post }: PostCardProps) => {
                     </div>
                   ) : (
                     <>
-                      <Share2 className="w-4 h-4 text-zinc-400 group-hover/item:text-white transition-colors" />
-                      <span className="text-[13px] font-bold text-zinc-400 group-hover/item:text-white transition-colors">Share Post</span>
+                      <Share2 className="w-4 h-4 text-white group-hover/item:text-white transition-colors" />
+                      <span className="text-[13px] font-bold text-white group-hover/item:text-white transition-colors">Share Post</span>
                     </>
                   )}
                 </button>
@@ -561,35 +570,35 @@ const PostCard = ({ post }: PostCardProps) => {
         </div>
       </div>
 
-      <div className="mb-6">
+      <div className="relative z-10 mb-6">
         <div className="flex gap-2 mb-5">
           <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full font-apple ${subjectTagStyles}`}>
             {post.subject.match(/^[A-Z]{2,4}\s?\d{4}/)?.[0] || post.subject}
           </span>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 bg-white/[0.05] px-3 py-1.5 rounded-full border border-white/[0.02]">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-white bg-white/[0.05] px-3 py-1.5 rounded-full border border-white/[0.02]">
             Chapter {post.chapter}
           </span>
         </div>
-        <p className="text-[17px] text-zinc-200 leading-relaxed font-medium">
+        <p className="text-[17px] text-white leading-relaxed font-medium">
           {post.content}
         </p>
       </div>
 
-      <div className="flex items-center gap-8 pt-6 border-t border-white/[0.05]">
+      <div className="relative z-10 flex items-center gap-8 pt-6 border-t border-white/[0.05]">
         <button 
           onClick={toggleUpvote}
-          className={`flex items-center gap-2 transition-colors group ${upvoted ? 'text-white' : 'text-zinc-500 hover:text-white'}`}
+          className={`flex items-center gap-2 transition-colors group ${upvoted ? 'text-white' : 'text-white hover:text-white'}`}
         >
           <Triangle className={`w-4 h-4 transition-all ${upvoted ? 'text-white fill-white' : 'group-hover:scale-110'}`} />
           <span className="text-[14px] font-bold">{likes} Upvoted</span>
         </button>
-        <button className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors group">
+        <button className="flex items-center gap-2 text-white hover:text-white transition-colors group">
           <MessageCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
           <span className="text-[14px] font-bold">{post.replies} Replies</span>
         </button>
         <button 
           onClick={() => setSaved(!saved)}
-          className={`flex items-center gap-2 transition-colors group ${saved ? 'text-yellow-500' : 'text-zinc-500 hover:text-white'}`}
+          className={`flex items-center gap-2 transition-colors group ${saved ? 'text-yellow-500' : 'text-white hover:text-white'}`}
         >
           <Star className={`w-4 h-4 transition-all ${saved ? 'fill-yellow-500' : 'group-hover:scale-110'}`} />
           <span className="text-[14px] font-bold">{saved ? 'Saved' : 'Save'}</span>
@@ -774,16 +783,20 @@ export default function App() {
   const activeSubjectData = activeSubject ? SUBJECTS.find(s => s.id === activeSubject) : null;
 
   return (
-    <div className="min-h-screen font-sans selection:bg-blue-500/30 overflow-x-hidden bg-zinc-950 text-zinc-100">
-      
-      <Navbar 
-        currentView={view}
-        onPostClick={() => setView('feed')}
-        onSubjectsClick={() => setView('subjects')} 
-      />
+    <div 
+      className="min-h-screen font-sans selection:bg-blue-500/30 overflow-x-hidden text-zinc-100"
+      style={{
+        backgroundImage: 'url(/images/nature.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      <TopNavigationBar onSubjectsClick={() => setView('subjects')} />
 
       {/* Background Mesh - Cinematic Luminous Glows */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-black/40" />
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/20 blur-[120px]" />
         <div className="absolute bottom-[20%] right-[-5%] w-[35%] h-[35%] rounded-full bg-purple-600/15 blur-[100px]" />
         <div className="absolute top-[40%] left-[60%] w-[30%] h-[30%] rounded-full bg-indigo-600/10 blur-[80px]" />
@@ -797,7 +810,7 @@ export default function App() {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 60, scale: 0.95 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="pt-32 pb-48 pl-32 pr-8 max-w-5xl mx-auto relative z-10"
+            className="pt-24 pb-48 px-8 max-w-5xl mx-auto relative z-10"
           >
             {/* Feed Heading - Simplified */}
             {activeSubjectData && (

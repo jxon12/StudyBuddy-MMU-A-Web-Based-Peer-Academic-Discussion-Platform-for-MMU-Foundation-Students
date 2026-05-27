@@ -9,7 +9,6 @@ import { Team } from '../components/team';
 import Homepage from '../components/homepage';
 import { AuthPage } from '../components/AuthPage';
 import { SubjectSelection } from '../components/SubjectSelection';
-import { CreatePostPage} from '../components/createpost';
 
 import { 
   Search, 
@@ -32,10 +31,11 @@ const ACCENT_COLORS = [
 ];
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion' | 'auth-login' | 'auth-signup' | 'subject-selection'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion' | 'faqs' | 'terms' | 'privacy' | 'mission' | 'auth-login' | 'auth-signup' | 'subject-selection'>('home');
   const [previousAuthType, setPreviousAuthType] = useState<'login' | 'signup'>('login');
   const [accentColor] = useState(ACCENT_COLORS[0]);
   const [showDocsMenu, setShowDocsMenu] = useState(false);
+  const [pendingScrollSection, setPendingScrollSection] = useState<string | null>(null);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
@@ -45,6 +45,26 @@ export default function App() {
   }, [theme, accentColor]);
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+
+  const navigateToHomeSection = (sectionId: string) => {
+    if (currentPage !== 'home') {
+      setPendingScrollSection(sectionId);
+      setCurrentPage('home');
+      return;
+    }
+
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  useEffect(() => {
+    if (!pendingScrollSection || currentPage !== 'home') return;
+
+    const element = document.getElementById(pendingScrollSection);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setPendingScrollSection(null);
+    }
+  }, [currentPage, pendingScrollSection]);
 
   return (
     <div className={`min-h-screen relative flex flex-col items-center selection:bg-apple-blue/30 overflow-x-hidden ${theme}`}>
@@ -66,7 +86,7 @@ export default function App() {
               <span className="nav-item cursor-pointer" onClick={() => setCurrentPage('auth-signup')}>Get Started</span>
               <span className="nav-item cursor-pointer" onClick={() => setCurrentPage('team')}>About Us</span>
               <span className="nav-item cursor-pointer" onClick={() => document.getElementById('academic-help')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>StudyBuddy</span>
-              <span className="nav-item cursor-pointer" onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>How it Works</span>
+              <span className="nav-item cursor-pointer" onClick={() => navigateToHomeSection('how-it-works')}>How it Works</span>
               <div 
                 className="relative"
                 onMouseEnter={() => setShowDocsMenu(true)}
@@ -153,30 +173,7 @@ export default function App() {
       )}
 
       {currentPage === 'discussion' && (
-      <nav className="liquid-nav-local px-4 md:px-8">
-        <div className="w-full max-w-5xl flex items-center justify-between">
-          <div className="text-[20px] md:text-[22px] font-semibold tracking-tight cursor-pointer" onClick={() => setCurrentPage('home')}>
-            StudyBuddy
-          </div>
-          <div className="flex-grow max-w-md mx-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-60" />
-              <input 
-                type="text" 
-                placeholder="Search questions or chapters..."
-                className="w-full h-10 pl-10 pr-4 bg-white/10 border border-white/20 rounded-full text-sm outline-none focus:border-apple-blue focus:bg-white/15 transition-all"
-              />
-            </div>
-          </div>
-          <div className="flex items-center gap-4 md:gap-6">
-            <Plus className="w-5 h-5 cursor-pointer opacity-60 hover:opacity-100 transition-all" />
-            <Bell className="w-5 h-5 cursor-pointer opacity-60 hover:opacity-100 transition-all" />
-            <div className="w-8 h-8 rounded-full liquid-glass flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-all">
-              <User className="w-4 h-4 opacity-80" />
-            </div>
-          </div>
-        </div>
-      </nav>
+      <></>
       )}
 
       {/* Main Content — HIG Spatial Structure */}
@@ -410,6 +407,14 @@ export default function App() {
             </motion.div>
           ) : currentPage === 'discussion' ? (
             <Homepage />
+         ) : currentPage === 'faqs' ? (
+            <FAQPage />
+          ) : currentPage === 'terms' ? (
+            <TermsPage />
+          ) : currentPage === 'privacy' ? (
+            <PrivacyPage />
+          ) : currentPage === 'mission' ? (
+            <MissionPage onGetInvolved={() => setCurrentPage('auth-signup')} />
           ) : (
             <Team onBackToHome={() => setCurrentPage('home')} />
           )}
@@ -430,7 +435,13 @@ export default function App() {
             <h4 className="text-[13px] font-bold opacity-30 uppercase tracking-widest">Platform</h4>
             <div className="flex flex-col gap-2">
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Features</span>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">How It Works</span>
+              <button
+                type="button"
+                onClick={() => navigateToHomeSection('how-it-works')}
+                className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                How It Works
+              </button>
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Leaderboard</span>
             </div>
           </div>
@@ -440,14 +451,29 @@ export default function App() {
             <div className="flex flex-col gap-2">
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Subjects</span>
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Course</span>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">FAQs</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentPage('faqs');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                FAQs
+              </button>
             </div>
           </div>
 
           <div className="space-y-4">
             <h4 className="text-[13px] font-bold opacity-30 uppercase tracking-widest">About</h4>
             <div className="flex flex-col gap-2">
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Our Mission</span>
+              <button
+                type="button"
+                onClick={() => { setCurrentPage('mission'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                Our Mission
+              </button>
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer" onClick={() => setCurrentPage('team')}>Team</span>
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Feedback</span>
             </div>
@@ -460,8 +486,20 @@ export default function App() {
               © 2026 STUDYBUDDY MMU COMMUNITY • BUILT FOR MMU FCI FOUNDATION STUDENTS
             </div>
             <div className="flex gap-6">
-               <span className="text-[11px] font-medium opacity-50 hover:opacity-100 transition-all cursor-pointer">Terms & Conditions</span>
-               <span className="text-[11px] font-medium opacity-50 hover:opacity-100 transition-all cursor-pointer">Privacy Policy</span>
+               <button
+                 type="button"
+                 onClick={() => { setCurrentPage('terms'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                 className="text-[11px] font-medium opacity-50 hover:opacity-100 transition-all cursor-pointer"
+               >
+                 Terms & Conditions
+               </button>
+               <button
+                 type="button"
+                 onClick={() => { setCurrentPage('privacy'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                 className="text-[11px] font-medium opacity-50 hover:opacity-100 transition-all cursor-pointer"
+               >
+                 Privacy Policy
+               </button>
             </div>
           </div>
 
