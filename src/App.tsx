@@ -9,6 +9,8 @@ import { Team } from '../components/team';
 import Homepage from '../components/homepage';
 import { AuthPage } from '../components/AuthPage';
 import { SubjectSelection } from '../components/SubjectSelection';
+import { CreatePostPage} from '../components/createpost';
+
 import { 
   Search, 
   ChevronDown, 

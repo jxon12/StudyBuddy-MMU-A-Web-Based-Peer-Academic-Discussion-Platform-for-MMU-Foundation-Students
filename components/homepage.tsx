@@ -36,19 +36,17 @@ interface Post {
 // --- Mock Data ---
 
 const SUBJECTS = [
-  { id: 'english', name: 'LAE1113 Academic English', color: 'bg-[#AF52DE]', cover: 'https://i.pinimg.com/736x/91/d4/91/91d491485a1126a79219f01c444d53db.jpg', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
-  { id: 'math', name: 'CMT 1134 Mathematics III', color: 'bg-[#5856D6]', cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
-  { id: 'digital', name: 'CDS1114 Intro to Digital System', color: 'bg-[#7D7AFF]', cover: 'https://i.pinimg.com/1200x/1a/ba/fb/1abafb14825c44b36d26df4c296eaa14.jpg', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
-  { id: 'physics', name: 'CPP1113 Principles of Physics', color: 'bg-[#BF5AF2]', cover: 'https://i.pinimg.com/736x/36/9e/41/369e4128b77f1b098dd57abd412bf723.jpg', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
-  { id: 'critical', name: 'LCT1113 Critical Thinking', color: 'bg-[#3634A3]', cover: 'https://i.pinimg.com/736x/88/0b/09/880b09b7b25fdd1bab31bf75ef721382.jpg', chapters: ['Logic', 'Arguments', 'Fallacies'] },
-  { id: 'mini-it', name: 'CSP1123 Mini IT Project', color: 'bg-[#DA8FFF]', cover: 'https://i.pinimg.com/1200x/86/f3/97/86f397cce8974ec841776c26d2604295.jpg', chapters: ['Project Planning', 'Development', 'Documentation'] },
+  { id: 'english', name: 'English', color: 'bg-[#AF52DE]', cover: 'https://i.pinimg.com/736x/91/d4/91/91d491485a1126a79219f01c444d53db.jpg', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
+  { id: 'math', name: 'Mathematics', color: 'bg-[#5856D6]', cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] },
+  { id: 'technical', name: 'Technical', color: 'bg-[#7D7AFF]', cover: 'https://i.pinimg.com/1200x/1a/ba/fb/1abafb14825c44b36d26df4c296eaa14.jpg', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
+  { id: 'critical', name: 'Critical Thinking', color: 'bg-[#3634A3]', cover: 'https://i.pinimg.com/736x/05/d7/9b/05d79bc6a859a129a7a2ee8504a601ff.jpg', chapters: ['Logic', 'Arguments', 'Fallacies'] },
 ];
 
 const MOCK_POSTS: Post[] = [
   // Shuffled for a more natural feed feel
   {
     id: 'mi1',
-    author: 'Brendan Tan',
+    author: 'Brandon Tan',
     avatar: 'https://i.pinimg.com/736x/44/26/04/44260448c1d15234d8341b0a4f869a6b.jpg',
     subject: 'CSP1123 Mini IT Project',
     chapter: 'Development',
