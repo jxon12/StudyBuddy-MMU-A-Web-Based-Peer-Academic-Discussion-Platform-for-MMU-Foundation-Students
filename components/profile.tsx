@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowLeft, 
@@ -8,7 +8,6 @@ import {
   Heart, 
   Save, 
   LogOut, 
-  ChevronDown, 
   Check,
   Plus,
   MessageCircle,
@@ -16,16 +15,11 @@ import {
 } from 'lucide-react';
 
 interface ProfileProps {
+  key?: string;
   onBack: () => void;
   onSignOut?: () => void;
 }
 
-
-const LOCATIONS = [
-  'Detecting...',
-  'MMU Cyberjaya Campus',
-  'MMU Melaka Campus',
-];
 
 export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
   // --- Persistent Profile State ---
@@ -34,11 +28,11 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
   });
   
   const [location, setLocation] = useState(() => {
-    return localStorage.getItem('profile-location') || 'Detecting...';
+    return localStorage.getItem('profile-location') || 'MMU Cyberjaya Campus';
   });
 
   const [avatarSeed, setAvatarSeed] = useState(() => {
-    return localStorage.getItem('profile-avatar-seed') || 'Me';
+    return localStorage.getItem('profile-avatar-seed') || 'real-photo';
   });
 
   const [bookmarksCount, setBookmarksCount] = useState(() => {
@@ -52,28 +46,15 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
   });
 
   // --- Dynamic dropdown menus UI ---
-  const [activeDropdown, setActiveDropdown] = useState<'location' | null>(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   // --- Mock posts created by this profile ---
-  const [myPosts, setMyPosts] = useState<Array<{id: string, content: string, timestamp: string, likes: number, replies: number}>>(() => {
+  const [myPosts, setMyPosts] = useState<Array<{id: string, content: string, timestamp: string, likes: number, replies: number, image?: string}>>(() => {
     const saved = localStorage.getItem('profile-my-posts');
     return saved ? JSON.parse(saved) : [];
   });
   const [newPostText, setNewPostText] = useState('');
   const [showPostModal, setShowPostModal] = useState(false);
-
-  // Auto-detect location simulator on component mount if set to Detecting...
-  useEffect(() => {
-    if (location === 'Detecting...') {
-      const timer = setTimeout(() => {
-        const randomLoc = LOCATIONS[Math.floor(Math.random() * (LOCATIONS.length - 1)) + 1];
-        setLocation(randomLoc);
-        localStorage.setItem('profile-location', randomLoc);
-      }, 1800);
-      return () => clearTimeout(timer);
-    }
-  }, [location]);
 
   // Handle Save profile info
   const handleSave = () => {
@@ -121,13 +102,14 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
 
   // Change avatar seed randomly
   const handleRandomizeAvatar = () => {
-    const randomSeeds = ['Lucky', 'Spooky', 'Snuggles', 'Tiger', 'Cookie', 'Precious', 'Willow', 'Buster', 'Milo', 'Cody', 'Me', 'StudyTime', 'MMUStar'];
+    const randomSeeds = ['real-photo', 'Lucky', 'Spooky', 'Snuggles', 'Tiger', 'Cookie', 'Precious', 'Willow', 'Buster', 'Milo', 'Cody', 'Me', 'StudyTime', 'MMUStar'];
     const currentIdx = randomSeeds.indexOf(avatarSeed);
     let nextIdx = Math.floor(Math.random() * randomSeeds.length);
     if (nextIdx === currentIdx) {
       nextIdx = (nextIdx + 1) % randomSeeds.length;
     }
     setAvatarSeed(randomSeeds[nextIdx]);
+    localStorage.setItem('profile-avatar-seed', randomSeeds[nextIdx]);
   };
 
   return (
@@ -158,17 +140,17 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
         )}
       </AnimatePresence>
 
-      {/* Profile Main Container Card */}
-      <div className="bg-zinc-900/60 backdrop-blur-2xl rounded-[32px] border border-white/[0.08] shadow-2xl p-6 md:p-8 space-y-8">
+      {/* Profile Main Container - Borderless Seamless Layout */}
+      <div className="space-y-8">
         
         {/* Interactive Profile Header Area */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6 pb-6 border-b border-white/[0.05]">
           
           {/* Avatar Container */}
-          <div className="relative group cursor-pointer" onClick={handleRandomizeAvatar}>
-            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/10 bg-zinc-800 flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+          <div className="relative group cursor-pointer animate-pulse-slow" onClick={handleRandomizeAvatar} title="Click to randomize your avatar!">
+            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20 bg-zinc-800 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-xl shadow-black/50">
               <img 
-                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`} 
+                src={avatarSeed === 'real-photo' ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=Me' : `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`} 
                 alt="Profile Avatar" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
@@ -203,43 +185,9 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
             </div>
 
             {/* Location Line */}
-            <div className="relative flex items-center gap-2">
+            <div className="flex items-center gap-2 px-2 text-left">
               <MapPin className="w-4 h-4 text-zinc-500" />
-              <button 
-                onClick={() => setActiveDropdown(activeDropdown === 'location' ? null : 'location')}
-                className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white font-medium hover:bg-white/5 px-2.5 py-1.5 rounded-lg transition-colors border border-transparent hover:border-white/5 text-left"
-              >
-                <span>{location}</span>
-                <ChevronDown className="w-3 h-3 text-zinc-500" />
-              </button>
-
-              {/* Location Select Dropdown */}
-              <AnimatePresence>
-                {activeDropdown === 'location' && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute top-10 left-0 bg-zinc-950 border border-white/10 rounded-xl shadow-2xl p-1.5 z-40 w-56 flex flex-col gap-0.5"
-                  >
-                    {LOCATIONS.map((loc) => (
-                      <button
-                        key={loc}
-                        onClick={() => {
-                          setLocation(loc);
-                          setActiveDropdown(null);
-                        }}
-                        className={`text-xs font-bold font-sans rounded-lg px-3 py-2 text-left transition-colors flex items-center justify-between ${
-                          location === loc ? 'bg-blue-600 text-white' : 'text-zinc-400 hover:bg-white/5 hover:text-white'
-                        }`}
-                      >
-                        <span>{loc}</span>
-                        {location === loc && <Check className="w-3.5 h-3.5" />}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <span className="text-sm text-zinc-400 font-medium">MMU Cyberjaya Campus</span>
             </div>
 
 
@@ -247,35 +195,19 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
           </div>
         </div>
 
-        {/* Profile Statistics Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          
-          {/* Upvoted Stat Card */}
-          <div className="bg-white/[0.03] hover:bg-white/[0.05] border border-white/[0.06] hover:border-white/10 rounded-2xl p-4 flex items-center justify-between transition-all group">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-rose-600/10 rounded-xl border border-rose-600/20 text-rose-400 group-hover:scale-105 transition-transform">
-                <TriangleIcon className="w-5 h-5 text-rose-400" />
-              </div>
-              <div className="text-left">
-                <p className="text-[11px] font-bold text-zinc-500 tracking-wider uppercase">Upvoted</p>
-                <h4 className="text-2xl font-black text-white">{bookmarksCount}</h4>
-              </div>
-            </div>
+        {/* Profile Statistics */}
+        <div className="bg-white/[0.03] hover:bg-white/[0.05] border border-white/[0.06] hover:border-white/10 rounded-2xl p-4 transition-all grid grid-cols-2 text-left divide-x divide-white/[0.06]">
+          {/* Upvoted Stat */}
+          <div className="pr-4">
+            <p className="text-[11px] font-bold text-zinc-500 tracking-wider uppercase">Upvoted</p>
+            <h4 className="text-2xl font-black text-white">{bookmarksCount}</h4>
           </div>
 
-          {/* Saved Stat Card */}
-          <div className="bg-white/[0.03] hover:bg-white/[0.05] border border-white/[0.06] hover:border-white/10 rounded-2xl p-4 flex items-center justify-between transition-all group">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-600/10 rounded-xl border border-blue-600/20 text-blue-400 group-hover:scale-105 transition-transform">
-                <Bookmark className="w-5 h-5" />
-              </div>
-              <div className="text-left">
-                <p className="text-[11px] font-bold text-zinc-500 tracking-wider uppercase">Saved</p>
-                <h4 className="text-2xl font-black text-white">{likesReceived}</h4>
-              </div>
-            </div>
+          {/* Saved Stat */}
+          <div className="pl-4">
+            <p className="text-[11px] font-bold text-zinc-500 tracking-wider uppercase">Saved</p>
+            <h4 className="text-2xl font-black text-white">{likesReceived}</h4>
           </div>
-
         </div>
 
         {/* My Posts Activity Section */}
@@ -364,6 +296,16 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
                     <p className="text-[13px] font-semibold text-zinc-300 leading-relaxed text-left">
                       {p.content}
                     </p>
+                    {p.image && (
+                      <div className="rounded-xl overflow-hidden border border-white/5 max-h-40 bg-zinc-950/40 mt-1">
+                        <img 
+                          src={p.image} 
+                          alt="Post photo" 
+                          className="w-full h-full object-cover max-h-40"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                    )}
                     <div className="flex items-center gap-6 pt-2 border-t border-white/[0.03]">
                       <div className="flex items-center gap-1.5 text-xs text-zinc-500">
                         <TriangleIcon className="w-3.5 h-3.5 text-zinc-500" />
@@ -421,4 +363,3 @@ function TriangleIcon(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-
