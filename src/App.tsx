@@ -9,6 +9,7 @@ import { Team } from '../components/team';
 import Homepage from '../components/homepage';
 import { AuthPage } from '../components/AuthPage';
 import { SubjectSelection } from '../components/SubjectSelection';
+<<<<<<< HEAD
 import { FAQPage } from '../components/FAQs';
 import { TermsPage } from '../components/TermsAndCondition';
 import { PrivacyPage } from '../components/Privacy';
@@ -16,6 +17,10 @@ import { MissionPage } from '../components/Mission';
 import { Leaderboard } from '../components/Leaderboard';
 import { FeedbackPage } from '../components/Feedback';
 import { CoursePage } from '../components/Course';
+=======
+import {profile} from '../components/profile';
+
+>>>>>>> 666386bdfab64e3b2482f56bbe28d6b025e8797d
 import { 
   Search, 
   ChevronDown, 
@@ -433,8 +438,13 @@ export default function App() {
             </motion.div>
           ) : currentPage === 'discussion' ? (
             <Homepage />
+<<<<<<< HEAD
           ) : currentPage === 'faqs' ? (
             <FAQPage onNavigate={(page) => { setCurrentPage(page as any); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+=======
+         ) : currentPage === 'faqs' ? (
+            <FAQPage />
+>>>>>>> 666386bdfab64e3b2482f56bbe28d6b025e8797d
           ) : currentPage === 'terms' ? (
             <TermsPage />
           ) : currentPage === 'privacy' ? (
