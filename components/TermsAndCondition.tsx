@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Info, AlertTriangle, Scale, Lock, FileText } from 'lucide-react';
+import { Info, AlertTriangle, Scale, Lock, FileText } from 'lucide-react';
 
 const SECTIONS = [
   {

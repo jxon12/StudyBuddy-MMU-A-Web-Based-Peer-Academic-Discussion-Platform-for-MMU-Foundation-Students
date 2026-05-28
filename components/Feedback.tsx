@@ -3,17 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageSquare, 
   Send, 
-  Check, 
-  AlertCircle, 
+  Check,
   User, 
   Sparkles, 
-  Grid, 
-  BookOpen, 
-  GraduationCap, 
+  
   TrendingUp, 
   History, 
   RefreshCw,
-  ThumbsUp,
+  
   Heart
 } from 'lucide-react';
 
@@ -63,20 +60,7 @@ const TRIMESTERS_DATA: Record<string, string[]> = {
   'General/None': []
 };
 
-// Generates an ID according to the user requested format: 252FC253ZL
-function generateRandomStudentId(): string {
-  const digits1 = Math.floor(100 + Math.random() * 900); // 3 digits
-  const letters1 = String.fromCharCode(
-    65 + Math.floor(Math.random() * 26), 
-    65 + Math.floor(Math.random() * 26)
-  ); // 2 letters
-  const digits2 = Math.floor(100 + Math.random() * 900); // 3 digits
-  const letters2 = String.fromCharCode(
-    65 + Math.floor(Math.random() * 26), 
-    65 + Math.floor(Math.random() * 26)
-  ); // 2 letters
-  return `${digits1}${letters1}${digits2}${letters2}`;
-}
+
 
 export function FeedbackPage() {
   const [formData, setFormData] = useState({

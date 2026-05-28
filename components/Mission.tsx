@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Target, Users, Coffee, Cpu } from 'lucide-react';
+import { Target, Users, Cpu } from 'lucide-react';
 
 const MISSION_PILLARS = [
   {

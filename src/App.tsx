@@ -15,6 +15,7 @@ import { PrivacyPage } from '../components/Privacy';
 import { MissionPage } from '../components/Mission';
 import { Leaderboard } from '../components/Leaderboard';
 import { FeedbackPage } from '../components/Feedback';
+import { CoursePage } from '../components/Course';
 import { 
   Search, 
   ChevronDown, 
@@ -34,7 +35,7 @@ const ACCENT_COLORS = [
 ];
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion' | 'faqs' | 'terms' | 'privacy' | 'mission' | 'leaderboard' | 'feedback' | 'auth-login' | 'auth-signup' | 'subject-selection'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion' | 'course' | 'faqs' | 'terms' | 'privacy' | 'mission' | 'leaderboard' | 'feedback' | 'auth-login' | 'auth-signup' | 'subject-selection'>('home');
   const [previousAuthType, setPreviousAuthType] = useState<'login' | 'signup'>('login');
   const [accentColor] = useState(ACCENT_COLORS[0]);
   const [showDocsMenu, setShowDocsMenu] = useState(false);
@@ -48,6 +49,11 @@ export default function App() {
   }, [theme, accentColor]);
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+
+  const navigateToPage = (page: 'home' | 'team' | 'discussion' | 'course' | 'faqs' | 'terms' | 'privacy' | 'mission' | 'leaderboard' | 'feedback' | 'auth-login' | 'auth-signup' | 'subject-selection') => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const navigateToHomeSection = (sectionId: string) => {
     if (currentPage !== 'home') {
@@ -87,7 +93,7 @@ export default function App() {
             <img src="/images/mmu-logo.svg" alt="MMU Logo" className="h-[18px] w-auto nav-item" />
             <div className="hidden lg:flex items-center gap-8">
               <span className="nav-item cursor-pointer" onClick={() => setCurrentPage('auth-signup')}>Get Started</span>
-              <span className="nav-item cursor-pointer" onClick={() => setCurrentPage('team')}>About Us</span>
+              <span className="nav-item cursor-pointer" onClick={() => navigateToPage('team')}>About Us</span>
               <span className="nav-item cursor-pointer" onClick={() => document.getElementById('academic-help')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>StudyBuddy</span>
               <span className="nav-item cursor-pointer" onClick={() => navigateToHomeSection('how-it-works')}>How it Works</span>
               <div 
@@ -110,7 +116,7 @@ export default function App() {
                       className="absolute top-full left-0 pt-3 w-72 -translate-x-1/4"
                     >
                       <div className="glass-card !p-2 !rounded-[24px]">
-                        <div className="flex items-start gap-4 p-4 rounded-[18px] hover:bg-white/10 dark:hover:bg-white/5 transition-all cursor-pointer group" onClick={() => { setCurrentPage('team'); setShowDocsMenu(false); }}>
+                        <div className="flex items-start gap-4 p-4 rounded-[18px] hover:bg-white/10 dark:hover:bg-white/5 transition-all cursor-pointer group" onClick={() => { navigateToPage('team'); setShowDocsMenu(false); }}>
                            <div className="w-10 h-10 rounded-[14px] liquid-glass flex items-center justify-center bg-apple-blue/20 text-apple-blue">
                              <BookOpen className="w-5 h-5" />
                            </div>
@@ -193,7 +199,9 @@ export default function App() {
       {/* Main Content — HIG Spatial Structure */}
       <main className="flex-grow w-full relative">
         <AnimatePresence mode="wait">
-          {currentPage === 'auth-login' || currentPage === 'auth-signup' ? (
+          {currentPage === 'course' ? (
+            <CoursePage key="course" />
+          ) : currentPage === 'auth-login' || currentPage === 'auth-signup' ? (
             <AuthPage 
               key="auth"
               type={currentPage === 'auth-login' ? 'login' : 'signup'}
@@ -477,7 +485,16 @@ export default function App() {
             <h4 className="text-[13px] font-bold opacity-30 uppercase tracking-widest">Resources</h4>
             <div className="flex flex-col gap-2">
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Subjects</span>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Course</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentPage('course');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                Course
+              </button>
               <button
                 type="button"
                 onClick={() => {
@@ -501,7 +518,13 @@ export default function App() {
               >
                 Our Mission
               </button>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer" onClick={() => setCurrentPage('team')}>Team</span>
+              <button
+                type="button"
+                onClick={() => navigateToPage('team')}
+                className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                Team
+              </button>
               <button
                 type="button"
                 onClick={() => { setCurrentPage('feedback'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}

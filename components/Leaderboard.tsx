@@ -481,7 +481,7 @@ export const Leaderboard: React.FC = () => {
                 <option value="Academic English" className="text-white">Academic English</option>
                 <option value="Mathematics III" className="text-white">Mathematics III</option>
               </optgroup>
-            </select>
+            </select>   
           </div>
         </div>
       </div>
