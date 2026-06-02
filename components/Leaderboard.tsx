@@ -3,20 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Trophy, 
   Award, 
-  Sparkles, 
-  TrendingUp, 
+  Star, 
   Flame, 
   ThumbsUp, 
   Search, 
-  ArrowUpRight, 
-  Star, 
   UserCheck, 
-  Clock, 
   X, 
-  CheckCircle2, 
-  AlertCircle,
-  GraduationCap,
-  Sparkle
+  BookOpen
 } from 'lucide-react';
 
 // Type definitions matching MMU Student profile attributes
@@ -75,8 +68,6 @@ const STUDY_CHALLENGES = [
     subject: 'Mathematics II',
     question: 'What is the average time complexity of searching a value in an unsorted array of size N?',
     options: ['O(1)', 'O(log N)', 'O(N)', 'O(N^2)'],
-    correctIndex: 2,
-    explanation: 'In an unsorted array, we may have to traverse up to all N elements. The average and worst-case complexity is linear, O(N).',
   }
 ];
 
@@ -246,7 +237,7 @@ const INITIAL_STUDENTS: Student[] = [
 ];
 
 export const Leaderboard: React.FC = () => {
-  const [students, setStudents] = useState<Student[]>(INITIAL_STUDENTS);
+  const [students] = useState<Student[]>(INITIAL_STUDENTS);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTimeframe, setActiveTimeframe] = useState<'weekly' | 'monthly' | 'alltime'>('weekly');
   const [selectedSubject, setSelectedSubject] = useState<string>('All');
@@ -255,12 +246,7 @@ export const Leaderboard: React.FC = () => {
   // Custom non-blocking feedback message for contributions action
   const [contributionNavMessage, setContributionNavMessage] = useState<string | null>(null);
 
-  // Daily Challenge State
-  const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [isQuizSubmitted, setIsQuizSubmitted] = useState(false);
-  const [quizSuccess, setQuizSuccess] = useState<boolean | null>(null);
-  const [pointsEarnedMessage, setPointsEarnedMessage] = useState<string | null>(null);
+
 
   // Filter and Search Logic
   const filteredStudents = useMemo(() => {
@@ -283,17 +269,17 @@ export const Leaderboard: React.FC = () => {
       );
     }
 
-    // Timeframe multiplier simulation
+    // Timeframe multiplier simulation for upvotes
     return result.map(student => {
-      let scoreMultiplier = 1;
-      if (activeTimeframe === 'weekly') scoreMultiplier = 0.3;
-      if (activeTimeframe === 'monthly') scoreMultiplier = 0.7;
+      let upvoteMultiplier = 1;
+      if (activeTimeframe === 'weekly') upvoteMultiplier = 0.3;
+      if (activeTimeframe === 'monthly') upvoteMultiplier = 0.7;
 
       return {
         ...student,
-        points: Math.round(student.points * scoreMultiplier)
+        upvotes: Math.round(student.upvotes * upvoteMultiplier)
       };
-    }).sort((a, b) => b.points - a.points)
+    }).sort((a, b) => b.upvotes - a.upvotes)
       .map((student, index) => ({
         ...student,
         rank: index + 1
@@ -305,51 +291,7 @@ export const Leaderboard: React.FC = () => {
     return filteredStudents.find(s => s.isCurrentUser);
   }, [filteredStudents]);
 
-  // Quiz Handling
-  const handleOptionSelect = (optionIndex: number) => {
-    if (isQuizSubmitted) return;
-    setSelectedOption(optionIndex);
-  };
 
-  const handleQuizSubmit = () => {
-    if (selectedOption === null || isQuizSubmitted) return;
-
-    const quiz = STUDY_CHALLENGES[currentQuizIndex];
-    const isCorrect = selectedOption === quiz.correctIndex;
-    
-    setIsQuizSubmitted(true);
-    setQuizSuccess(isCorrect);
-
-    if (isCorrect) {
-      // Award 150 study points
-      const pointsToAdd = 150;
-      setPointsEarnedMessage(`+${pointsToAdd} XP Earned. Exceptional study work!`);
-
-      // Modify the current user's state to increment points and streak
-      setStudents(prev => prev.map(student => {
-        if (student.isCurrentUser) {
-          return {
-            ...student,
-            points: student.points + pointsToAdd,
-            streak: student.streak + 1,
-            questionsSolved: student.questionsSolved + 1,
-            upvotes: student.upvotes + 4
-          };
-        }
-        return student;
-      }));
-    } else {
-      setPointsEarnedMessage('Incorrect answer. Review this topic in your notes!');
-    }
-  };
-
-  const handleNextQuiz = () => {
-    setSelectedOption(null);
-    setIsQuizSubmitted(false);
-    setQuizSuccess(null);
-    setPointsEarnedMessage(null);
-    setCurrentQuizIndex((prev) => (prev + 1) % STUDY_CHALLENGES.length);
-  };
 
   // Top 3 Podium Extraction
   const podiumStudents = useMemo(() => {
@@ -375,8 +317,7 @@ export const Leaderboard: React.FC = () => {
       <div id="leaderboard-header-section" className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-12">
         <div className="space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full liquid-glass bg-apple-blue/10 text-apple-blue text-[11px] font-semibold tracking-wide uppercase border-apple-blue/20">
-            <Trophy className="w-3.5 h-3.5" />
-            MMU Academic Hub
+            
           </div>
           <h1 id="leaderboard-main-title" className="text-[36px] md:text-[44px] font-bold tracking-tight leading-tight">
             Academic Leaderboard
@@ -384,22 +325,6 @@ export const Leaderboard: React.FC = () => {
           <p className="text-[15px] opacity-60 max-w-2xl">
             Meet the leading academic contributors of Multimedia University (MMU). Solve topics, post answers, get upvotes, and build credentials.
           </p>
-        </div>
-
-        {/* Global Statistics */}
-        <div id="leaderboard-quick-stats" className="flex items-center gap-4 bg-white/5 dark:bg-black/20 p-2 rounded-[20px] border border-white/5 backdrop-blur-md">
-          <div className="px-4 py-2 border-r border-white/5 text-center">
-            <div className="text-[10px] font-bold opacity-30 uppercase tracking-widest">Active Users</div>
-            <div className="text-[17px] font-bold mt-0.5 text-apple-blue">247</div>
-          </div>
-          <div className="px-4 py-2 border-r border-white/5 text-center">
-            <div className="text-[10px] font-bold opacity-30 uppercase tracking-widest">Helpful Answers</div>
-            <div className="text-[17px] font-bold mt-0.5 text-apple-mint">1,829</div>
-          </div>
-          <div className="px-4 py-2 text-center">
-            <div className="text-[10px] font-bold opacity-30 uppercase tracking-widest">Weekly Study Hrs</div>
-            <div className="text-[17px] font-bold mt-0.5 text-apple-indigo">4,120</div>
-          </div>
         </div>
       </div>
 
@@ -532,9 +457,9 @@ export const Leaderboard: React.FC = () => {
 
                 {/* 2nd place Podium column block */}
                 <div className="w-full h-24 mt-4 bg-zinc-600/10 hover:bg-zinc-600/15 border-t border-x border-zinc-500/20 rounded-t-[20px] flex flex-col justify-center items-center backdrop-blur-md transition-all">
-                  <TrendingUp className="w-4 h-4 text-zinc-400 mb-1" />
+                  <ThumbsUp className="w-4 h-4 text-zinc-400 mb-1" />
                   <span className="text-[14px] font-black leading-tight text-zinc-300">
-                    {podiumStudents[0].points} XP
+                    {podiumStudents[0].upvotes}
                   </span>
                   <span className="text-[10px] font-bold text-orange-500 bg-orange-500/10 px-1.5 py-0.5 rounded-md mt-1 flex items-center gap-0.5">
                     <Flame className="w-2.5 h-2.5" />
@@ -577,7 +502,7 @@ export const Leaderboard: React.FC = () => {
                     <span className="text-[15px] font-black tracking-tight text-primary group-hover:text-amber-400 transition-colors truncate">
                       {podiumStudents[1].name}
                     </span>
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <Star className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   </div>
                   <span className="block text-[10px] opacity-50 font-bold uppercase tracking-widest leading-none mt-0.5 truncate px-1">
                     {podiumStudents[1].subject}
@@ -586,9 +511,9 @@ export const Leaderboard: React.FC = () => {
 
                 {/* 1st place Podium column block */}
                 <div className="w-full h-32 mt-4 bg-gradient-to-b from-amber-500/10 to-amber-600/5 hover:from-amber-500/15 border-t border-x border-amber-400/20 rounded-t-[24px] flex flex-col justify-center items-center backdrop-blur-md shadow-[0_-10px_30px_rgba(251,191,36,0.05)] transition-all">
-                  <Star className="w-4.5 h-4.5 text-amber-400 mb-1" />
+                  <ThumbsUp className="w-4.5 h-4.5 text-amber-400 mb-1" />
                   <span className="text-[17px] font-black leading-none text-amber-300">
-                    {podiumStudents[1].points} XP
+                    {podiumStudents[1].upvotes}
                   </span>
                   <span className="text-[10px] font-bold text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-lg mt-1.5 flex items-center gap-1">
                     <Flame className="w-3 h-3" />
@@ -634,9 +559,9 @@ export const Leaderboard: React.FC = () => {
 
                 {/* 3rd place Podium column block */}
                 <div className="w-full h-20 mt-4 bg-amber-900/10 hover:bg-amber-900/15 border-t border-x border-amber-800/15 rounded-t-[20px] flex flex-col justify-center items-center backdrop-blur-md transition-all">
-                  <TrendingUp className="w-4 h-4 text-amber-600 mb-1" />
+                  <ThumbsUp className="w-4 h-4 text-amber-600 mb-1" />
                   <span className="text-[14px] font-black leading-tight text-amber-500">
-                    {podiumStudents[2].points} XP
+                    {podiumStudents[2].upvotes}
                   </span>
                   <span className="text-[10px] font-bold text-orange-500 bg-orange-500/10 px-1.5 py-0.5 rounded-md mt-1 flex items-center gap-0.5">
                     <Flame className="w-2.5 h-2.5" />
@@ -656,7 +581,7 @@ export const Leaderboard: React.FC = () => {
               <div className="col-span-2 text-center">Rank</div>
               <div className="col-span-5">Buddy</div>
               <div className="col-span-3">Subject Name</div>
-              <div className="col-span-2 text-right">XP Points</div>
+              <div className="col-span-2 text-right">Upvotes</div>
             </div>
 
             {/* List Rows */}
@@ -728,13 +653,13 @@ export const Leaderboard: React.FC = () => {
                         </span>
                       </div>
 
-                      {/* XP Points Column */}
+                      {/* Upvotes Column */}
                       <div className="col-span-2 text-right">
                         <span className="text-[15px] font-black text-primary/95 block leading-none">
-                          {student.points}
+                          {student.upvotes}
                         </span>
                         <span className="text-[9px] font-bold text-apple-blue mt-1 inline-block opacity-75">
-                          Study XP
+                          Upvotes
                         </span>
                       </div>
 
@@ -753,7 +678,7 @@ export const Leaderboard: React.FC = () => {
               <div id="sticky-current-user-badge" className="p-4 bg-apple-blue/5 border-t border-white/10 flex items-center justify-between text-[13px] px-6">
                 <div className="flex items-center gap-3">
                   <UserCheck className="w-4 h-4 text-apple-blue" />
-                  <span>Your current placement: <strong className="text-apple-blue">Rank #{currentUser.rank}</strong> with <strong>{currentUser.points} XP</strong></span>
+                  <span>Your current placement: <strong className="text-apple-blue">Rank #{currentUser.rank}</strong> with <strong>{currentUser.upvotes} upvotes</strong></span>
                 </div>
                 <div className="flex items-center gap-1 text-[11px] bg-orange-500/10 text-orange-500 px-2 py-0.5 rounded-lg font-bold">
                   <Flame className="w-3 h-3" />
@@ -766,150 +691,13 @@ export const Leaderboard: React.FC = () => {
 
         </div>
 
-        {/* RIGHT COLUMN: DAILY STUDY CHALLENGE & CONTRIBUTOR PATHWAY */}
+        {/* RIGHT COLUMN: CONTRIBUTOR PATHWAY */}
         <div className="space-y-8">
           
-          {/* STUDY CHALLENGE SIMULATOR CARD */}
-          <div id="quiz-challenge-card" className="glass-card !bg-gradient-to-b from-white/10 to-white/5 relative border border-white/10 shadow-2xl overflow-hidden group">
-            
-            {/* Visual background lights */}
-            <div className="absolute top-[-50px] right-[-50px] w-24 h-24 rounded-full bg-apple-blue/20 blur-[50px] pointer-events-none group-hover:bg-apple-blue/30 transition-all duration-700" />
-            <div className="absolute bottom-[-50px] left-[-50px] w-24 h-24 rounded-full bg-apple-indigo/15 blur-[50px] pointer-events-none" />
-
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-apple-blue/10 text-apple-blue flex items-center justify-center shrink-0">
-                  <Clock className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-[16px] font-bold">Contribute & Earn XP</h3>
-                  <p className="text-[11px] opacity-40 leading-none">Climb the podium leaderboard instantly</p>
-                </div>
-              </div>
-              <span className="text-[10px] font-extrabold bg-apple-blue text-white px-2 py-1 rounded-md uppercase tracking-wider animate-pulse">
-                Live Quiz
-              </span>
-            </div>
-
-            {/* Simulated Quiz Area */}
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-[11px] font-bold text-apple-purple bg-apple-purple/10 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                  {STUDY_CHALLENGES[currentQuizIndex].subject}
-                </span>
-                <span className="text-[12px] opacity-40">
-                  Question {currentQuizIndex + 1}/{STUDY_CHALLENGES.length}
-                </span>
-              </div>
-
-              <p className="text-[15px] font-bold leading-snug text-primary">
-                {STUDY_CHALLENGES[currentQuizIndex].question}
-              </p>
-
-              {/* Options */}
-              <div id="quiz-options-wrapper" className="space-y-2 mt-4">
-                {STUDY_CHALLENGES[currentQuizIndex].options.map((option, idx) => {
-                  let optionStyle = 'bg-white/5 border-white/10 hover:bg-white/10 hover:scale-[1.01]';
-                  
-                  if (selectedOption === idx) {
-                    optionStyle = 'bg-apple-blue/20 border-apple-blue/40 text-apple-blue shadow-[0_4px_12px_rgba(10,132,255,0.1)]';
-                  }
-
-                  if (isQuizSubmitted) {
-                    if (idx === STUDY_CHALLENGES[currentQuizIndex].correctIndex) {
-                      optionStyle = 'bg-apple-mint/20 border-apple-mint/40 text-apple-mint shadow-[0_4px_12px_rgba(48,209,88,0.1)]';
-                    } else if (selectedOption === idx) {
-                      optionStyle = 'bg-apple-coral/20 border-apple-coral/40 text-apple-coral';
-                    } else {
-                      optionStyle = 'bg-white/5 border-white/10 opacity-30';
-                    }
-                  }
-
-                  return (
-                    <button
-                      key={idx}
-                      id={`quiz-option-${idx}`}
-                      disabled={isQuizSubmitted}
-                      onClick={() => handleOptionSelect(idx)}
-                      className={`w-full p-3.5 rounded-xl border text-left text-[13px] font-semibold transition-all duration-300 flex items-center justify-between cursor-pointer ${optionStyle}`}
-                    >
-                      <span>{option}</span>
-                      
-                      {isQuizSubmitted && idx === STUDY_CHALLENGES[currentQuizIndex].correctIndex && (
-                        <CheckCircle2 className="w-4 h-4 text-apple-mint flex-shrink-0 ml-2" />
-                      )}
-                      {isQuizSubmitted && selectedOption === idx && idx !== STUDY_CHALLENGES[currentQuizIndex].correctIndex && (
-                        <AlertCircle className="w-4 h-4 text-apple-coral flex-shrink-0 ml-2" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Submit / Feedback Button */}
-              <div className="pt-4 space-y-3">
-                <AnimatePresence mode="wait">
-                  {pointsEarnedMessage && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className={`p-3 rounded-xl flex items-center gap-2.5 border text-[12px] font-bold ${
-                        quizSuccess 
-                          ? 'bg-apple-mint/10 border-apple-mint/30 text-apple-mint' 
-                          : 'bg-apple-coral/10 border-apple-coral/30 text-apple-coral'
-                      }`}
-                    >
-                      {quizSuccess ? <Sparkle className="w-4 h-4 flex-shrink-0" /> : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
-                      <span>{pointsEarnedMessage}</span>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {!isQuizSubmitted ? (
-                  <button
-                    id="quiz-submit-button"
-                    onClick={handleQuizSubmit}
-                    disabled={selectedOption === null}
-                    className={`w-full h-11 rounded-xl text-[13px] font-extrabold flex items-center justify-center transition-all cursor-pointer ${
-                      selectedOption !== null 
-                        ? 'bg-apple-blue text-white shadow-lg shadow-apple-blue/20 hover:brightness-110 active:scale-98' 
-                        : 'bg-white/5 text-primary opacity-30 cursor-not-allowed border border-white/10'
-                    }`}
-                  >
-                    Submit Practice Solution
-                  </button>
-                ) : (
-                  <button
-                    id="quiz-next-button"
-                    onClick={handleNextQuiz}
-                    className="w-full h-11 bg-white/10 border border-white/20 hover:bg-white/15 hover:border-white/35 text-white rounded-xl text-[13px] font-extrabold flex items-center justify-center gap-2 transition-all active:scale-98 cursor-pointer"
-                  >
-                    Load Next Study Topic
-                    <ArrowUpRight className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-
-              {/* Expansions description */}
-              {isQuizSubmitted && (
-                <motion.div 
-                  initial={{ opacity: 0 }} 
-                  animate={{ opacity: 1 }} 
-                  className="p-3 bg-black/10 dark:bg-black/30 border border-white/5 rounded-xl text-[11px] leading-relaxed opacity-80 animate-fade-in"
-                >
-                  <span className="font-bold block text-apple-purple uppercase tracking-[0.05em] mb-1">Peer Explanation Hint:</span>
-                  {STUDY_CHALLENGES[currentQuizIndex].explanation}
-                </motion.div>
-              )}
-
-            </div>
-          </div>
-
           {/* HOW TO CLIMB WORKFLOW WIDGET */}
           <div id="contributor-pathways-panel" className="glass-card p-6 border border-white/5">
             <h3 className="text-[17px] font-bold mb-4 flex items-center gap-2">
-              <Award className="w-4.5 h-4.5 text-apple-blue" />
+              <Star className="w-4.5 h-4.5 text-apple-blue" />
               Contributor Pathway
             </h3>
             
@@ -917,23 +705,23 @@ export const Leaderboard: React.FC = () => {
               {[
                 { 
                   action: 'Respond to academic queries', 
-                  points: '+100 XP per upvote', 
+                  points: '+100 upvotes per answer', 
                   desc: 'A peer upvotes your answer on specific subject chapters.' 
                 },
                 { 
                   action: 'Resolve open questions', 
-                  points: '+250 XP per accepted solution', 
+                  points: '+250 upvotes per solution', 
                   desc: 'A student marks your reply as the single verified solution.' 
                 },
                 { 
                   action: 'Post structured notes', 
-                  points: '+80 XP per chapter summary', 
+                  points: '+80 upvotes per chapter', 
                   desc: 'Publish comprehensive study summaries tagged with course code.' 
                 },
                 { 
-                  action: 'Pass daily concept checks', 
-                  points: '+150 XP first daily try', 
-                  desc: 'Clear the interactive prompt questions right here.' 
+                  action: 'Help peers in discussions', 
+                  points: '+5 upvotes per attempt', 
+                  desc: 'Clear the interactive study challenges and share your knowledge.' 
                 }
               ].map((item, i) => (
                 <div key={i} className="flex gap-3.5 items-start">
@@ -983,7 +771,7 @@ export const Leaderboard: React.FC = () => {
                   <X className="w-4 h-4" />
                 </button>
                 <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1 bg-black/25 rounded-full text-[10px] font-extrabold text-white uppercase tracking-wider">
-                  <GraduationCap className="w-3 h-3 text-apple-blue" />
+                  <BookOpen className="w-3 h-3 text-apple-blue" />
                   MMU Academic Credential
                 </div>
               </div>
@@ -1027,8 +815,8 @@ export const Leaderboard: React.FC = () => {
                 {/* Stats Grid */}
                 <div className="grid grid-cols-3 gap-3.5 mt-6 mb-6">
                   <div className="bg-black/10 dark:bg-white/5 border border-white/5 p-3 rounded-[18px] text-center">
-                    <div className="text-[10px] font-semibold opacity-30 uppercase tracking-widest leading-none">Study Points</div>
-                    <div className="text-[17px] font-black mt-1 text-primary">{selectedStudent.points} XP</div>
+                    <div className="text-[10px] font-semibold opacity-30 uppercase tracking-widest leading-none">Total Upvotes</div>
+                    <div className="text-[17px] font-black mt-1 text-primary">{selectedStudent.upvotes}</div>
                   </div>
                   <div className="bg-black/10 dark:bg-white/5 border border-white/5 p-3 rounded-[18px] text-center">
                     <div className="text-[10px] font-semibold opacity-30 uppercase tracking-widest leading-none">Daily Streak</div>

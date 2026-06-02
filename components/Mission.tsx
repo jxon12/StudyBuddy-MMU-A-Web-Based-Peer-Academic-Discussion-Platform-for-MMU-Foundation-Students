@@ -112,7 +112,7 @@ export function MissionPage({ onGetInvolved }: MissionPageProps) {
       >
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6">Join the movement.</h2>
         <p className="text-[19px] opacity-60 mb-10 max-w-2xl mx-auto">
-          We're just getting started. If you're an MMU student who cares about better tools, help us build the future of study platforms.
+          We're just getting started. If you're an MMU FCI foundation student who cares about better tools, help us build the future of study platforms.
         </p>
         <button className="apple-button-primary mx-auto" onClick={onGetInvolved}>Get Involved</button>
       </motion.div>

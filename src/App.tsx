@@ -2,25 +2,6 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Team } from '../components/team';
-import Homepage from '../components/homepage';
-import { AuthPage } from '../components/AuthPage';
-import { SubjectSelection } from '../components/SubjectSelection';
-<<<<<<< HEAD
-import { FAQPage } from '../components/FAQs';
-import { TermsPage } from '../components/TermsAndCondition';
-import { PrivacyPage } from '../components/Privacy';
-import { MissionPage } from '../components/Mission';
-import { Leaderboard } from '../components/Leaderboard';
-import { FeedbackPage } from '../components/Feedback';
-import { CoursePage } from '../components/Course';
-=======
-import {profile} from '../components/profile';
-
->>>>>>> 666386bdfab64e3b2482f56bbe28d6b025e8797d
 import { 
   Search, 
   ChevronDown, 
@@ -30,6 +11,19 @@ import {
   Sun,
   User
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Team } from '../components/team';
+import Homepage from '../components/homepage';
+import { AuthPage } from '../components/AuthPage';
+import { SubjectSelection } from '../components/SubjectSelection';
+import { FAQPage } from '../components/FAQs';
+import { TermsPage } from '../components/TermsAndCondition';
+import { PrivacyPage } from '../components/Privacy';
+import { MissionPage } from '../components/Mission';
+import { Leaderboard } from '../components/Leaderboard';
+import { FeedbackPage } from '../components/Feedback';
+import { CoursePage } from '../components/Course';
 
 const ACCENT_COLORS = [
   { name: 'Blue', value: '#0A84FF', secondary: '#007AFF' },
@@ -47,20 +41,50 @@ export default function App() {
   const [pendingScrollSection, setPendingScrollSection] = useState<string | null>(null);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
+  // Spatial tap sound generator
+  const playSpatialTap = (freq = 600, duration = 0.08) => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      osc.type = 'triangle';  // 中间色彩
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(freq / 2.3, ctx.currentTime + duration);
+      
+      gain.gain.setValueAtTime(0.06, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+    } catch (e) {
+      // gracefully ignore sandbox context blocks
+    }
+  };
+
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
     document.documentElement.style.setProperty('--color-brand-blue', accentColor.value);
     document.documentElement.style.setProperty('--color-brand-purple', accentColor.secondary);
   }, [theme, accentColor]);
 
-  const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  const toggleTheme = () => {
+    playSpatialTap(480, 0.1);
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
 
   const navigateToPage = (page: 'home' | 'team' | 'discussion' | 'course' | 'faqs' | 'terms' | 'privacy' | 'mission' | 'leaderboard' | 'feedback' | 'auth-login' | 'auth-signup' | 'subject-selection') => {
+    playSpatialTap(600, 0.08);
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const navigateToHomeSection = (sectionId: string) => {
+    playSpatialTap(550, 0.09);
     if (currentPage !== 'home') {
       setPendingScrollSection(sectionId);
       setCurrentPage('home');
@@ -438,13 +462,9 @@ export default function App() {
             </motion.div>
           ) : currentPage === 'discussion' ? (
             <Homepage />
-<<<<<<< HEAD
+
           ) : currentPage === 'faqs' ? (
             <FAQPage onNavigate={(page) => { setCurrentPage(page as any); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
-=======
-         ) : currentPage === 'faqs' ? (
-            <FAQPage />
->>>>>>> 666386bdfab64e3b2482f56bbe28d6b025e8797d
           ) : currentPage === 'terms' ? (
             <TermsPage />
           ) : currentPage === 'privacy' ? (
@@ -503,7 +523,7 @@ export default function App() {
                 }}
                 className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
               >
-                Course
+                Academic
               </button>
               <button
                 type="button"

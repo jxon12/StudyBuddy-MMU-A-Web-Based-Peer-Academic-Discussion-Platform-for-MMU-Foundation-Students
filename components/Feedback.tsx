@@ -270,7 +270,7 @@ export function FeedbackPage() {
                       <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 opacity-30" />
                       <input 
                         type="text" 
-                        placeholder="e.g. Kenji Tan"
+                        placeholder="e.g. Tan Kenji"
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
                         className="w-full h-11 bg-black/10 dark:bg-white/5 border border-white/5 rounded-xl pl-10 pr-4 text-[13px] font-medium text-primary outline-none focus:border-apple-blue/40"
@@ -465,62 +465,7 @@ export function FeedbackPage() {
         </div>
       </div>
 
-      {/* FEEDBACK HISTORY LOGS */}
-      <div className="mt-16 pt-8 border-t border-white/10 space-y-6">
-        <div className="flex justify-between items-center">
-          <h3 className="text-xl font-bold flex items-center gap-2">
-            <History className="w-5 h-5 text-apple-blue" />
-            Your Feedback Logs ({history.length})
-          </h3>
-          {history.length > 0 && (
-            <button 
-              onClick={handleClearHistory}
-              className="text-[11px] font-bold text-apple-coral opacity-70 hover:opacity-100 uppercase tracking-widest transition-opacity"
-            >
-              Clear Logs
-            </button>
-          )}
-        </div>
-
-        {history.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {history.map((item) => (
-              <div key={item.id} className="glass-card border border-white/5 flex flex-col gap-3.5 !p-5 relative group">
-                <div className="flex items-start justify-between gap-2.5">
-                  <div>
-                    <span className="text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full bg-apple-indigo/10 text-apple-indigo">
-                      {item.category}
-                    </span>
-                    <span className="text-[11px] opacity-40 block mt-1.5 font-bold">
-                      By ID: <span className="font-mono text-apple-blue">{item.studentId}</span>
-                    </span>
-                  </div>
-                  <span className="text-[10px] opacity-30 text-right">{item.timestamp}</span>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="text-[11px] font-bold text-apple-blue">
-                    {item.trimester} {item.subject !== 'General Hub Discussion' ? `• ${item.subject}` : ''}
-                  </div>
-                  <p className="text-[12.5px] opacity-80 leading-relaxed font-medium break-words italic pl-2.5 border-l-2 border-white/10 mt-1">
-                    "{item.message}"
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-white/5 opacity-50">
-                  <span>Score: {'⭐️'.repeat(item.rating)}</span>
-                  <span>Ticket Verified: <span className="text-apple-mint font-semibold">Active</span></span>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="glass-card text-center py-12 text-primary/40 text-[13px] border border-white/5 italic">
-            You haven't written any feedback items yet. Submit the form above to record your log entry dynamically.
-          </div>
-        )}
-      </div>
-
+    
     </motion.div>
   );
 }
