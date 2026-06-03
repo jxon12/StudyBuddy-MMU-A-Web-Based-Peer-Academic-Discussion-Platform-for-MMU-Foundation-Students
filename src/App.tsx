@@ -9,7 +9,7 @@ import { Team } from '../components/team';
 import Homepage from '../components/homepage';
 import { AuthPage } from '../components/AuthPage';
 import { SubjectSelection } from '../components/SubjectSelection';
-import {profile} from '../components/profile';
+import ProfilePage from '../components/homepage';
 
 import { 
   Search, 
