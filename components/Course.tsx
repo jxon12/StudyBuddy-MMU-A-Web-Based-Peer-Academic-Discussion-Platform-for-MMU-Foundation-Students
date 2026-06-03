@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   GraduationCap, 
   BookOpen, 
@@ -156,22 +156,9 @@ export function CoursePage() {
       {/* HEADER HERO AREA */}
       <div className="mb-12 pb-8 border-b border-white/10 flex flex-col md:flex-row items-start md:items-end justify-between gap-6 relative">
         <div className="space-y-3.5">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-apple-purple/10 border border-apple-purple/20 text-apple-purple rounded-full text-[10px] font-extrabold uppercase tracking-widest">
-            <GraduationCap className="w-3.5 h-3.5" />
-            MMU Academic Pathway
-          </div>
-          
           <h1 className="text-[44px] md:text-[56px] font-black tracking-tight leading-none text-primary">
             Foundation in Computing
           </h1>
-          
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] text-gray-400 font-bold font-mono">
-            <span className="bg-white/5 border border-white/10 px-2 py-0.5 rounded text-gray-300">R3/0610/3/0007</span>
-            <span>•</span>
-            <span className="bg-white/5 border border-white/10 px-2 py-0.5 rounded text-gray-300">12/27</span>
-            <span>•</span>
-            <span className="bg-white/5 border border-white/10 px-2 py-0.5 rounded text-gray-300">A8670</span>
-          </div>
         </div>
 
         <div className="h-0.5 w-[160px] bg-gradient-to-r from-apple-purple via-apple-indigo to-apple-blue rounded-full" />
@@ -267,7 +254,7 @@ export function CoursePage() {
                   <button
                     key={tri}
                     onClick={() => setActiveTrimester(tri as any)}
-                    className={`h-7 px-3 rounded-lg text-[11px] font-semibold transition-all ${
+                    className={`h-7 px-3 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
                       activeTrimester === tri 
                         ? 'bg-apple-purple text-white shadow'
                         : 'text-primary opacity-50 hover:opacity-100'
@@ -295,7 +282,7 @@ export function CoursePage() {
                       {triName}
                     </span>
                     <div className="h-px bg-white/5 flex-grow" />
-                    <span className="text-[10.5px] font-mono opacity-40 font-bold">{list.length} Electives</span>
+                    <span className="text-[10.5px] font-mono opacity-40 font-bold">{list.length} Modules</span>
                   </div>
 
                   <div className="grid grid-cols-1 gap-3">
@@ -308,9 +295,9 @@ export function CoursePage() {
                         <motion.button
                           key={idx}
                           onClick={() => setSelectedSubject(sub)}
-                          className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between group ${
+                          className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between group cursor-pointer ${
                             isSelected
-                              ? 'bg-apple-purple/10 border-apple-purple/40 shadow-lg shadow-apple-purple/10 scale-[1.01]'
+                              ? 'bg-apple-purple/10 border-apple-purple/40 shadow-lg scale-[1.01]'
                               : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/15'
                           }`}
                         >
@@ -408,8 +395,8 @@ export function CoursePage() {
                     <BookOpen className="w-4 h-4" />
                   </div>
                   <div className="text-left">
-                    <div className="text-[11.5px] font-extrabold">Have questions about this subject?</div>
-                    <div className="text-[10px] opacity-40">Discuss syllabus questions on our leaderboards instantly.</div>
+                    <div className="text-[11.5px] font-bold">Have questions about this subject?</div>
+                    <div className="text-[10.5px] opacity-40">Discuss syllabus questions on our leaderboards instantly.</div>
                   </div>
                 </div>
 
