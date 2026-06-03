@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  GraduationCap, 
   BookOpen, 
   Terminal, 
   Binary, 
@@ -134,7 +133,7 @@ const TRIMESTERS_SUBJECTS: Record<string, CourseSubject[]> = {
 
 const CATEGORIES_INFO = {
   programming: { label: 'Software & Code', icon: Terminal, color: 'text-apple-blue bg-apple-blue/10 border-apple-blue/20' },
-  math: { label: 'Mathematics & Science', icon: Binary, color: 'text-apple-purple bg-apple-purple/10 border-apple-purple/20' },
+  math: { label: 'Mathematics & Science', icon: Binary, color: 'text-cyan-teal bg-apple-purple/10 border-apple-purple/20' },
   humanities: { label: 'Communication & Logic', icon: Globe, color: 'text-apple-mint bg-apple-mint/10 border-apple-mint/20' },
   electronics: { label: 'Hardware Systems', icon: Cpu, color: 'text-apple-coral bg-apple-coral/10 border-apple-coral/20' },
   business: { label: 'Corporate Management', icon: Briefcase, color: 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20' },
@@ -171,7 +170,7 @@ export function CoursePage() {
           
           <div className="space-y-4">
             <h2 className="text-[20px] font-black tracking-tight flex items-center gap-2">
-              <BookMarked className="w-5 h-5 text-apple-purple" />
+              <BookMarked className="w-5 h-5 text-cyan-teal" />
               Programme Synopsis
             </h2>
             <p className="text-[15px] leading-relaxed opacity-70 text-justify">
@@ -184,7 +183,7 @@ export function CoursePage() {
 
           <div className="mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-apple-purple/10 flex items-center justify-center text-apple-purple shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-apple-purple/10 flex items-center justify-center text-cyan-teal shrink-0">
                 <Info className="w-5 h-5" />
               </div>
               <p className="text-[12px] opacity-50 max-w-sm">
@@ -195,7 +194,7 @@ export function CoursePage() {
             <div className="flex gap-2">
               <div className="px-3 py-1.5 bg-neutral-900 border border-white/5 rounded-xl text-center">
                 <div className="text-[11px] opacity-40 uppercase font-bold leading-none">Duration</div>
-                <div className="text-[14px] font-black text-apple-purple mt-0.5">1 Year (3 Trimesters)</div>
+                <div className="text-[14px] font-black text-cyan-teal mt-0.5">1 Year (3 Trimesters)</div>
               </div>
             </div>
           </div>
@@ -203,7 +202,7 @@ export function CoursePage() {
 
         <div className="lg:col-span-4 glass-card p-7 flex flex-col justify-between bg-gradient-to-br from-white/5 to-transparent border border-white/5">
           <h3 className="text-[16px] font-extrabold text-primary flex items-center gap-2 mb-4">
-            <Award className="w-4.5 h-4.5 text-apple-purple" />
+            <Award className="w-4.5 h-4.5 text-cyan-teal" />
             Progression Faculties
           </h3>
           
@@ -224,7 +223,7 @@ export function CoursePage() {
             ].map((fac, idx) => (
               <div key={idx} className="p-4 rounded-2xl bg-black/20 border border-white/5 space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-[16px] font-black text-apple-purple">{fac.abbr}</span>
+                  <span className="text-[16px] font-black text-cyan-teal">{fac.abbr}</span>
                   <span className="text-[9px] font-black bg-white/5 tracking-wider uppercase px-2 py-0.5 rounded border border-white/10 opacity-70">{fac.location}</span>
                 </div>
                 <div className="text-[12px] font-bold opacity-80">{fac.full}</div>
@@ -244,7 +243,7 @@ export function CoursePage() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <h3 className="text-[19px] font-extrabold text-primary flex items-center gap-2">
-                <Layers className="w-4.5 h-4.5 text-apple-purple" />
+                <Layers className="w-4.5 h-4.5 text-cyan-teal" />
                 Academic Structure
               </h3>
               
@@ -278,7 +277,7 @@ export function CoursePage() {
               .map(([triName, list]) => (
                 <div key={triName} className="space-y-3.5">
                   <div className="flex items-center gap-3">
-                    <span className="text-[12px] font-black uppercase tracking-widest text-apple-purple bg-apple-purple/10 border border-apple-purple/20 px-3 py-1 rounded-full">
+                    <span className="text-[12px] font-black uppercase tracking-widest text-cyan-teal bg-apple-purple/10 border border-apple-purple/20 px-3 py-1 rounded-full">
                       {triName}
                     </span>
                     <div className="h-px bg-white/5 flex-grow" />
@@ -308,7 +307,7 @@ export function CoursePage() {
                             
                             <div className="min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className={`text-[14px] font-extrabold truncate text-primary group-hover:text-apple-purple transition-colors ${isSelected ? 'text-apple-purple font-black' : ''}`}>
+                                <span className={`text-[14px] font-extrabold truncate text-primary group-hover:text-cyan-teal transition-colors ${isSelected ? 'text-cyan-teal font-black' : ''}`}>
                                   {sub.name}
                                 </span>
                               </div>
@@ -321,7 +320,7 @@ export function CoursePage() {
                           </div>
 
                           <ChevronRight className={`w-4 h-4 opacity-30 group-hover:opacity-75 transition-all shrink-0 ${
-                            isSelected ? 'translate-x-1 opacity-100 text-apple-purple' : ''
+                            isSelected ? 'translate-x-1 opacity-100 text-cyan-teal' : ''
                           }`} />
                         </motion.button>
                       );
@@ -359,7 +358,7 @@ export function CoursePage() {
                     </div>
                   </div>
 
-                  <span className="text-[10px] font-mono bg-neutral-900 border border-white/5 px-2.5 py-1 rounded-md text-apple-purple font-extrabold">
+                  <span className="text-[10px] font-mono bg-neutral-900 border border-white/5 px-2.5 py-1 rounded-md text-cyan-teal font-extrabold">
                     {selectedSubject.code}
                   </span>
                 </div>
@@ -377,21 +376,21 @@ export function CoursePage() {
                 {/* Capabilities and skills list */}
                 <div className="space-y-3 pt-2">
                   <span className="text-[10px] font-black uppercase tracking-widest text-primary opacity-40 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-apple-purple" />
+                    <Sparkles className="w-3.5 h-3.5 text-cyan-teal" />
                     Key Capabilities Mastered
                   </span>
 
                   <div className="flex flex-wrap gap-1.5 pt-0.5">
                     {selectedSubject.skills.map((skill, i) => (
-                      <span key={i} className="text-[10.5px] font-semibold bg-white/5 hover:bg-apple-purple/5 border border-white/5 hover:border-apple-purple/25 text-primary/80 hover:text-apple-purple px-2.5 py-1 rounded-xl transition-all">
+                      <span key={i} className="text-[10.5px] font-semibold bg-white/5 hover:bg-apple-purple/5 border border-white/5 hover:border-apple-purple/25 text-primary/80 hover:text-cyan-teal px-2.5 py-1 rounded-xl transition-all">
                         {skill}
                       </span>
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-4 mt-2 border-t border-white/5 bg-neutral-950/40 p-4 rounded-xl border border-white/5 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-apple-purple/10 text-apple-purple flex items-center justify-center shrink-0">
+                <div className="pt-4 mt-2 border-t border-white/5 bg-neutral-950/40 p-4 rounded-xl flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-apple-purple/10 text-cyan-teal flex items-center justify-center shrink-0">
                     <BookOpen className="w-4 h-4" />
                   </div>
                   <div className="text-left">

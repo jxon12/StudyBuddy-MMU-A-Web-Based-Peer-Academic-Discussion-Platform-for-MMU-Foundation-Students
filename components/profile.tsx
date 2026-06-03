@@ -1,365 +1,147 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { 
-  ArrowLeft, 
-  Camera, 
-  MapPin, 
-  Bookmark, 
-  Heart, 
-  Save, 
-  LogOut, 
-  Check,
-  Plus,
-  MessageCircle,
-  FileText
-} from 'lucide-react';
+import { motion, AnimatePresence } from "framer-motion";
+import { X, LogOut, Award, User, Mail, Shield, BookOpen, Clock } from 'lucide-react';
 
-interface ProfileProps {
+interface ProfilePageProps {
   key?: string;
   onBack: () => void;
-  onSignOut?: () => void;
+  onSignOut: () => void;
 }
 
-
-export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
-  // --- Persistent Profile State ---
-  const [name, setName] = useState(() => {
-    return localStorage.getItem('profile-name') || 'Ling Yi Yon';
-  });
-  
-  const [location, setLocation] = useState(() => {
-    return localStorage.getItem('profile-location') || 'MMU Cyberjaya Campus';
-  });
-
-  const [avatarSeed, setAvatarSeed] = useState(() => {
-    return localStorage.getItem('profile-avatar-seed') || 'real-photo';
-  });
-
-  const [bookmarksCount, setBookmarksCount] = useState(() => {
-    const saved = localStorage.getItem('profile-bookmarks-count');
-    return saved ? parseInt(saved, 10) : 0;
-  });
-
-  const [likesReceived, setLikesReceived] = useState(() => {
-    const saved = localStorage.getItem('profile-likes-count');
-    return saved ? parseInt(saved, 10) : 0;
-  });
-
-  // --- Dynamic dropdown menus UI ---
-  const [alertMessage, setAlertMessage] = useState<string | null>(null);
-
-  // --- Mock posts created by this profile ---
-  const [myPosts, setMyPosts] = useState<Array<{id: string, content: string, timestamp: string, likes: number, replies: number, image?: string}>>(() => {
-    const saved = localStorage.getItem('profile-my-posts');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [newPostText, setNewPostText] = useState('');
-  const [showPostModal, setShowPostModal] = useState(false);
-
-  // Handle Save profile info
-  const handleSave = () => {
-    localStorage.setItem('profile-name', name);
-    localStorage.setItem('profile-location', location);
-    localStorage.setItem('profile-avatar-seed', avatarSeed);
-    localStorage.setItem('profile-bookmarks-count', bookmarksCount.toString());
-    localStorage.setItem('profile-likes-count', likesReceived.toString());
-    localStorage.setItem('profile-my-posts', JSON.stringify(myPosts));
-
-    setAlertMessage('Profile changes saved successfully! 💾');
-    setTimeout(() => setAlertMessage(null), 3000);
-  };
-
-  // Create a new post from the profile
-  const handleCreatePost = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPostText.trim()) return;
-
-    const newPost = {
-      id: `user-post-${Date.now()}`,
-      content: newPostText.trim(),
-      timestamp: 'Just now',
-      likes: 0,
-      replies: 0
-    };
-
-    const updated = [newPost, ...myPosts];
-    setMyPosts(updated);
-    localStorage.setItem('profile-my-posts', JSON.stringify(updated));
-    setNewPostText('');
-    setShowPostModal(false);
-
-    // Increment likes received or simply notify
-    setAlertMessage('Posted successfully! Check your Discussion Feed.');
-    setTimeout(() => setAlertMessage(null), 3000);
-  };
-
-  // Delete a post
-  const handleDeletePost = (id: string) => {
-    const updated = myPosts.filter(p => p.id !== id);
-    setMyPosts(updated);
-    localStorage.setItem('profile-my-posts', JSON.stringify(updated));
-  };
-
-  // Change avatar seed randomly
-  const handleRandomizeAvatar = () => {
-    const randomSeeds = ['real-photo', 'Lucky', 'Spooky', 'Snuggles', 'Tiger', 'Cookie', 'Precious', 'Willow', 'Buster', 'Milo', 'Cody', 'Me', 'StudyTime', 'MMUStar'];
-    const currentIdx = randomSeeds.indexOf(avatarSeed);
-    let nextIdx = Math.floor(Math.random() * randomSeeds.length);
-    if (nextIdx === currentIdx) {
-      nextIdx = (nextIdx + 1) % randomSeeds.length;
-    }
-    setAvatarSeed(randomSeeds[nextIdx]);
-    localStorage.setItem('profile-avatar-seed', randomSeeds[nextIdx]);
+export function ProfilePage({ onBack, onSignOut }: ProfilePageProps) {
+  // Clean custom tap audio effect
+  const playCustomTap = (freq = 600, duration = 0.08) => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(freq / 2, ctx.currentTime + duration);
+      gain.gain.setValueAtTime(0.04, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+    } catch (e) {}
   };
 
   return (
-    <div className="min-h-screen text-zinc-100 font-sans pb-32 pt-28 pl-4 pr-4 md:pl-32 md:pr-12 max-w-4xl mx-auto relative z-10">
-      
-      {/* Back button and title */}
-      <div className="flex items-center gap-4 mb-8">
-        <button 
-          onClick={onBack}
-          className="p-3 rounded-full transition-colors hover:bg-white/5 border border-white/5 bg-zinc-900/50"
-        >
-          <ArrowLeft className="w-5 h-5 text-zinc-400 hover:text-white" />
-        </button>
-      </div>
+    <div className="fixed inset-0 z-[100] flex items-center justify-end bg-black/60 backdrop-blur-sm">
+      {/* Background overlay click closes panel */}
+      <div 
+        className="absolute inset-0 cursor-default" 
+        onClick={() => {
+          playCustomTap(450, 0.08);
+          onBack();
+        }}
+      />
 
-      {/* Floating Save/Alert Banner */}
-      <AnimatePresence>
-        {alertMessage && (
-          <motion.div 
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-blue-600 text-white font-bold text-sm px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 border border-blue-500/30"
-          >
-            <Check className="w-4 h-4" />
-            <span>{alertMessage}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Profile Main Container - Borderless Seamless Layout */}
-      <div className="space-y-8">
-        
-        {/* Interactive Profile Header Area */}
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-6 pb-6 border-b border-white/[0.05]">
-          
-          {/* Avatar Container */}
-          <div className="relative group cursor-pointer animate-pulse-slow" onClick={handleRandomizeAvatar} title="Click to randomize your avatar!">
-            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20 bg-zinc-800 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-xl shadow-black/50">
-              <img 
-                src={avatarSeed === 'real-photo' ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=Me' : `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`} 
-                alt="Profile Avatar" 
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-            <div className="absolute -bottom-1 -right-1 bg-blue-600 hover:bg-blue-500 p-2 rounded-full border border-zinc-950 shadow-md text-white transition-colors">
-              <Camera className="w-3.5 h-3.5" />
-            </div>
-          </div>
-
-          {/* User Details Form & Display */}
-          <div className="flex-1 w-full space-y-4">
-            
-            {/* User Name input/text */}
-            <div className="space-y-1">
-              <input 
-                type="text"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  localStorage.setItem('profile-name', e.target.value);
-                }}
-                placeholder="Enter Your Name"
-                className="bg-transparent border-b border-transparent hover:border-white/10 focus:border-blue-500 hover:bg-white/[0.02] focus:bg-white/[0.04] px-2 py-1 rounded text-2xl font-black text-white w-full max-w-md focus:outline-none transition-all"
-              />
-              <div className="flex items-center gap-2 px-2 pt-0.5">
-                <span className="text-[10px] font-bold text-zinc-500 tracking-wider uppercase">Student ID</span>
-                <span className="text-xs font-mono font-bold text-zinc-400">
-                  252FC253TM
-                </span>
-              </div>
-            </div>
-
-            {/* Location Line */}
-            <div className="flex items-center gap-2 px-2 text-left">
-              <MapPin className="w-4 h-4 text-zinc-500" />
-              <span className="text-sm text-zinc-400 font-medium">MMU Cyberjaya Campus</span>
-            </div>
-
-
-
-          </div>
-        </div>
-
-        {/* Profile Statistics */}
-        <div className="bg-white/[0.03] hover:bg-white/[0.05] border border-white/[0.06] hover:border-white/10 rounded-2xl p-4 transition-all grid grid-cols-2 text-left divide-x divide-white/[0.06]">
-          {/* Upvoted Stat */}
-          <div className="pr-4">
-            <p className="text-[11px] font-bold text-zinc-500 tracking-wider uppercase">Upvoted</p>
-            <h4 className="text-2xl font-black text-white">{bookmarksCount}</h4>
-          </div>
-
-          {/* Saved Stat */}
-          <div className="pl-4">
-            <p className="text-[11px] font-bold text-zinc-500 tracking-wider uppercase">Saved</p>
-            <h4 className="text-2xl font-black text-white">{likesReceived}</h4>
-          </div>
-        </div>
-
-        {/* My Posts Activity Section */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-white/[0.05]">
-            <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4 text-zinc-400" />
-              <h3 className="text-sm font-bold tracking-wider uppercase text-zinc-300">My Post</h3>
-            </div>
-            <button 
-              onClick={() => setShowPostModal(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold text-white flex items-center gap-1.5 transition-all"
+      {/* Slide-over Profile Panel */}
+      <motion.div
+        initial={{ x: '100%', opacity: 0.9 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: '100%', opacity: 0.9 }}
+        transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+        className="w-full max-w-md h-full bg-zinc-950/95 border-l border-white/10 p-8 flex flex-col justify-between relative z-[110] shadow-2xl backdrop-blur-2xl"
+      >
+        <div className="space-y-8">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-black tracking-widest text-white uppercase">Profile Center</h3>
+            <button
+              onClick={() => {
+                playCustomTap(400, 0.08);
+                onBack();
+              }}
+              className="p-2 rounded-full hover:bg-white/10 transition-colors text-zinc-400 hover:text-white cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Write Post</span>
+              <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Quick Post Creator Modal */}
-          <AnimatePresence>
-            {showPostModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95, y: 25 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 25 }}
-                  className="bg-zinc-900 border border-white/10 p-6 rounded-[24px] max-w-lg w-full space-y-4 shadow-2xl"
-                >
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-white">Create a student post</h3>
-                    <button 
-                      onClick={() => setShowPostModal(false)}
-                      className="text-zinc-500 hover:text-white font-bold"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                  <form onSubmit={handleCreatePost} className="space-y-4">
-                    <textarea
-                      required
-                      placeholder="What is your question or thought? (e.g., Struggling with spherical coordinates...)"
-                      value={newPostText}
-                      onChange={(e) => setNewPostText(e.target.value)}
-                      rows={5}
-                      className="w-full bg-zinc-950/80 border border-white/10 rounded-xl p-4 text-[13px] font-semibold text-white placeholder:text-zinc-600 focus:outline-none focus:border-blue-500 transition-colors resize-none"
-                    />
-                    <div className="flex justify-end">
-                      <button 
-                        type="submit"
-                        className="bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-xs px-5 py-2.5 rounded-xl transition-all"
-                      >
-                        Publish Post
-                      </button>
-                    </div>
-                  </form>
-                </motion.div>
+          {/* User Badge Info */}
+          <div className="flex flex-col items-center text-center space-y-4 py-4 rounded-3xl bg-white/[0.03] border border-white/[0.05] relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-apple-blue/10 rounded-full blur-2xl pointer-events-none" />
+            
+            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-apple-blue to-apple-purple p-0.5 shadow-xl">
+              <div className="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center font-bold text-lg text-white">
+                <img src="/images/team/liou-zi-en.jpeg" alt="Liou Zi En" className="w-full h-full rounded-full object-cover" />
               </div>
-            )}
-          </AnimatePresence>
+            </div>
 
-          {/* Posts Feed or Placeholder */}
-          <div className="space-y-3 min-h-[120px] flex flex-col justify-center">
-            {myPosts.length === 0 ? (
-              <div className="text-zinc-600 py-8 text-center text-sm font-semibold pointer-events-none">
-                No posts yet.
+            <div>
+              <h4 className="text-xl font-bold text-white tracking-tight">Liou Zi En</h4>
+              <p className="text-xs text-zinc-400 font-mono mt-1">ID: 252FC251LC</p>
+            </div>
+
+            <div className="flex gap-2">
+              <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center gap-1">
+                <Award className="w-3 h-3" />
+                Silver Tier
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-apple-blue/10 border border-apple-blue/20 text-apple-blue">
+                Computing
+              </span>
+            </div>
+          </div>
+
+          {/* Details / Contribution Stats */}
+          <div className="space-y-4">
+            <h5 className="text-xs font-black text-zinc-500 uppercase tracking-widest">Academic Badges</h5>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+                <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Helper score</div>
+                <div className="text-2xl font-black text-white mt-1">310 <span className="text-xs text-zinc-500">pts</span></div>
               </div>
-            ) : (
-              <div className="space-y-3">
-                {myPosts.map((p) => (
-                  <motion.div 
-                    key={p.id}
-                    layoutId={p.id}
-                    className="p-4 bg-white/[0.02] border border-white/[0.05] hover:border-white/10 rounded-2xl flex flex-col gap-3 group/post"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-zinc-500">{p.timestamp}</span>
-                      </div>
-                      <button 
-                        onClick={() => handleDeletePost(p.id)}
-                        className="opacity-0 group-hover/post:opacity-100 text-xs font-bold text-rose-500 hover:text-rose-400 px-2 py-1 rounded transition-opacity"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                    <p className="text-[13px] font-semibold text-zinc-300 leading-relaxed text-left">
-                      {p.content}
-                    </p>
-                    {p.image && (
-                      <div className="rounded-xl overflow-hidden border border-white/5 max-h-40 bg-zinc-950/40 mt-1">
-                        <img 
-                          src={p.image} 
-                          alt="Post photo" 
-                          className="w-full h-full object-cover max-h-40"
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-                    )}
-                    <div className="flex items-center gap-6 pt-2 border-t border-white/[0.03]">
-                      <div className="flex items-center gap-1.5 text-xs text-zinc-500">
-                        <TriangleIcon className="w-3.5 h-3.5 text-zinc-500" />
-                        <span>{p.likes} Upvoted</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-xs text-zinc-500">
-                        <MessageCircle className="w-3.5 h-3.5 text-zinc-500" />
-                        <span>{p.replies} Replies</span>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+                <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Posts Rank</div>
+                <div className="text-2xl font-black text-white mt-1">#4 <span className="text-xs text-zinc-500">buddy</span></div>
               </div>
-            )}
+            </div>
+
+            {/* List Details */}
+            <div className="space-y-3.5 pt-4">
+              <div className="flex items-center gap-3.5 text-sm">
+                <Mail className="w-4 h-4 text-zinc-500" />
+                <span className="text-zinc-300">LIOU.ZI.EN@student.mmu.edu.my</span>
+              </div>
+              <div className="flex items-center gap-3.5 text-sm">
+                <BookOpen className="w-4 h-4 text-zinc-500" />
+                <span className="text-zinc-300">Foundation in Computing (FCI)</span>
+              </div>
+              <div className="flex items-center gap-3.5 text-sm">
+                <Clock className="w-4 h-4 text-zinc-500" />
+                <span className="text-zinc-300">Joined MMU Semester 3, 2026</span>
+              </div>
+              <div className="flex items-center gap-3.5 text-sm">
+                
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Global Action Controls: Save & Sign out */}
-        <div className="space-y-3 pt-4">
-          <button 
-            onClick={handleSave}
-            className="w-full bg-white hover:bg-zinc-200 text-zinc-950 font-black text-xs py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-xl hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] active:scale-95"
-          >
-            <Save className="w-4 h-4" />
-            <span>Save Profile</span>
-          </button>
-
-          <button 
-            onClick={onSignOut}
-            className="w-full bg-zinc-900 hover:bg-red-950/20 border border-white/[0.05] hover:border-red-500/20 text-zinc-500 hover:text-red-500 font-bold text-xs py-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95"
+        {/* Footer actions */}
+        <div className="space-y-4">
+          <button
+            onClick={() => {
+              playCustomTap(350, 0.12);
+              onSignOut();
+            }}
+            className="w-full h-12 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold flex items-center justify-center gap-2 transition-all cursor-pointer border border-red-500/20 active:scale-[0.98]"
           >
             <LogOut className="w-4 h-4" />
-            <span>Sign out</span>
+            Sign Out Accounts
           </button>
+          
+          <div className="text-center text-[10px] text-zinc-600 font-mono uppercase tracking-wider">
+            StudyBuddy MMU - Mini IT Project | 2026 &copy; All rights reserved.
+          </div>
         </div>
-
-      </div>
+      </motion.div>
     </div>
-  );
-}
-
-// Simple Mini Triangle Icon replacement
-function TriangleIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <path d="M3 20h18L12 4z" />
-    </svg>
   );
 }

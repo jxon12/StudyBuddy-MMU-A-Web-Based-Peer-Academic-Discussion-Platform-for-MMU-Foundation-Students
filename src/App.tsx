@@ -490,7 +490,7 @@ export default function App() {
           <div className="space-y-4">
             <h4 className="text-[13px] font-bold opacity-30 uppercase tracking-widest">Platform</h4>
             <div className="flex flex-col gap-2">
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Features</span>
+              
               <button
                 type="button"
                 onClick={() => navigateToHomeSection('how-it-works')}
@@ -514,7 +514,7 @@ export default function App() {
           <div className="space-y-4">
             <h4 className="text-[13px] font-bold opacity-30 uppercase tracking-widest">Resources</h4>
             <div className="flex flex-col gap-2">
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Subjects</span>
+              
               <button
                 type="button"
                 onClick={() => {
@@ -523,7 +523,7 @@ export default function App() {
                 }}
                 className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
               >
-                Academic
+                Academics
               </button>
               <button
                 type="button"

@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   BookOpen, 
   MessageCircle, 
@@ -13,8 +13,11 @@ import {
   Bell,
   User
 } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './LiquidGlassCard.css';
+import { CreatePostPage } from './createpost';
+import { ProfilePage } from './profile';
+import { NotificationsPanel } from './notifications';
 
 /**
  * @license
@@ -384,7 +387,7 @@ const MOCK_POSTS: Post[] = [
 
 // --- Components ---
 
-const TopNavigationBar = ({ onSubjectsClick }: { onSubjectsClick: () => void }) => {
+const TopNavigationBar = ({ onSubjectsClick, onComposeClick, onProfileClick, onNotificationsClick, hasUnread }: { onSubjectsClick: () => void; onComposeClick: () => void; onProfileClick: () => void; onNotificationsClick: () => void; hasUnread: boolean }) => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl border-b border-white/10">
       <div className="flex items-center justify-between px-8 py-4 h-20">
@@ -418,6 +421,7 @@ const TopNavigationBar = ({ onSubjectsClick }: { onSubjectsClick: () => void }) 
 
           {/* Plus Icon */}
           <button 
+            onClick={onComposeClick}
             className="p-2.5 rounded-full hover:bg-white/10 transition-colors text-zinc-400 hover:text-white group"
             title="Create post"
           >
@@ -426,15 +430,19 @@ const TopNavigationBar = ({ onSubjectsClick }: { onSubjectsClick: () => void }) 
 
           {/* Bell Icon */}
           <button 
-            className="p-2.5 rounded-full hover:bg-white/10 transition-colors text-zinc-400 hover:text-white group relative"
+            onClick={onNotificationsClick}
+            className="p-2.5 rounded-full hover:bg-white/10 transition-colors text-zinc-400 hover:text-white group relative cursor-pointer"
             title="Notifications"
           >
             <Bell className="w-5 h-5" />
-            <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+            {hasUnread && (
+              <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            )}
           </button>
 
           {/* Profile Icon */}
           <button 
+            onClick={onProfileClick}
             className="p-2.5 rounded-full hover:bg-white/10 transition-colors text-zinc-400 hover:text-white group"
             title="Profile"
           >
@@ -780,7 +788,29 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
 export default function App() {
   const [view, setView] = useState<'feed' | 'subjects'>('feed');
   const [activeSubject, setActiveSubject] = useState<string | null>(null);
+  const [showCompose, setShowCompose] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [hasUnread, setHasUnread] = useState(true);
   const activeSubjectData = activeSubject ? SUBJECTS.find(s => s.id === activeSubject) : null;
+
+  // Reactively track if there are any unread notifications
+  useEffect(() => {
+    const checkUnread = () => {
+      const saved = localStorage.getItem('mmu_studybuddy_notifications_v1');
+      if (saved) {
+        try {
+          const list = JSON.parse(saved);
+          setHasUnread(list.some((n: any) => n.isUnread));
+        } catch (e) {
+          setHasUnread(true);
+        }
+      } else {
+        setHasUnread(true);
+      }
+    };
+    checkUnread();
+  }, [showNotifications]);
 
   return (
     <div 
@@ -792,7 +822,13 @@ export default function App() {
         backgroundAttachment: 'fixed',
       }}
     >
-      <TopNavigationBar onSubjectsClick={() => setView('subjects')} />
+      <TopNavigationBar 
+        onSubjectsClick={() => setView('subjects')}
+        onComposeClick={() => setShowCompose(true)}
+        onProfileClick={() => setShowProfile(true)}
+        onNotificationsClick={() => setShowNotifications(true)}
+        hasUnread={hasUnread}
+      />
 
       {/* Background Mesh - Cinematic Luminous Glows */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
@@ -801,6 +837,42 @@ export default function App() {
         <div className="absolute bottom-[20%] right-[-5%] w-[35%] h-[35%] rounded-full bg-purple-600/15 blur-[100px]" />
         <div className="absolute top-[40%] left-[60%] w-[30%] h-[30%] rounded-full bg-indigo-600/10 blur-[80px]" />
       </div>
+
+      <AnimatePresence mode="wait">
+        {showCompose && (
+          <CreatePostPage
+            key="compose"
+            onBack={() => setShowCompose(false)}
+            onPublish={(postData) => {
+              console.log('Post published:', postData);
+              setShowCompose(false);
+            }}
+            subjects={SUBJECTS.map(s => ({
+              id: s.id,
+              name: s.name,
+              chapters: s.chapters
+            }))}
+          />
+        )}
+        
+        {showProfile && (
+          <ProfilePage
+            key="profile"
+            onBack={() => setShowProfile(false)}
+            onSignOut={() => {
+              console.log('Signed out');
+              setShowProfile(false);
+            }}
+          />
+        )}
+
+        {showNotifications && (
+          <NotificationsPanel
+            key="notifications"
+            onBack={() => setShowNotifications(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <AnimatePresence mode="wait">
         {view === 'feed' ? (
@@ -874,6 +946,8 @@ export default function App() {
           />
         )}
       </AnimatePresence>
+
+
 
       {/* Global CSS for hiding scrollbar */}
       <style>{`
