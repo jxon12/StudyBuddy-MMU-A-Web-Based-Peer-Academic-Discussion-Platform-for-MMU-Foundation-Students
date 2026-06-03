@@ -1,18 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowLeft, 
   Camera, 
   MapPin, 
-  Bookmark, 
-  Heart, 
   Save, 
   LogOut, 
   Check,
-  Plus,
   MessageCircle,
   FileText
 } from 'lucide-react';
+import { CreatePostPage } from './createpost';
 
 interface ProfileProps {
   key?: string;
@@ -21,13 +19,26 @@ interface ProfileProps {
 }
 
 
+const PROFILE_SUBJECTS = [
+  { id: 'all', name: 'All Subjects' },
+  { id: 'CMT1114', name: 'CMT1114 Mathematics 1' },
+  { id: 'CMF1114', name: 'CMF1114 Multimedia' },
+  { id: 'CDS1114', name: 'CDS1114 Digital System' },
+  { id: 'CSP1114', name: 'CSP1114 Program Design' },
+  { id: 'CSP1123', name: 'CSP1123 Mini IT Project' },
+  { id: 'GNB1114', name: 'GNB1114 Business Management' },
+  { id: 'LAE1113', name: 'LAE1113 Academic English' },
+  { id: 'CMT1124', name: 'CMT1124 Mathematics 2' },
+  { id: 'LCT1113', name: 'LCT1113 Critical Thinking' },
+];
+
 export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
   // --- Persistent Profile State ---
   const [name, setName] = useState(() => {
     return localStorage.getItem('profile-name') || 'Ling Yi Yon';
   });
   
-  const [location, setLocation] = useState(() => {
+  const [location] = useState(() => {
     return localStorage.getItem('profile-location') || 'MMU Cyberjaya Campus';
   });
 
@@ -35,12 +46,12 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
     return localStorage.getItem('profile-avatar-seed') || 'real-photo';
   });
 
-  const [bookmarksCount, setBookmarksCount] = useState(() => {
+  const [bookmarksCount] = useState(() => {
     const saved = localStorage.getItem('profile-bookmarks-count');
     return saved ? parseInt(saved, 10) : 0;
   });
 
-  const [likesReceived, setLikesReceived] = useState(() => {
+  const [likesReceived] = useState(() => {
     const saved = localStorage.getItem('profile-likes-count');
     return saved ? parseInt(saved, 10) : 0;
   });
@@ -48,12 +59,13 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
   // --- Dynamic dropdown menus UI ---
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
+  // --- Dynamic Subject Filtering & New Post State ---
+
   // --- Mock posts created by this profile ---
-  const [myPosts, setMyPosts] = useState<Array<{id: string, content: string, timestamp: string, likes: number, replies: number, image?: string}>>(() => {
+  const [myPosts, setMyPosts] = useState<Array<{id: string, content: string, timestamp: string, likes: number, replies: number, image?: string, subject?: string}>>(() => {
     const saved = localStorage.getItem('profile-my-posts');
     return saved ? JSON.parse(saved) : [];
   });
-  const [newPostText, setNewPostText] = useState('');
   const [showPostModal, setShowPostModal] = useState(false);
 
   // Handle Save profile info
@@ -69,29 +81,6 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
     setTimeout(() => setAlertMessage(null), 3000);
   };
 
-  // Create a new post from the profile
-  const handleCreatePost = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPostText.trim()) return;
-
-    const newPost = {
-      id: `user-post-${Date.now()}`,
-      content: newPostText.trim(),
-      timestamp: 'Just now',
-      likes: 0,
-      replies: 0
-    };
-
-    const updated = [newPost, ...myPosts];
-    setMyPosts(updated);
-    localStorage.setItem('profile-my-posts', JSON.stringify(updated));
-    setNewPostText('');
-    setShowPostModal(false);
-
-    // Increment likes received or simply notify
-    setAlertMessage('Posted successfully! Check your Discussion Feed.');
-    setTimeout(() => setAlertMessage(null), 3000);
-  };
 
   // Delete a post
   const handleDeletePost = (id: string) => {
@@ -150,7 +139,7 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
           <div className="relative group cursor-pointer animate-pulse-slow" onClick={handleRandomizeAvatar} title="Click to randomize your avatar!">
             <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20 bg-zinc-800 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-xl shadow-black/50">
               <img 
-                src={avatarSeed === 'real-photo' ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=Me' : `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`} 
+                src={avatarSeed === 'real-photo' ? 'https://www.image2url.com/r2/default/images/1779863184214-810fc126-789a-442f-831b-06cda160f159.jpeg' : `https://www.image2url.com/r2/default/images/1779863184214-810fc126-789a-442f-831b-06cda160f159.jpeg`} 
                 alt="Profile Avatar" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
@@ -177,8 +166,8 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
                 className="bg-transparent border-b border-transparent hover:border-white/10 focus:border-blue-500 hover:bg-white/[0.02] focus:bg-white/[0.04] px-2 py-1 rounded text-2xl font-black text-white w-full max-w-md focus:outline-none transition-all"
               />
               <div className="flex items-center gap-2 px-2 pt-0.5">
-                <span className="text-[10px] font-bold text-zinc-500 tracking-wider uppercase">Student ID</span>
-                <span className="text-xs font-mono font-bold text-zinc-400">
+                <span className="text-[10px] font-bold text-white tracking-wider uppercase">Student ID</span>
+                <span className="text-xs font-mono font-bold text-white">
                   252FC253TM
                 </span>
               </div>
@@ -186,25 +175,17 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
 
             {/* Location Line */}
             <div className="flex items-center gap-2 px-2 text-left">
-              <MapPin className="w-4 h-4 text-zinc-500" />
-              <span className="text-sm text-zinc-400 font-medium">MMU Cyberjaya Campus</span>
+              <MapPin className="w-4 h-4 text-zinc-400" />
+              <span className="text-sm text-white font-medium">MMU Cyberjaya Campus</span>
             </div>
-
-
 
           </div>
         </div>
 
         {/* Profile Statistics */}
-        <div className="bg-white/[0.03] hover:bg-white/[0.05] border border-white/[0.06] hover:border-white/10 rounded-2xl p-4 transition-all grid grid-cols-2 text-left divide-x divide-white/[0.06]">
-          {/* Upvoted Stat */}
-          <div className="pr-4">
-            <p className="text-[11px] font-bold text-zinc-500 tracking-wider uppercase">Upvoted</p>
-            <h4 className="text-2xl font-black text-white">{bookmarksCount}</h4>
-          </div>
-
+        <div className="bg-white/[0.03] hover:bg-white/[0.05] border border-white/[0.06] hover:border-white/10 rounded-2xl p-4 transition-all text-left">
           {/* Saved Stat */}
-          <div className="pl-4">
+          <div>
             <p className="text-[11px] font-bold text-zinc-500 tracking-wider uppercase">Saved</p>
             <h4 className="text-2xl font-black text-white">{likesReceived}</h4>
           </div>
@@ -217,54 +198,32 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
               <FileText className="w-4 h-4 text-zinc-400" />
               <h3 className="text-sm font-bold tracking-wider uppercase text-zinc-300">My Post</h3>
             </div>
-            <button 
-              onClick={() => setShowPostModal(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold text-white flex items-center gap-1.5 transition-all"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Write Post</span>
-            </button>
           </div>
 
-          {/* Quick Post Creator Modal */}
+          {/* Quick Post Creator Modal (replaced with CreatePostPage) */}
           <AnimatePresence>
             {showPostModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95, y: 25 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 25 }}
-                  className="bg-zinc-900 border border-white/10 p-6 rounded-[24px] max-w-lg w-full space-y-4 shadow-2xl"
-                >
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-white">Create a student post</h3>
-                    <button 
-                      onClick={() => setShowPostModal(false)}
-                      className="text-zinc-500 hover:text-white font-bold"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                  <form onSubmit={handleCreatePost} className="space-y-4">
-                    <textarea
-                      required
-                      placeholder="What is your question or thought? (e.g., Struggling with spherical coordinates...)"
-                      value={newPostText}
-                      onChange={(e) => setNewPostText(e.target.value)}
-                      rows={5}
-                      className="w-full bg-zinc-950/80 border border-white/10 rounded-xl p-4 text-[13px] font-semibold text-white placeholder:text-zinc-600 focus:outline-none focus:border-blue-500 transition-colors resize-none"
-                    />
-                    <div className="flex justify-end">
-                      <button 
-                        type="submit"
-                        className="bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-xs px-5 py-2.5 rounded-xl transition-all"
-                      >
-                        Publish Post
-                      </button>
-                    </div>
-                  </form>
-                </motion.div>
-              </div>
+              <CreatePostPage
+                subjects={PROFILE_SUBJECTS.filter(s => s.id !== 'all').map(s => ({ id: s.id, name: s.name, chapters: ['General'] }))}
+                onBack={() => setShowPostModal(false)}
+                onPublish={(postData) => {
+                  const newPost = {
+                    id: `user-post-${Date.now()}`,
+                    content: postData.content || postData.title || '',
+                    timestamp: 'Just now',
+                    likes: 0,
+                    replies: 0,
+                    image: postData.image,
+                    subject: postData.subject,
+                  };
+                  const updated = [newPost, ...myPosts];
+                  setMyPosts(updated);
+                  localStorage.setItem('profile-my-posts', JSON.stringify(updated));
+                  setShowPostModal(false);
+                  setAlertMessage('Posted successfully! Check your Discussion Feed.');
+                  setTimeout(() => setAlertMessage(null), 3000);
+                }}
+              />
             )}
           </AnimatePresence>
 
@@ -272,7 +231,7 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
           <div className="space-y-3 min-h-[120px] flex flex-col justify-center">
             {myPosts.length === 0 ? (
               <div className="text-zinc-600 py-8 text-center text-sm font-semibold pointer-events-none">
-                No posts yet.
+                No posts published yet.
               </div>
             ) : (
               <div className="space-y-3">
@@ -285,6 +244,11 @@ export function ProfilePage({ onBack, onSignOut }: ProfileProps) {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-black uppercase tracking-wider text-zinc-500">{p.timestamp}</span>
+                        {p.subject && (
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-white/5 border border-white/10 text-zinc-400">
+                            {p.subject}
+                          </span>
+                        )}
                       </div>
                       <button 
                         onClick={() => handleDeletePost(p.id)}

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Target, Heart, Rocket, Users, Coffee, Cpu } from 'lucide-react';
+import { Target, Users, Cpu } from 'lucide-react';
 
 const MISSION_PILLARS = [
   {
@@ -44,7 +44,6 @@ export function MissionPage({ onGetInvolved }: MissionPageProps) {
           animate={{ y: 0, opacity: 1 }}
           className="inline-block px-4 py-1.5 rounded-full bg-apple-blue/10 text-apple-blue text-[13px] font-bold tracking-widest uppercase mb-8"
         >
-          Our Purpose
         </motion.div>
         <h1 className="text-[54px] md:text-[82px] font-bold tracking-tighter mb-8 leading-[1.05]">
           A new era for <br /> <span className="text-apple-blue">civic intelligence.</span>
@@ -57,9 +56,6 @@ export function MissionPage({ onGetInvolved }: MissionPageProps) {
       {/* Honesty Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-40">
         <div className="space-y-8">
-          <div className="w-14 h-14 rounded-2xl bg-apple-coral/10 flex items-center justify-center text-apple-coral">
-             <Heart className="w-7 h-7" />
-          </div>
           <h2 className="text-[40px] font-bold tracking-tight leading-tight">Born from frustration, built with love.</h2>
           <div className="space-y-6 text-[18px] opacity-70 leading-relaxed font-medium">
             <p>
@@ -71,21 +67,13 @@ export function MissionPage({ onGetInvolved }: MissionPageProps) {
           </div>
         </div>
         <div className="glass-card !p-12 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:opacity-10 transition-opacity">
-            <Coffee className="w-32 h-32" />
-          </div>
           <div className="space-y-6 relative z-10">
             <div className="text-[14px] font-bold tracking-widest uppercase text-apple-blue">Current Status</div>
             <h3 className="text-2xl font-bold">The Honest Truth</h3>
             <p className="text-[17px] opacity-60 leading-relaxed">
               We aren't a multi-million dollar corporation. We're a team of developers and students trying to solve our own problems. This is an alpha project—there will be bugs, and features will evolve. But every line of code is written with the goal of making your academic life at MMU just a little bit easier.
             </p>
-            <div className="pt-4">
-               <div className="flex items-center gap-3 text-apple-blue">
-                 <Rocket className="w-5 h-5" />
-                 <span className="font-bold">Beta testing in Cyberjaya</span>
-               </div>
-            </div>
+            <div className="pt-4" />
           </div>
         </div>
       </div>
@@ -124,7 +112,7 @@ export function MissionPage({ onGetInvolved }: MissionPageProps) {
       >
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6">Join the movement.</h2>
         <p className="text-[19px] opacity-60 mb-10 max-w-2xl mx-auto">
-          We're just getting started. If you're an MMU student who cares about better tools, help us build the future of study platforms.
+          We're just getting started. If you're an MMU FCI foundation student who cares about better tools, help us build the future of study platforms.
         </p>
         <button className="apple-button-primary mx-auto" onClick={onGetInvolved}>Get Involved</button>
       </motion.div>

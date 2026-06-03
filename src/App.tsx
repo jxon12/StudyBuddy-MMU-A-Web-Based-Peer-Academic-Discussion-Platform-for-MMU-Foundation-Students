@@ -2,6 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
+<<<<<<< HEAD
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,6 +12,8 @@ import { AuthPage } from '../components/AuthPage';
 import { SubjectSelection } from '../components/SubjectSelection';
 import ProfilePage from '../components/homepage';
 
+=======
+>>>>>>> 0f224179b2ecf811f561c100ae10d2effdfad2d5
 import { 
   Search, 
   ChevronDown, 
@@ -18,10 +21,21 @@ import {
   Play, 
   Moon,
   Sun,
-  User,
-  Plus,
-  Bell
+  User
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Team } from '../components/team';
+import Homepage from '../components/homepage';
+import { AuthPage } from '../components/AuthPage';
+import { SubjectSelection } from '../components/SubjectSelection';
+import { FAQPage } from '../components/FAQs';
+import { TermsPage } from '../components/TermsAndCondition';
+import { PrivacyPage } from '../components/Privacy';
+import { MissionPage } from '../components/Mission';
+import { Leaderboard } from '../components/Leaderboard';
+import { FeedbackPage } from '../components/Feedback';
+import { CoursePage } from '../components/Course';
 
 const ACCENT_COLORS = [
   { name: 'Blue', value: '#0A84FF', secondary: '#007AFF' },
@@ -32,12 +46,37 @@ const ACCENT_COLORS = [
 ];
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion' | 'faqs' | 'terms' | 'privacy' | 'mission' | 'auth-login' | 'auth-signup' | 'subject-selection'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion' | 'course' | 'faqs' | 'terms' | 'privacy' | 'mission' | 'leaderboard' | 'feedback' | 'auth-login' | 'auth-signup' | 'subject-selection'>('home');
   const [previousAuthType, setPreviousAuthType] = useState<'login' | 'signup'>('login');
   const [accentColor] = useState(ACCENT_COLORS[0]);
   const [showDocsMenu, setShowDocsMenu] = useState(false);
   const [pendingScrollSection, setPendingScrollSection] = useState<string | null>(null);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  // Spatial tap sound generator
+  const playSpatialTap = (freq = 600, duration = 0.08) => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      osc.type = 'triangle';  // 中间色彩
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(freq / 2.3, ctx.currentTime + duration);
+      
+      gain.gain.setValueAtTime(0.06, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+    } catch (e) {
+      // gracefully ignore sandbox context blocks
+    }
+  };
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
@@ -45,9 +84,19 @@ export default function App() {
     document.documentElement.style.setProperty('--color-brand-purple', accentColor.secondary);
   }, [theme, accentColor]);
 
-  const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  const toggleTheme = () => {
+    playSpatialTap(480, 0.1);
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
+  const navigateToPage = (page: 'home' | 'team' | 'discussion' | 'course' | 'faqs' | 'terms' | 'privacy' | 'mission' | 'leaderboard' | 'feedback' | 'auth-login' | 'auth-signup' | 'subject-selection') => {
+    playSpatialTap(600, 0.08);
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const navigateToHomeSection = (sectionId: string) => {
+    playSpatialTap(550, 0.09);
     if (currentPage !== 'home') {
       setPendingScrollSection(sectionId);
       setCurrentPage('home');
@@ -85,7 +134,7 @@ export default function App() {
             <img src="/images/mmu-logo.svg" alt="MMU Logo" className="h-[18px] w-auto nav-item" />
             <div className="hidden lg:flex items-center gap-8">
               <span className="nav-item cursor-pointer" onClick={() => setCurrentPage('auth-signup')}>Get Started</span>
-              <span className="nav-item cursor-pointer" onClick={() => setCurrentPage('team')}>About Us</span>
+              <span className="nav-item cursor-pointer" onClick={() => navigateToPage('team')}>About Us</span>
               <span className="nav-item cursor-pointer" onClick={() => document.getElementById('academic-help')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>StudyBuddy</span>
               <span className="nav-item cursor-pointer" onClick={() => navigateToHomeSection('how-it-works')}>How it Works</span>
               <div 
@@ -108,7 +157,7 @@ export default function App() {
                       className="absolute top-full left-0 pt-3 w-72 -translate-x-1/4"
                     >
                       <div className="glass-card !p-2 !rounded-[24px]">
-                        <div className="flex items-start gap-4 p-4 rounded-[18px] hover:bg-white/10 dark:hover:bg-white/5 transition-all cursor-pointer group" onClick={() => { setCurrentPage('team'); setShowDocsMenu(false); }}>
+                        <div className="flex items-start gap-4 p-4 rounded-[18px] hover:bg-white/10 dark:hover:bg-white/5 transition-all cursor-pointer group" onClick={() => { navigateToPage('team'); setShowDocsMenu(false); }}>
                            <div className="w-10 h-10 rounded-[14px] liquid-glass flex items-center justify-center bg-apple-blue/20 text-apple-blue">
                              <BookOpen className="w-5 h-5" />
                            </div>
@@ -160,7 +209,18 @@ export default function App() {
             StudyBuddy
           </div>
           <div className="flex items-center gap-4 md:gap-6">
-            <span className="text-[11px] md:text-[13px] font-medium opacity-60 hover:opacity-100 cursor-pointer transition-all">Ask Community</span>
+            <span className="text-[11px] md:text-[13px] font-medium opacity-60 hover:opacity-100 cursor-pointer transition-all" onClick={() => {
+              setCurrentPage('leaderboard');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}>
+              Leaderboard
+            </span>
+            <span className="text-[11px] md:text-[13px] font-medium opacity-60 hover:opacity-100 cursor-pointer transition-all" onClick={() => {
+              setCurrentPage('discussion');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}>
+              Ask Community
+            </span>
             <button 
               onClick={() => setCurrentPage('auth-login')}
               className="h-[28px] px-3 md:px-4 bg-apple-blue hover:brightness-110 text-white text-[11px] md:text-[12px] font-semibold rounded-full transition-all active:scale-95 shadow-sm"
@@ -180,7 +240,9 @@ export default function App() {
       {/* Main Content — HIG Spatial Structure */}
       <main className="flex-grow w-full relative">
         <AnimatePresence mode="wait">
-          {currentPage === 'auth-login' || currentPage === 'auth-signup' ? (
+          {currentPage === 'course' ? (
+            <CoursePage key="course" />
+          ) : currentPage === 'auth-login' || currentPage === 'auth-signup' ? (
             <AuthPage 
               key="auth"
               type={currentPage === 'auth-login' ? 'login' : 'signup'}
@@ -200,6 +262,10 @@ export default function App() {
               onComplete={() => setCurrentPage('discussion')}
               onPrevious={() => setCurrentPage(previousAuthType === 'login' ? 'auth-login' : 'auth-signup')}
             />
+          ) : currentPage === 'feedback' ? (
+            <FeedbackPage key="feedback" />
+          ) : currentPage === 'leaderboard' ? (
+            <Leaderboard key="leaderboard" />
           ) : currentPage === 'home' ? (
             <motion.div
               key="home"
@@ -408,8 +474,9 @@ export default function App() {
             </motion.div>
           ) : currentPage === 'discussion' ? (
             <Homepage />
-         ) : currentPage === 'faqs' ? (
-            <FAQPage />
+
+          ) : currentPage === 'faqs' ? (
+            <FAQPage onNavigate={(page) => { setCurrentPage(page as any); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           ) : currentPage === 'terms' ? (
             <TermsPage />
           ) : currentPage === 'privacy' ? (
@@ -443,7 +510,16 @@ export default function App() {
               >
                 How It Works
               </button>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Leaderboard</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentPage('leaderboard');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                Leaderboard
+              </button>
             </div>
           </div>
 
@@ -451,7 +527,16 @@ export default function App() {
             <h4 className="text-[13px] font-bold opacity-30 uppercase tracking-widest">Resources</h4>
             <div className="flex flex-col gap-2">
               <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Subjects</span>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Course</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentPage('course');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                Academic
+              </button>
               <button
                 type="button"
                 onClick={() => {
@@ -475,8 +560,20 @@ export default function App() {
               >
                 Our Mission
               </button>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer" onClick={() => setCurrentPage('team')}>Team</span>
-              <span className="text-[14px] opacity-60 hover:opacity-100 cursor-pointer">Feedback</span>
+              <button
+                type="button"
+                onClick={() => navigateToPage('team')}
+                className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                Team
+              </button>
+              <button
+                type="button"
+                onClick={() => { setCurrentPage('feedback'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="text-left text-[14px] opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                Feedback
+              </button>
             </div>
           </div>
         </div>
