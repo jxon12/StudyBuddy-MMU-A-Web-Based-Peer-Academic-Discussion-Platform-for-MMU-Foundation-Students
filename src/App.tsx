@@ -2,6 +2,18 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
+<<<<<<< HEAD
+
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Team } from '../components/team';
+import Homepage from '../components/homepage';
+import { AuthPage } from '../components/AuthPage';
+import { SubjectSelection } from '../components/SubjectSelection';
+import ProfilePage from '../components/homepage';
+
+=======
+>>>>>>> 0f224179b2ecf811f561c100ae10d2effdfad2d5
 import { 
   Search, 
   ChevronDown, 

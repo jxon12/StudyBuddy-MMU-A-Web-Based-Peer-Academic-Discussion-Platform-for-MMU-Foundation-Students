@@ -1,9 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
+<<<<<<< HEAD
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   X, Check, BookOpen, UploadCloud, Image, Trash2, Link, Camera, 
   AlertCircle, RefreshCw, Layers, Globe
 } from 'lucide-react';
+=======
+import { motion } from 'motion/react';
+import { X, Check, BookOpen, UploadCloud, Image, Trash2, Link, Camera, Video, AlertCircle, RefreshCw, ArrowLeft } from 'lucide-react';
+>>>>>>> 331adfb541e95bad51a4d491b94bba295b70eae6
 
 interface CreatePostProps {
   key?: string;
@@ -200,6 +205,7 @@ export function CreatePostPage({ onBack, onPublish, subjects }: CreatePostProps)
   };
 
   return (
+<<<<<<< HEAD
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-sm px-4">
       
       {/* Click overlay backplate to close modal */}
@@ -236,6 +242,37 @@ export function CreatePostPage({ onBack, onPublish, subjects }: CreatePostProps)
           >
             <X className="w-4 h-4" />
           </button>
+=======
+    <div className="min-h-screen text-zinc-100 font-sans pb-32 pt-28 px-4 md:px-0 max-w-2xl mx-auto relative z-10 w-full">
+      {/* Back button and title */}
+      <div className="flex items-center gap-4 mb-8">
+        <button 
+          onClick={onBack}
+          className="p-3 rounded-full transition-colors hover:bg-white/5 border border-white/5 bg-zinc-900/50 cursor-pointer"
+          type="button"
+        >
+          <ArrowLeft className="w-5 h-5 text-zinc-400 hover:text-white" />
+        </button>
+        <span className="text-[11px] font-black uppercase tracking-[0.3em] px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-zinc-300 font-mono">
+          New Discussion
+        </span>
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 20 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+        className="bg-zinc-900/40 backdrop-blur-3xl border border-white/10 rounded-[32px] p-6 md:p-8 shadow-2xl space-y-6 relative animate-fade-in"
+      >
+        {/* Background glow effects to match the app theme */}
+        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/10 blur-[60px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-purple-600/10 blur-[60px] pointer-events-none" />
+
+        {/* Header */}
+        <div className="flex items-center justify-between relative z-10">
+          <h2 className="text-2xl font-black text-white tracking-tight font-apple">Compose Post</h2>
+>>>>>>> 331adfb541e95bad51a4d491b94bba295b70eae6
         </div>
 
         {/* Form elements */}
