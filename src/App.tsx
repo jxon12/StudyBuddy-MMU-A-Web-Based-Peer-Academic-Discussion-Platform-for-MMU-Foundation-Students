@@ -2,18 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-<<<<<<< HEAD
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Team } from '../components/team';
-import Homepage from '../components/homepage';
-import { AuthPage } from '../components/AuthPage';
-import { SubjectSelection } from '../components/SubjectSelection';
-import ProfilePage from '../components/homepage';
-
-=======
->>>>>>> 0f224179b2ecf811f561c100ae10d2effdfad2d5
 import { 
   Search, 
   ChevronDown, 
@@ -365,9 +354,14 @@ export default function App() {
               className="glass-card aspect-square flex items-center justify-center p-0 overflow-hidden"
             >
               <div className="w-full h-full bg-gradient-to-tr from-apple-blue/5 to-apple-purple/5 flex flex-col items-center justify-center text-center group">
-                <div className="text-7xl mb-4 group-hover:scale-110 transition-transform duration-700 ease-out">📵</div>
+                
                 <span className="text-[14px] font-bold opacity-30 uppercase tracking-widest px-8">
-                  [ PHOTO PLACEHOLDER: CHAOTIC CHAT MESSAGES VS ORGANIZED FEED ]
+                   <img
+                src="/images/trio.jpeg"
+                alt="Hogwarts Trio"
+                className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 rounded-[inherit]"
+                referrerPolicy="no-referrer"
+              />
                 </span>
                 <div className="absolute inset-0 border-[0.5px] border-white/20 rounded-[inherit] pointer-events-none" />
               </div>
