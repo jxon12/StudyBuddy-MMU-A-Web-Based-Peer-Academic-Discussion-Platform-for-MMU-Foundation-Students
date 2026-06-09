@@ -3,9 +3,9 @@ import { User, ChevronLeft } from 'lucide-react';
 
 export function Team({ onBackToHome }: { onBackToHome: () => void }) {
   const teamMembers = [
-    { name: 'Liou Zi En', role: 'Full-Stack Developer ', image: '/images/team/liou-zi-en.jpeg', bio: 'CodeNection 2025 Top 10 Finalist, HackDay Champion, Google Developer Group Software Engineering core team.' },
-    { name: 'Ling Yi Yon', role: 'UI/UX Designer + Developer', image: '/images/team/ling-yi-yon.jpeg', bio: 'Final year MMU student. Passionate about creating efficient digital spaces for peer-to-peer learning.' },
-    { name: 'Tan Kenji', role: 'Frontend Developer', image: '/images/team/tan-kenji.jpeg', bio: 'Expert in educational psychology and student engagement. Ensuring StudyBuddy remains a safe, productive space.' }
+    { name: 'Liou Zi En', role: 'Full-Stack Developer ', image: '/images/team/liou-zi-en.jpeg', bio: 'Email: LIOU.ZI.EN@student.mmu.edu.my' },
+    { name: 'Ling Yi Yon', role: 'UI/UX Designer + Developer', image: '/images/team/ling-yi-yon.jpeg', bio: 'Email: LING.YI.YON@student.mmu.edu.my' },
+    { name: 'Tan Kenji', role: 'Frontend Developer', image: '/images/team/tan-kenji.jpeg', bio: 'Email: TAN.KENJI@student.mmu.edu.my' }
   ];
 
   return (
@@ -40,12 +40,12 @@ export function Team({ onBackToHome }: { onBackToHome: () => void }) {
                 transition={{ delay: i * 0.1 }}
                 className="flex flex-col gap-6"
               >
-                <div className="aspect-square overflow-hidden group cursor-pointer relative rounded-3xl max-w-xs bg-black/5 dark:bg-white/5 flex items-center justify-center">
+                <div className="w-full aspect-square overflow-hidden group cursor-pointer relative rounded-[32px] bg-white/5 shadow-lg border border-white/10 flex items-center justify-center">
                   {member.image ? (
                     <img 
                       src={member.image} 
                       alt={member.name}
-                      className="max-w-full max-h-full group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                   ) : (
                     <div className="w-full h-full bg-black/10 dark:bg-white/5 flex items-center justify-center relative overflow-hidden">
@@ -63,6 +63,9 @@ export function Team({ onBackToHome }: { onBackToHome: () => void }) {
                   <div className="text-[15px] font-medium opacity-70">
                     {member.role}
                   </div>
+                  <p className="text-[14px] opacity-60 leading-relaxed mt-2">
+                    {member.bio}
+                  </p>
                 </div>
               </motion.div>
             ))}

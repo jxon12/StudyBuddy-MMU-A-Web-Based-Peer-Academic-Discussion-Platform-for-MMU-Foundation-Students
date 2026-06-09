@@ -42,7 +42,7 @@ const FAQS = [
   }
 ];
 
-function FAQItem({ question, answer, isOpen, onClick, index }: { question: string, answer: string, isOpen: boolean, onClick: () => void, index: number }) {
+function FAQItem({ question, answer, isOpen, onClick, index }: { question: string, answer: string, isOpen: boolean, onClick: () => void, index: number, key?: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -187,7 +187,12 @@ export function FAQPage({ onNavigate }: { onNavigate?: (page: string) => void })
               </p>
             </div>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button className="apple-button-primary min-w-[220px]">Contact Support</button>
+              <button 
+                className="apple-button-primary min-w-[220px]"
+                onClick={() => { onNavigate?.('team'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              >
+                Contact Support
+              </button>
               <button
                 className="apple-button-secondary min-w-[220px]"
                 onClick={() => { onNavigate?.('feedback'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}

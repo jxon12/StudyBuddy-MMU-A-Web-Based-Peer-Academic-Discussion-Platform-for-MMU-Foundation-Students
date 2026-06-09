@@ -6,13 +6,17 @@ import {
   Check,
   User, 
   Sparkles, 
-  
   TrendingUp, 
-  History, 
   RefreshCw,
-  
-  Heart
+  History,
+  Lock,
+  Database,
+  AlertTriangle,
+  CheckCircle,
+  Server,
+  HelpCircle
 } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../src/services/supabaseClient';
 
 interface FeedbackItem {
   id: string;
@@ -37,12 +41,11 @@ const CATEGORIES = [
 
 const TRIMESTERS_DATA: Record<string, string[]> = {
   'Trimester 1': [
-    'Introduction to Business',
-    'Management',
+    'Introduction to Business Management',
     'Introduction to Computing Technologies',
     'Communicative English',
-    'Mathematics 1',
-    'Problem Solving and Programme Design'
+    'Mathematics I',
+    'Problem Solving and Program Design'
   ],
   'Trimester 2': [
     'Critical Thinking',
@@ -60,7 +63,29 @@ const TRIMESTERS_DATA: Record<string, string[]> = {
   'General/None': []
 };
 
-
+const playSpatialTap = (freq = 600, duration = 0.08) => {
+  try {
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(freq / 2.1, ctx.currentTime + duration);
+    
+    gain.gain.setValueAtTime(0.05, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  } catch (e) {
+    // ignore
+  }
+};
 
 export function FeedbackPage() {
   const [formData, setFormData] = useState({
@@ -76,9 +101,10 @@ export function FeedbackPage() {
   const [submitted, setSubmitted] = useState(false);
   const [history, setHistory] = useState<FeedbackItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dbErrorNotice, setDbErrorNotice] = useState<string | null>(null);
+  const [isLiveSynced, setIsLiveSynced] = useState(false);
 
-  // Initialize student feedback history and prefill student ID on load
-  useEffect(() => {
+  const loadFromLocalStorage = () => {
     const stored = localStorage.getItem('studybuddy_feedback_history');
     if (stored) {
       try {
@@ -94,6 +120,64 @@ export function FeedbackPage() {
         console.error('Failed to parse feedback history', e);
       }
     }
+  };
+
+  const fetchFeedbackFromSupabase = async () => {
+    try {
+      if (!supabase) return;
+      
+      const { data, error } = await supabase
+        .from('studybuddy_feedbacks')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.warn('Supabase table error, falling back to local:', error.message);
+        // Table probably doesn't exist yet, we show a nice helper in the UI
+        setDbErrorNotice(error.message);
+        setIsLiveSynced(false);
+        loadFromLocalStorage();
+        return;
+      }
+
+      if (data) {
+        const mappedData: FeedbackItem[] = data.map((item: any) => ({
+          id: item.id?.toString() || 'FB' + Math.floor(1000 + Math.random() * 9000),
+          name: item.name || 'Anonymous Buddy',
+          studentId: item.student_id || '',
+          category: item.category || 'General Suggestion',
+          trimester: item.trimester || 'General/None',
+          subject: item.subject || 'General Hub Discussion',
+          rating: item.rating ?? 5,
+          message: item.message || '',
+          timestamp: item.created_at 
+            ? new Date(item.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+            : 'Just Now'
+        }));
+        setHistory(mappedData);
+        setIsLiveSynced(true);
+        setDbErrorNotice(null);
+        if (mappedData.length > 0 && mappedData[0].studentId) {
+          setFormData(prev => ({
+            ...prev,
+            studentId: mappedData[0].studentId
+          }));
+        }
+      }
+    } catch (e: any) {
+      console.error('Fetch exception:', e);
+      setIsLiveSynced(false);
+      loadFromLocalStorage();
+    }
+  };
+
+  // Initialize student feedback history and prefill student ID on load
+  useEffect(() => {
+    if (isSupabaseConfigured) {
+      fetchFeedbackFromSupabase();
+    } else {
+      loadFromLocalStorage();
+    }
   }, []);
 
   // Update subject list when trimester selection changes
@@ -106,42 +190,86 @@ export function FeedbackPage() {
   }, [formData.trimester]);
 
   const handleRatingSelect = (rate: number) => {
+    // Pitch rises depending on high rating! Delightful touch.
+    playSpatialTap(420 + rate * 70, 0.09);
     setFormData(prev => ({
       ...prev,
       rating: rate
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.message.trim()) return;
-
-    setIsSubmitting(true);
-
-    // Simulate short natural smooth submission time
-    setTimeout(() => {
-      const newFeedback: FeedbackItem = {
-        id: 'FB' + Math.floor(1000 + Math.random() * 9000),
-        name: formData.name.trim() || 'Anonymous Buddy',
-        studentId: formData.studentId,
-        category: formData.category,
-        trimester: formData.trimester,
-        subject: formData.subject || 'General Hub Discussion',
-        rating: formData.rating,
-        message: formData.message.trim(),
-        timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-      };
-
-      const updatedHistory = [newFeedback, ...history];
-      setHistory(updatedHistory);
-      localStorage.setItem('studybuddy_feedback_history', JSON.stringify(updatedHistory));
-
-      setIsSubmitting(false);
-      setSubmitted(true);
-    }, 800);
+  const saveLocally = (newFeedback: FeedbackItem) => {
+    const updatedHistory = [newFeedback, ...history];
+    setHistory(updatedHistory);
+    localStorage.setItem('studybuddy_feedback_history', JSON.stringify(updatedHistory));
+    setIsSubmitting(false);
+    setSubmitted(true);
+    playSpatialTap(800, 0.25);
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.message.trim() || !formData.studentId.trim()) return;
+
+    playSpatialTap(720, 0.15);
+    setIsSubmitting(true);
+
+    const newFeedbackLocal: FeedbackItem = {
+      id: 'FB' + Math.floor(1000 + Math.random() * 9000),
+      name: formData.name.trim() || 'Anonymous Buddy',
+      studentId: formData.studentId.trim().toUpperCase(),
+      category: formData.category,
+      trimester: formData.trimester,
+      subject: formData.subject || 'General Hub Discussion',
+      rating: formData.rating,
+      message: formData.message.trim(),
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    };
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { error } = await supabase
+          .from('studybuddy_feedbacks')
+          .insert([
+            {
+              name: newFeedbackLocal.name,
+              student_id: newFeedbackLocal.studentId,
+              category: newFeedbackLocal.category,
+              trimester: newFeedbackLocal.trimester,
+              subject: newFeedbackLocal.subject,
+              rating: newFeedbackLocal.rating,
+              message: newFeedbackLocal.message
+            }
+          ]);
+
+        if (error) {
+          console.error('Supabase save failed:', error.message);
+          setDbErrorNotice(error.message);
+          // Save locally as safe fallback
+          saveLocally(newFeedbackLocal);
+        } else {
+          // Success! Fetch the latest list
+          await fetchFeedbackFromSupabase();
+          setIsSubmitting(false);
+          setSubmitted(true);
+          playSpatialTap(800, 0.25);
+        }
+      } catch (err: any) {
+        console.error('Supabase exception:', err);
+        setDbErrorNotice(err.message || 'Unknown network error');
+        saveLocally(newFeedbackLocal);
+      }
+    } else {
+      // Direct local simulation timeout for beautiful responsive feedback
+      setTimeout(() => {
+        saveLocally(newFeedbackLocal);
+      }, 850);
+    }
+  };
+
+
   const handleResetForm = () => {
+    playSpatialTap(450, 0.1);
     setFormData(prev => ({
       name: '',
       studentId: prev.studentId, // Preserve the student ID keyed in by the user
@@ -154,97 +282,157 @@ export function FeedbackPage() {
     setSubmitted(false);
   };
 
-  const handleClearHistory = () => {
-    if (window.confirm('Do you want to clear your local feedback history logs?')) {
-      setHistory([]);
-      localStorage.removeItem('studybuddy_feedback_history');
-    }
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
-      className="pt-[180px] pb-32 px-4 max-w-6xl mx-auto w-full"
+      className="pt-[180px] pb-32 px-4 max-w-6xl mx-auto w-full font-sans animate-fade-in-up"
     >
       {/* Header section with branding underline */}
-      <div className="mb-12 pb-6 border-b border-white/10 flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-apple-blue/10 rounded-full text-[10px] font-extrabold text-apple-blue uppercase tracking-widest mb-3">
-            <MessageSquare className="w-3.5 h-3.5" />
-            Co-Creation
+      <div className="mb-12 pb-8 border-b border-white/10 flex flex-col md:flex-row items-start md:items-end justify-between gap-6 relative">
+        <div className="space-y-3.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-white/5 border border-white/15 text-primary/85 rounded-full text-[10px] font-extrabold uppercase tracking-widest shadow-sm">
+              <MessageSquare className="w-3.5 h-3.5 text-apple-blue" />
+              Co-Creation Box
+            </div>
+
+            {/* Supabase Integration State Bar */}
+            {!isSupabaseConfigured && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-500/10 border border-white/10 text-zinc-400 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                <span className="w-1.5 h-1.5 bg-zinc-400 rounded-full" />
+                Local Persistence Mode
+              </span>
+            )}
           </div>
-          <h1 id="feedback-main-title" className="text-[44px] md:text-[52px] font-black tracking-tight mb-2">Student Feedback</h1>
+          
+          <h1 className="text-[44px] md:text-[56px] font-black tracking-tight leading-none text-primary">
+            Student Feedback
+          </h1>
+          
           <p className="text-[15px] opacity-60 max-w-xl">
-            Have thoughts, bugs, or requests about StudyBuddy MMU? Share them here. We modify this app continuously based on raw student input!
+            Help improve StudyBuddy. Share high-fidelity feature ideas, system bug reports, or questions directly with our founding academic board.
           </p>
         </div>
-        <div className="w-[120px] h-1.5 rounded-full bg-gradient-to-r from-apple-blue via-apple-indigo to-apple-purple" />
+
+        <div className="h-0.5 w-[160px] bg-gradient-to-r from-apple-blue via-apple-indigo to-apple-purple rounded-full" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* Supabase Error & Table Creation Helper */}
+      {dbErrorNotice && (
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 p-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex flex-col md:flex-row gap-4 items-start md:items-center justify-between"
+        >
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2 text-amber-400 font-bold text-[14px]">
+              <AlertTriangle className="w-5 h-5 shrink-0" />
+              Supabase Table Configuration Needed
+            </div>
+            <p className="text-[12px] opacity-75 max-w-2xl leading-relaxed">
+              We parsed your environment keys correctly, but Supabase returned: <code className="bg-black/30 px-1 py-0.5 rounded font-mono text-amber-300">{dbErrorNotice}</code>. 
+              To fix this, please run the following query in your <strong>Supabase SQL Editor</strong> to construct the target database matching your schema:
+            </p>
+            <pre className="text-[11px] font-mono p-3 bg-black/40 rounded-xl mt-2 select-all overflow-x-auto text-primary/80 border border-white/5 max-h-32">
+{`CREATE TABLE studybuddy_feedbacks (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  name text,
+  student_id text NOT NULL,
+  category text NOT NULL,
+  trimester text,
+  subject text,
+  rating integer,
+  message text NOT NULL,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);`}
+            </pre>
+          </div>
+          <button 
+            onClick={() => {
+              playSpatialTap(600, 0.1);
+              fetchFeedbackFromSupabase();
+            }}
+            className="shrink-0 h-9 px-4 bg-white/10 hover:bg-white/15 text-primary border border-white/10 rounded-xl text-[11px] font-bold flex items-center gap-1.5 active:scale-95 transition-all text-center self-end md:self-center"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Retry Table Check
+          </button>
+        </motion.div>
+      )}
+
+      {/* Supabase Config Setup Instructions Indicator */}
+      {!isSupabaseConfigured && (
+        <div className="mb-8 p-5 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center gap-4">
+          <Database className="w-8 h-8 text-apple-blue shrink-0 animate-pulse" />
+          <div className="space-y-1">
+            <h4 className="text-[13px] font-extrabold text-primary">Want to persist this and sync to Supabase Cloud?</h4>
+            <p className="text-[11.5px] opacity-60 leading-relaxed">
+              Connect your online database instantly! Select the <strong>Secrets</strong> menu in AI Studio and add <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code>. StudyBuddy will automatically migrate live and read/write real-time cloud items.
+            </p>
+          </div>
+        </div>
+      )}
+
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-16">
         {/* Left Side: Dynamic Context Card detailing changes */}
         <div className="lg:col-span-5 space-y-6">
           
-          <div className="glass-card flex flex-col gap-5 p-7 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-apple-indigo/10 rounded-full blur-2xl group-hover:bg-apple-indigo/20 transition-all pointer-events-none" />
+          <div className="glass-card flex flex-col gap-5 p-7 relative overflow-hidden group border border-white/10 shadow-xl">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-apple-blue/10 rounded-full blur-2xl group-hover:bg-apple-blue/20 transition-all pointer-events-none" />
             
             <h2 className="text-[19px] font-bold text-primary flex items-center gap-2">
-              <Sparkles className="w-4.5 h-4.5 text-apple-blue" />
+              <Sparkles className="w-4.5 h-4.5 text-apple-blue animate-pulse" />
               Community-Driven Updates
             </h2>
-            <p className="text-[13.5px] opacity-60 leading-relaxed">
-              StudyBuddy is an active peer-to-peer experiment run on MMU. We regularly implement students' requests to construct a perfect collaborative workspace. Here are latest changes requested by students:
+            <p className="text-[13.5px] opacity-60 leading-relaxed text-justify">
+              StudyBuddy is an active peer-to-peer workspace run at MMU. We regularly address and implement student feedback to build a highly streamlined system. Here are the latest changes requested by our community:
             </p>
 
-            <div className="space-y-3.5 mt-2">
+            <div className="space-y-4 mt-2">
               {[
                 {
-                  title: 'Exact Subdivided Syllabus',
-                  desc: 'Mapped out and listed all structural and numerical subjects for Trimester 1, Trimester 2, and Trimester 3 precisely.'
+                  title: 'Precise Modular Syllabus Map',
+                  desc: 'Mapped and categorized the structure of each computing course across all three trimesters.'
                 },
                 {
-                  title: 'Clean IDs (No Specialities)',
-                  desc: 'Streamlined the database indexes, eliminated complex specialization tags, and focused purely on subjects.'
+                  title: 'Streamlined Navigation Structure',
+                  desc: 'Designed sleek Apple-like tabs for academics, leaderboards, and support lines.'
                 },
                 {
-                  title: 'Compliant Student ID Generator',
-                  desc: 'Changed default random placeholder profiles to comply exactly with the student format: 252FC253ZL.'
+                  title: 'Reliable Profile Connection',
+                  desc: 'Bound academic contributions to standard formats matching MMU student structures.'
                 }
               ].map((update, i) => (
-                <div key={i} className="flex gap-3 items-start text-left">
-                  <div className="w-5 h-5 rounded-full bg-apple-blue/10 flex items-center justify-center shrink-0 mt-0.5">
+                <div key={i} className="flex gap-3 text-left items-start">
+                  <div className="w-5 h-5 rounded-full bg-apple-blue/10 flex items-center justify-center shrink-0 mt-0.5 border border-apple-blue/20">
                     <Check className="w-3 h-3 text-apple-blue" />
                   </div>
                   <div>
-                    <h3 className="text-[13px] font-extrabold text-primary">{update.title}</h3>
-                    <p className="text-[11.5px] opacity-50 mt-0.5">{update.desc}</p>
+                    <h3 className="text-[13px] font-bold text-primary leading-tight">{update.title}</h3>
+                    <p className="text-[11.5px] opacity-50 mt-1 leading-normal">{update.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
-
-            <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-3 bg-neutral-900/40 p-3.5 rounded-2xl border border-white/5 text-[12px] opacity-80">
-              <Heart className="w-4 h-4 text-apple-coral shrink-0 animate-pulse fill-apple-coral" />
-              <span>We review and address 100% of inputs within 24 hours.</span>
-            </div>
           </div>
 
-          <div className="glass-card p-6 border border-white/5 space-y-4">
-            <h3 className="text-[15px] font-bold tracking-tight text-primary flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-apple-mint" />
-              MMU Study Statistics
+          <div className="glass-card p-6 border border-white/10 space-y-4 shadow-lg">
+            <h3 className="text-[11px] font-bold tracking-widest text-primary flex items-center gap-2 uppercase opacity-45">
+              <TrendingUp className="w-4 h-4 text-apple-mint animate-pulse" />
+              Academic Hub Performance
             </h3>
-            <div className="grid grid-cols-2 gap-3 text-center">
-              <div className="p-3 bg-white/5 rounded-xl border border-white/5">
-                <div className="text-[20px] font-black text-apple-blue">24 Hrs</div>
-                <div className="text-[10px] uppercase font-bold opacity-40 mt-1">Average SLA Response</div>
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div className="p-4 bg-white/5 border border-white/10 rounded-2xl shadow-sm">
+                <div className="text-[22px] font-black text-apple-blue font-mono">24h</div>
+                <div className="text-[10px] uppercase font-extrabold opacity-40 mt-1">Average Response SLA</div>
               </div>
-              <div className="p-3 bg-white/5 rounded-xl border border-white/5">
-                <div className="text-[20px] font-black text-apple-mint">98.4%</div>
-                <div className="text-[10px] uppercase font-bold opacity-40 mt-1">Satisfaction Rate</div>
+              <div className="p-4 bg-white/5 border border-white/10 rounded-2xl shadow-sm">
+                <div className="text-[22px] font-black text-apple-mint font-mono">98.4%</div>
+                <div className="text-[10px] uppercase font-extrabold opacity-40 mt-1">Satisfaction Rate</div>
               </div>
             </div>
           </div>
@@ -257,29 +445,30 @@ export function FeedbackPage() {
             {!submitted ? (
               <motion.div
                 key="feedback-form"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -25 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
                 className="glass-card p-8 border border-white/10 shadow-xl"
               >
-                <form id="student-feedback-form-element" onSubmit={handleSubmit} className="space-y-5">
-                  <div className="space-y-1.5">
+                <form id="student-feedback-form-element" onSubmit={handleSubmit} className="space-y-6">
+                  {/* Name field (optional) */}
+                  <div className="space-y-2">
                     <label className="text-[11px] font-extrabold uppercase tracking-wider opacity-40">Your Student Name (Optional)</label>
                     <div className="relative">
-                      <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 opacity-30" />
+                      <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 opacity-35 text-primary" />
                       <input 
                         type="text" 
                         placeholder="e.g. Tan Kenji"
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        className="w-full h-11 bg-black/10 dark:bg-white/5 border border-white/5 rounded-xl pl-10 pr-4 text-[13px] font-medium text-primary outline-none focus:border-apple-blue/40"
+                        onFocus={() => playSpatialTap(450, 0.05)}
+                        className="w-full h-12 bg-white/5 dark:bg-black/25 backdrop-blur-md border border-white/10 rounded-2xl pl-10 pr-4 text-[13px] font-medium text-primary outline-none focus:border-white/20 transition-all shadow-inner"
                       />
                     </div>
                   </div>
 
-                  {/* Student ID Group */}
-                  <div className="space-y-1.5">
+                  {/* Student ID block */}
+                  <div className="space-y-2">
                     <label className="text-[11px] font-extrabold uppercase tracking-wider opacity-40">Your Student ID</label>
                     <input 
                       type="text" 
@@ -287,120 +476,131 @@ export function FeedbackPage() {
                       required
                       value={formData.studentId}
                       onChange={(e) => setFormData({...formData, studentId: e.target.value})}
-                      className="w-full h-11 bg-black/10 dark:bg-white/5 border border-white/5 rounded-xl px-4 text-[13px] font-mono font-bold tracking-wider text-apple-blue outline-none focus:border-apple-blue/40"
+                      onFocus={() => playSpatialTap(480, 0.05)}
+                      className="w-full h-12 bg-white/5 dark:bg-black/25 backdrop-blur-md border border-white/10 rounded-2xl px-4 text-[13px] font-mono font-bold tracking-widest text-apple-blue outline-none focus:border-white/20 transition-all uppercase shadow-inner"
                     />
-                    <span className="text-[10px] opacity-30 block">
-                      Please enter your MMU Student ID to connect this feedback to your academic profile.
+                    <span className="text-[10.5px] opacity-35 block leading-normal">
+                      Connecting your student ID binds this feedback record safely to your contributor score.
                     </span>
                   </div>
 
+                  {/* Classification grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Category Selection */}
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       <label className="text-[11px] font-extrabold uppercase tracking-wider opacity-40">Classification</label>
                       <select 
                         value={formData.category}
-                        onChange={(e) => setFormData({...formData, category: e.target.value})}
-                        className="w-full h-11 bg-black/10 dark:bg-white/5 border border-white/5 rounded-xl px-3.5 text-[12px] font-semibold text-primary outline-none focus:border-apple-blue/40 cursor-pointer"
+                        onChange={(e) => {
+                          playSpatialTap(550, 0.08);
+                          setFormData({...formData, category: e.target.value});
+                        }}
+                        className="w-full h-12 bg-white/5 dark:bg-black/25 backdrop-blur-md border border-white/10 rounded-2xl px-3.5 text-[12px] font-bold text-primary outline-none focus:border-white/20 cursor-pointer shadow-sm appearance-none"
                       >
                         {CATEGORIES.map(cat => (
-                          <option key={cat} value={cat} className="bg-neutral-800 text-white">{cat}</option>
+                          <option key={cat} value={cat} className="bg-neutral-950 text-white">{cat}</option>
                         ))}
                       </select>
                     </div>
 
-                    {/* Trimester Academic Context */}
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       <label className="text-[11px] font-extrabold uppercase tracking-wider opacity-40">Trimester Context</label>
                       <select 
                         value={formData.trimester}
-                        onChange={(e) => setFormData({...formData, trimester: e.target.value})}
-                        className="w-full h-11 bg-black/10 dark:bg-white/5 border border-white/5 rounded-xl px-3.5 text-[12px] font-semibold text-primary outline-none focus:border-apple-blue/40 cursor-pointer"
+                        onChange={(e) => {
+                          playSpatialTap(560, 0.08);
+                          setFormData({...formData, trimester: e.target.value});
+                        }}
+                        className="w-full h-12 bg-white/5 dark:bg-black/25 backdrop-blur-md border border-white/10 rounded-2xl px-3.5 text-[12px] font-bold text-primary outline-none focus:border-white/20 cursor-pointer shadow-sm appearance-none"
                       >
                         {Object.keys(TRIMESTERS_DATA).map(tri => (
-                          <option key={tri} value={tri} className="bg-neutral-800 text-white">{tri}</option>
+                          <option key={tri} value={tri} className="bg-neutral-950 text-white">{tri}</option>
                         ))}
                       </select>
                     </div>
                   </div>
 
-                  {/* Conditional Subject Selection matches exactly with selected Trimester */}
+                  {/* Subject selector conditional */}
                   {formData.trimester !== 'General/None' && (
                     <motion.div 
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
-                      className="space-y-1.5"
+                      className="space-y-2"
                     >
                       <label className="text-[11px] font-extrabold uppercase tracking-wider opacity-40">Related Academic Subject</label>
                       <select 
                         value={formData.subject}
-                        onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                        className="w-full h-11 bg-black/10 dark:bg-white/5 border border-white/5 rounded-xl px-3.5 text-[12px] font-semibold text-primary outline-none focus:border-apple-blue/40 cursor-pointer"
+                        onChange={(e) => {
+                          playSpatialTap(580, 0.08);
+                          setFormData({...formData, subject: e.target.value});
+                        }}
+                        className="w-full h-12 bg-white/5 dark:bg-black/25 backdrop-blur-md border border-white/10 rounded-2xl px-3.5 text-[12px] font-bold text-primaryoutline-none focus:border-white/20 cursor-pointer shadow-sm appearance-none"
                       >
                         {(TRIMESTERS_DATA[formData.trimester] || []).map(sub => (
-                          <option key={sub} value={sub} className="bg-neutral-800 text-white">{sub}</option>
+                          <option key={sub} value={sub} className="bg-neutral-950 text-white">{sub}</option>
                         ))}
                       </select>
                     </motion.div>
                   )}
 
-                  {/* Character Satisfaction Rating scale of 1-5 */}
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-extrabold uppercase tracking-wider opacity-40">Your Satisfaction Score</label>
-                    <div className="flex bg-neutral-900/30 p-2 border border-white/5 rounded-xl justify-around items-center">
-                      {[1, 2, 3, 4, 5].map((index) => (
-                        <button
-                          key={index}
-                          type="button"
-                          onClick={() => handleRatingSelect(index)}
-                          className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-[12.5px] transition-all hover:scale-110 ${
-                            formData.rating === index 
-                              ? 'bg-apple-blue text-white shadow-md shadow-apple-blue/20 scale-105' 
-                              : 'text-primary/40 hover:text-primary'
-                          }`}
-                        >
-                          {index === 1 && '😠'}
-                          {index === 2 && '🙁'}
-                          {index === 3 && '😐'}
-                          {index === 4 && '🙂'}
-                          {index === 5 && '🤩'}
-                        </button>
-                      ))}
+                  {/* Core rating button scale */}
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-extrabold uppercase tracking-wider opacity-40">Your Experience Score</label>
+                    <div className="grid grid-cols-5 gap-2 bg-white/5 border border-white/10 p-2 rounded-2xl shadow-inner">
+                      {[1, 2, 3, 4, 5].map((index) => {
+                        const emoji = index === 1 ? '😠' : index === 2 ? '🙁' : index === 3 ? '😐' : index === 4 ? '🙂' : '🤩';
+                        const isSelected = formData.rating === index;
+                        return (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => handleRatingSelect(index)}
+                            className={`h-11 rounded-xl flex items-center justify-center font-extrabold text-[13px] border transition-all cursor-pointer ${
+                              isSelected 
+                                ? 'bg-white/20 border-white/35 text-white shadow-xl scale-105' 
+                                : 'bg-transparent border-transparent text-primary opacity-55 hover:opacity-100 hover:bg-white/5'
+                            }`}
+                          >
+                            <span className="mr-1">{emoji}</span>
+                            <span>{index}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  {/* Main Message Text Area */}
-                  <div className="space-y-1.5">
+                  {/* Message body */}
+                  <div className="space-y-2">
                     <label className="text-[11px] font-extrabold uppercase tracking-wider opacity-40">Describe your suggestion / feedback</label>
                     <textarea 
                       placeholder="Please write your detailed comments, bugs, feature requests or suggestions here..."
                       rows={5}
                       value={formData.message}
                       onChange={(e) => setFormData({...formData, message: e.target.value})}
+                      onFocus={() => playSpatialTap(450, 0.05)}
                       required
-                      className="w-full bg-black/10 dark:bg-white/5 border border-white/5 rounded-xl p-4 text-[13px] font-medium text-primary outline-none focus:border-apple-blue/40 font-sans leading-relaxed resize-none"
+                      className="w-full bg-white/5 dark:bg-black/25 backdrop-blur-md border border-white/10 rounded-2xl p-4 text-[13px] font-medium text-primary outline-none focus:border-white/20 font-sans leading-relaxed resize-none shadow-inner"
                     />
-                    <div className="text-[11px] opacity-40 flex justify-between">
-                      <span>Maximum recommended length 1,000 characters.</span>
-                      <span>{formData.message.length} chars</span>
+                    <div className="text-[10px] opacity-35 flex justify-between">
+                      <span>Provide description of features or issues.</span>
+                      <span>{formData.message.length} characters</span>
                     </div>
                   </div>
 
-                  {/* Submit feedback button */}
+                  {/* Submit CTA button */}
                   <div className="pt-2">
                     <button
                       type="submit"
                       disabled={isSubmitting || !formData.message.trim() || !formData.studentId.trim()}
-                      className={`w-full h-11 rounded-xl text-[13px] font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                      className={`w-full h-12 rounded-2xl text-[13px] font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
                         formData.message.trim() && formData.studentId.trim() && !isSubmitting
-                          ? 'bg-apple-blue hover:brightness-110 text-white shadow-lg shadow-apple-blue/15 active:scale-98'
+                          ? 'bg-apple-blue hover:brightness-110 text-white shadow-lg active:scale-98'
                           : 'bg-white/5 text-primary opacity-30 cursor-not-allowed border border-white/5'
                       }`}
                     >
                       {isSubmitting ? (
                         <>
                           <RefreshCw className="w-4 h-4 animate-spin" />
-                          Sending securely to founding board...
+                          Submitting securely to founding board...
                         </>
                       ) : (
                         <>
@@ -418,7 +618,7 @@ export function FeedbackPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
-                className="glass-card p-10 border border-white/10 text-center space-y-6 relative overflow-hidden"
+                className="glass-card p-10 border border-white/10 text-center space-y-6 relative overflow-hidden shadow-2xl"
               >
                 <div className="w-16 h-16 rounded-full bg-apple-mint/10 border border-apple-mint/30 flex items-center justify-center text-apple-mint mx-auto mb-2 animate-bounce">
                   <Check className="w-8 h-8" />
@@ -431,10 +631,10 @@ export function FeedbackPage() {
                   </p>
                 </div>
 
-                <div className="bg-white/5 border border-white/5 p-4 rounded-2xl max-w-sm mx-auto text-left space-y-2 text-[12px]">
+                <div className="bg-white/5 border border-white/10 p-4 rounded-2xl max-w-sm mx-auto text-left space-y-2.5 text-[12px] shadow-lg">
                   <div className="flex justify-between border-b border-white/5 pb-1 opacity-60">
-                    <span>Buddy ID</span>
-                    <span className="font-mono font-bold text-apple-blue">{formData.studentId}</span>
+                    <span>Contributor ID</span>
+                    <span className="font-mono font-bold text-apple-blue">{formData.studentId.toUpperCase()}</span>
                   </div>
                   <div className="flex justify-between border-b border-white/5 pb-1 opacity-60">
                     <span>Classification</span>
@@ -446,7 +646,7 @@ export function FeedbackPage() {
                       <span className="truncate max-w-[200px] font-semibold">{formData.subject}</span>
                     </div>
                   )}
-                  <div className="pt-1 select-all break-words italic line-clamp-3 opacity-80">
+                  <div className="pt-2 select-all break-words italic line-clamp-3 opacity-85 bg-black/15 p-3 rounded-lg border border-white/5 text-[12px] leading-relaxed">
                     "{formData.message}"
                   </div>
                 </div>
@@ -454,7 +654,7 @@ export function FeedbackPage() {
                 <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
                   <button
                     onClick={handleResetForm}
-                    className="h-10 px-6 font-bold text-[13px] border border-white/15 bg-white/5 hover:bg-white/10 text-primary rounded-xl transition-all"
+                    className="h-11 px-6 font-bold text-[13px] border border-white/15 bg-white/5 hover:bg-white/10 text-primary rounded-2xl transition-all cursor-pointer shadow-md"
                   >
                     Submit Another Feedback
                   </button>
@@ -465,7 +665,69 @@ export function FeedbackPage() {
         </div>
       </div>
 
-    
+      {/* Historical logs display */}
+      <div className="glass-card !p-0 border border-white/10 overflow-hidden shadow-2xl">
+        <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/5 dark:bg-black/30 backdrop-blur-md">
+          <div className="flex items-center gap-2">
+            <History className="w-4 h-4 text-apple-blue shrink-0" />
+            <h3 className="text-[16px] font-extrabold text-primary">
+              {isLiveSynced ? 'Community Sandbox Feedbacks' : 'Your Co-Creation Submissions'} ({history.length})
+            </h3>
+          </div>
+          <div className="flex items-center gap-1.5 text-[10.5px] opacity-40 font-mono font-bold uppercase tracking-wider">
+            {isLiveSynced ? (
+              <>
+                <Server className="w-3.5 h-3.5 text-emerald-400" />
+                Live Cloud Synced to Supabase
+              </>
+            ) : (
+              <>
+                <Lock className="w-3.5 h-3.5 text-amber-400" />
+                Locally Saved to Browser Storage
+              </>
+            )}
+          </div>
+        </div>
+
+        {history.length > 0 ? (
+          <div className="divide-y divide-white/5">
+            {history.map((item) => (
+              <div key={item.id} className="p-6 hover:bg-white/[0.02] transition-colors flex flex-col md:flex-row md:items-start justify-between gap-4">
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[11px] font-extrabold px-2 py-0.5 bg-apple-blue/15 border border-apple-blue/20 text-apple-blue rounded">{item.category}</span>
+                    {item.trimester !== 'General/None' && (
+                      <span className="text-[11px] opacity-60 font-medium">{item.trimester} • {item.subject}</span>
+                    )}
+                    <span className="text-[11px] font-bold font-mono opacity-40">Contributor: {item.studentId}</span>
+                  </div>
+                  <p className="text-[13px] text-primary/80 line-clamp-3 leading-relaxed">
+                    "{item.message}"
+                  </p>
+                </div>
+                
+                <div className="flex flex-row md:flex-col items-center md:items-end justify-between shrink-0 gap-2">
+                  <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 h-7 px-2.5 rounded-lg text-[11px] font-bold">
+                    <span>Experience Score:</span>
+                    <span className="font-black text-apple-cyan">{item.rating}/5</span>
+                  </div>
+                  <div className="text-[10.5px] opacity-35 font-mono">{item.timestamp}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="py-16 text-center text-primary/40 space-y-2">
+            <div className="w-12 h-12 rounded-full border border-dashed border-white/10 flex items-center justify-center mx-auto mb-2 select-none opacity-40">
+              <MessageSquare className="w-5 h-5 text-primary" />
+            </div>
+            <div className="text-[14px] font-bold">No Submissions Recorded Yet</div>
+            <p className="text-[11.5px] text-primary/30 max-w-xs mx-auto leading-normal">
+              Contribute a feature idea or bug report using the workspace form above to initialize files.
+            </p>
+          </div>
+        )}
+      </div>
     </motion.div>
   );
 }
