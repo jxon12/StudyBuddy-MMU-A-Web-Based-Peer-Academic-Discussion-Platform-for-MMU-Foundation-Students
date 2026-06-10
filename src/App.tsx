@@ -1,8 +1,12 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
 
+
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
   ChevronDown, 
@@ -12,8 +16,6 @@ import {
   Sun,
   User
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Team } from '../components/team';
 import Homepage from '../components/homepage';
 import { AuthPage } from '../components/AuthPage';
@@ -22,9 +24,10 @@ import { FAQPage } from '../components/FAQs';
 import { TermsPage } from '../components/TermsAndCondition';
 import { PrivacyPage } from '../components/Privacy';
 import { MissionPage } from '../components/Mission';
-import { Leaderboard } from '../components/Leaderboard';
+import { LeaderboardPage as Leaderboard } from '../components/Leaderboard';
 import { FeedbackPage } from '../components/Feedback';
 import { CoursePage } from '../components/Course';
+
 
 const ACCENT_COLORS = [
   { name: 'Blue', value: '#0A84FF', secondary: '#007AFF' },
@@ -351,20 +354,18 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="glass-card aspect-square flex items-center justify-center p-0 overflow-hidden"
+              className="glass-card aspect-square p-0 overflow-hidden relative group"
             >
-              <div className="w-full h-full bg-gradient-to-tr from-apple-blue/5 to-apple-purple/5 flex flex-col items-center justify-center text-center group">
-                
-                <span className="text-[14px] font-bold opacity-30 uppercase tracking-widest px-8">
-                   <img
+              <img
                 src="/images/trio.jpeg"
                 alt="Hogwarts Trio"
-                className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 rounded-[inherit]"
+                className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 filter brightness-[1.08] saturate-[0.85] contrast-[1.02]"
                 referrerPolicy="no-referrer"
               />
-                </span>
-                <div className="absolute inset-0 border-[0.5px] border-white/20 rounded-[inherit] pointer-events-none" />
-              </div>
+              {/* Whitish cooling filter tint overlay to neutralize yellow cast */}
+              <div className="absolute inset-0 bg-white/15 mix-blend-overlay pointer-events-none" />
+              <div className="absolute inset-0 bg-white/5 pointer-events-none" />
+              <div className="absolute inset-0 border-[0.5px] border-white/20 rounded-[inherit] pointer-events-none" />
             </motion.div>
           </div>
         </section>
@@ -468,7 +469,6 @@ export default function App() {
             </motion.div>
           ) : currentPage === 'discussion' ? (
             <Homepage />
-
           ) : currentPage === 'faqs' ? (
             <FAQPage onNavigate={(page) => { setCurrentPage(page as any); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           ) : currentPage === 'terms' ? (
