@@ -2,13 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Check, BookOpen, UploadCloud, Image, Trash2, Link, Camera, 
-  AlertCircle, RefreshCw, Layers, Globe
+  AlertCircle, RefreshCw, Layers, Globe, FileText
 } from 'lucide-react';
 
 interface CreatePostProps {
   key?: string;
   onBack: () => void;
-  onPublish: (postData: { title: string; content: string; subject: string; chapter: string; image?: string }) => void;
+  onPublish: (postData: { title: string; content: string; subject: string; chapter: string; image?: string; pdf?: { name: string; size: string; dataUrl: string } | null }) => void;
   subjects: { id: string; name: string; chapters: string[] }[];
 }
 
@@ -17,9 +17,9 @@ export function CreatePostPage({ onBack, onPublish, subjects }: CreatePostProps)
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [image, setImage] = useState<string | null>(null);
-  const [isUrlInput, setIsUrlInput] = useState(false);
-  const [imageUrl, setImageUrl] = useState('');
+  const [pdfFile, setPdfFile] = useState<{ name: string; size: string; dataUrl: string } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
   
   // Dropdown menus
   const [showSubjectDropdown, setShowSubjectDropdown] = useState(false);
@@ -31,12 +31,16 @@ export function CreatePostPage({ onBack, onPublish, subjects }: CreatePostProps)
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
-  // Default selections
-  const [selectedSubjectId, setSelectedSubjectId] = useState(subjects[0]?.id || '');
+  // Default selections - set empty so user has to click "Select Subject" (select) instead of defaulting to "critical"
+  const [selectedSubjectId, setSelectedSubjectId] = useState('');
   const [selectedChapter, setSelectedChapter] = useState('');
 
   // Synchronize chapter options automatically when subject changes
   useEffect(() => {
+    if (!selectedSubjectId) {
+      setSelectedChapter('');
+      return;
+    }
     const sub = subjects.find(s => s.id === selectedSubjectId);
     if (sub && sub.chapters && sub.chapters.length > 0) {
       setSelectedChapter(sub.chapters[0]);
@@ -73,8 +77,8 @@ export function CreatePostPage({ onBack, onPublish, subjects }: CreatePostProps)
     };
   }, []);
 
-  const selectedSubject = subjects.find(s => s.id === selectedSubjectId) || subjects[0] || { id: '', name: 'General', chapters: ['General'] };
-  const chapters = selectedSubject ? selectedSubject.chapters : ['General'];
+  const selectedSubject = selectedSubjectId ? subjects.find(s => s.id === selectedSubjectId) : null;
+  const chapters = selectedSubject ? selectedSubject.chapters : [];
 
   const startCamera = async () => {
     setCameraError(null);
@@ -175,17 +179,36 @@ export function CreatePostPage({ onBack, onPublish, subjects }: CreatePostProps)
     }
   };
 
-  const handleUrlApply = () => {
-    if (imageUrl.trim()) {
-      setImage(imageUrl.trim());
-      setImageUrl('');
-      setIsUrlInput(false);
+  const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (event.target?.result) {
+            const sizeInKB = (file.size / 1024).toFixed(1);
+            const sizeStr = parseFloat(sizeInKB) > 1024 
+              ? `${(parseFloat(sizeInKB) / 1024).toFixed(1)} MB` 
+              : `${sizeInKB} KB`;
+
+            setPdfFile({
+              name: file.name,
+              size: sizeStr,
+              dataUrl: event.target.result as string,
+            });
+            playCustomTap(700, 0.1);
+          }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert("Please select a PDF document file (.pdf)");
+      }
     }
   };
 
   const handlePublish = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim() && !title.trim() && !image) return;
+    if (!content.trim() && !title.trim() && !image && !pdfFile) return;
 
     playCustomTap(850, 0.15);
 
@@ -196,6 +219,7 @@ export function CreatePostPage({ onBack, onPublish, subjects }: CreatePostProps)
       subject: selectedSubject ? selectedSubject.name : 'General Syllabus',
       chapter: selectedChapter,
       image: image || undefined,
+      pdf: pdfFile || undefined
     });
   };
 
@@ -397,35 +421,32 @@ export function CreatePostPage({ onBack, onPublish, subjects }: CreatePostProps)
             </div>
           )}
 
-          {/* Image URL text entry bar */}
-          <AnimatePresence>
-            {isUrlInput && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="bg-zinc-950 p-4 border border-zinc-800 rounded-xl space-y-2.5 overflow-hidden flex flex-col"
-              >
-                <span className="text-[10px] text-zinc-500 font-black uppercase tracking-wider font-mono">Image Link URL</span>
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    placeholder="https://images.unsplash.com/your-image.jpg"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-white placeholder:text-zinc-600 focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleUrlApply}
-                    className="px-3.5 h-8 bg-blue-500 hover:bg-blue-400 text-white font-extrabold text-[11px] rounded-lg cursor-pointer"
-                  >
-                    Apply URL
-                  </button>
+                  {/* Uploaded PDF preview */}
+          {pdfFile && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative rounded-xl border border-zinc-800/80 bg-zinc-950/60 p-4 flex items-center justify-between gap-4 group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 shrink-0">
+                  <FileText className="w-5 h-5" />
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <div className="min-w-0">
+                  <div className="text-xs font-bold text-zinc-300 truncate max-w-[240px] md:max-w-[320px]">{pdfFile.name}</div>
+                  <div className="text-[10px] text-zinc-500 font-mono mt-0.5">{pdfFile.size} • PDF Document</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPdfFile(null)}
+                className="p-1.5 bg-black/60 hover:bg-zinc-800/80 text-zinc-400 hover:text-red-400 rounded-full transition-colors cursor-pointer"
+                title="Remove PDF"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </motion.div>
+          )}
 
           {/* Uploaded / Selected image preview */}
           {image && (
@@ -476,23 +497,30 @@ export function CreatePostPage({ onBack, onPublish, subjects }: CreatePostProps)
                 <Camera className="w-4.5 h-4.5" />
               </button>
 
-              {/* Media Button: URL input */}
+              {/* Media Button: PDF Uploader */}
               <button
                 type="button"
                 onClick={() => {
                   playCustomTap(480, 0.05);
-                  setIsUrlInput(!isUrlInput);
+                  pdfInputRef.current?.click();
                 }}
-                className={`p-2.5 rounded-full hover:bg-zinc-800 transition-colors cursor-pointer ${isUrlInput ? 'text-blue-400 bg-blue-500/10' : 'text-zinc-400 hover:text-white'}`}
-                title="Paste Image Link"
+                className={`p-2.5 rounded-full hover:bg-zinc-800 transition-colors cursor-pointer ${pdfFile ? 'text-red-400 bg-red-500/10' : 'text-zinc-400 hover:text-white'}`}
+                title="Upload PDF File"
               >
-                <Link className="w-4.5 h-4.5" />
+                <FileText className="w-4.5 h-4.5" />
               </button>
+              <input 
+                type="file" 
+                ref={pdfInputRef} 
+                accept="application/pdf" 
+                onChange={handlePdfChange} 
+                className="hidden" 
+              />
             </div>
 
             <button
               type="submit"
-              disabled={!content.trim() && !title.trim() && !image}
+              disabled={!content.trim() && !title.trim() && !image && !pdfFile}
               className="h-10 px-5 bg-blue-500 hover:bg-blue-400 disabled:bg-zinc-800 text-white disabled:text-zinc-600 rounded-full text-xs font-black shadow-lg shadow-blue-500/20 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <Check className="w-4 h-4" />
