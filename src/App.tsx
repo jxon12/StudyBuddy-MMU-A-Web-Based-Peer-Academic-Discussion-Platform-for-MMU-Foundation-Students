@@ -383,9 +383,9 @@ export default function App() {
               
               <div className="space-y-24">
                 {[
-                  { step: 1, title: 'Create Account', text: 'Sign up using your MMU student email and set up your academic profile with your major and interests.' },
-                  { step: 2, title: 'Browse Feed', text: 'Explore questions filtered by your specific subjects and chapters. Find answers that help you right now.' },
-                  { step: 3, title: 'Post Questions', text: 'Stuck on a problem? Post it with mandatory tags. High-quality posts get answered faster.' },
+                  { step: 1, title: 'Create Account', text: 'Sign up using your MMU student email and set up your academic profile with your major and interests.', image: '/images/step-1.png' },
+                  { step: 2, title: 'Browse Feed', text: 'Explore questions filtered by your specific subjects and chapters. Find answers that help you right now.', image: '/images/step-2.png' },
+                  { step: 3, title: 'Post Questions', text: 'Stuck on a problem? Post it with mandatory tags. High-quality posts get answered faster.', image: '/images/step-3.png' },
                   { step: 4, title: 'Get Answers', text: 'Receive help from peers, upvote the best responses, and contribute back to climb the leaderboard.' }
                 ].map((item, i) => (
                   <motion.div 
@@ -393,7 +393,7 @@ export default function App() {
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className={`flex flex-col md:flex-row items-center gap-12 ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
+                    className={`flex flex-col md:flex-row items-stretch gap-12 ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
                   >
                     <div className="flex-1 text-center md:text-left space-y-4">
                       <div className="w-12 h-12 rounded-full liquid-glass flex items-center justify-center text-xl font-bold bg-apple-blue/20 mx-auto md:mx-0">
@@ -402,11 +402,20 @@ export default function App() {
                       <h3 className="text-3xl font-bold">{item.title}</h3>
                       <p className="text-lg opacity-60 leading-relaxed font-medium">{item.text}</p>
                     </div>
-                    <div className="flex-1 w-full flex justify-center">
-                       <div className="glass-card w-full aspect-[4/3] flex items-center justify-center">
-                          <span className="text-[12px] font-bold opacity-20 uppercase tracking-widest">
-                            [ PHOTO: STEP {item.step} VISUAL ]
-                          </span>
+                    <div className="flex-1 w-full h-full flex justify-center">
+                       <div className="glass-card w-full h-full min-h-[24rem] md:min-h-0 flex items-center justify-center overflow-hidden rounded-[32px]">
+                          {item.image ? (
+                            <img
+                              src={item.image}
+                              alt={item.title}
+                              className="block w-full h-full object-cover rounded-[32px]"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            <span className="text-[12px] font-bold opacity-20 uppercase tracking-widest">
+                              No preview available
+                            </span>
+                          )}
                        </div>
                     </div>
                   </motion.div>
@@ -422,7 +431,7 @@ export default function App() {
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-20">
             <div className="flex-1 order-2 md:order-1">
               <div className="glass-card aspect-[4/3] flex items-center justify-center">
-                <span className="text-[12px] font-bold opacity-20 uppercase tracking-widest">[ PHOTO: MESSY WHATSAPP GROUPS VIEW ]</span>
+                <img src="/images/messy-chat.jpg" alt="Messy WhatsApp Chat Interface" className="w-full h-full object-cover" />
               </div>
             </div>
             <div className="flex-1 order-1 md:order-2 space-y-6">
@@ -445,7 +454,7 @@ export default function App() {
             </div>
             <div className="flex-1">
               <div className="glass-card aspect-[4/3] flex items-center justify-center">
-                <span className="text-[12px] font-bold opacity-20 uppercase tracking-widest">[ PHOTO: SEARCH & FILTER INTERFACE ]</span>
+                <img src="/images/subject.png" alt="Search and Filter Interface" className="w-full h-full object-cover" />
               </div>
             </div>
           </div>
@@ -454,7 +463,8 @@ export default function App() {
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-20">
             <div className="flex-1 order-2 md:order-1">
               <div className="glass-card aspect-[4/3] flex items-center justify-center">
-                <span className="text-[12px] font-bold opacity-20 uppercase tracking-widest">[ PHOTO: VOTING MECHANISM IN ACTION ]</span>
+                <span className="text-[12px] font-bold opacity-20 uppercase tracking-widest"></span>
+                <img src="/images/leaderboard.png" alt="Upvoting Interface" className="w-full h-full object-cover" />
               </div>
             </div>
             <div className="flex-1 order-1 md:order-2 space-y-6">

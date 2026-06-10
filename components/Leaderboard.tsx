@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Trophy, 
   Search, 
   Award, 
   ArrowUpRight,
+  Crown,
   Sparkles,
   TrendingUp,
   ThumbsUp
@@ -22,10 +23,10 @@ interface LeaderboardUser {
 
 const LEADERBOARD_DATA: Omit<LeaderboardUser, 'rank'>[] = [
   {
-    name: 'Tan Kenji',
-    studentId: '252FC253ZL',
-    avatar: 'TK',
-    likes: 192,
+    name: 'Ling Yi Yon',
+    studentId: '252FC253TM',
+    avatar: '/images/team/ling-yi-yon.jpeg',
+    likes: 520,
     dominantSubject: 'Problem Solving & Program Design',
     major: 'Software Engineering'
   },
@@ -122,6 +123,10 @@ const playSpatialTap = (freq = 600, duration = 0.08) => {
 export function LeaderboardPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
+  const isAvatarImage = (avatar: string) => {
+    return avatar.startsWith('/') || avatar.startsWith('http') || avatar.match(/\.(png|jpe?g|webp|svg)$/i) !== null;
+  };
+
   // Filter, sort by likes in descending order, and dynamically map ranks
   const processedData = [...LEADERBOARD_DATA]
     .filter(user => {
@@ -198,8 +203,12 @@ export function LeaderboardPage() {
               >
                 <div className="absolute top-4 left-4 font-mono font-black text-white/10 text-4xl select-none">02</div>
                 <div className="space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-zinc-700 to-zinc-500 shadow-[0_4px_24px_rgba(0,0,0,0.3)] flex items-center justify-center font-bold text-white border-2 border-white/20 select-none text-[18px]">
-                    {podiumUsers[1].avatar}
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-zinc-700 to-zinc-500 shadow-[0_4px_24px_rgba(0,0,0,0.3)] flex items-center justify-center font-bold text-white border-2 border-white/20 select-none text-[18px] overflow-hidden">
+                    {isAvatarImage(podiumUsers[1].avatar) ? (
+                      <img src={podiumUsers[1].avatar} alt={podiumUsers[1].name} className="w-full h-full object-cover" />
+                    ) : (
+                      podiumUsers[1].avatar
+                    )}
                   </div>
                   <div>
                     <h3 className="text-[17px] font-black text-primary">{podiumUsers[1].name}</h3>
@@ -231,8 +240,12 @@ export function LeaderboardPage() {
                 </div>
                 
                 <div className="space-y-4 flex flex-col items-center">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-apple-blue to-apple-purple flex items-center justify-center font-bold text-white border-4 border-white/20 select-none shadow-[0_8px_32px_rgba(10,132,255,0.3)] relative text-[22px]">
-                    {podiumUsers[0].avatar}
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-apple-blue to-apple-purple flex items-center justify-center font-bold text-white border-4 border-white/20 select-none shadow-[0_8px_32px_rgba(10,132,255,0.3)] relative text-[22px] overflow-hidden">
+                    {isAvatarImage(podiumUsers[0].avatar) ? (
+                      <img src={podiumUsers[0].avatar} alt={podiumUsers[0].name} className="w-full h-full object-cover" />
+                    ) : (
+                      podiumUsers[0].avatar
+                    )}
                     <div className="absolute -bottom-2 right-1/2 translate-x-1/2 bg-apple-blue text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-black dark:border-white shadow-sm">
                       Champion
                     </div>
@@ -241,7 +254,7 @@ export function LeaderboardPage() {
                   <div className="mt-2">
                     <h3 className="text-[20px] font-black text-primary flex items-center justify-center gap-1">
                       {podiumUsers[0].name}
-                      <Sparkles className="w-4 h-4 text-apple-purple shrink-0 animate-pulse" />
+                      <Crown className="w-4 h-4 text-apple-purple shrink-0 animate-pulse" />
                     </h3>
                     <p className="text-[12px] font-mono opacity-40 font-bold">{podiumUsers[0].studentId}</p>
                   </div>
@@ -266,8 +279,12 @@ export function LeaderboardPage() {
               >
                 <div className="absolute top-4 left-4 font-mono font-black text-white/10 text-4xl select-none">03</div>
                 <div className="space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-700 to-amber-900 shadow-[0_4px_24px_rgba(0,0,0,0.3)] flex items-center justify-center font-bold text-white border-2 border-white/10 select-none text-[18px]">
-                    {podiumUsers[2].avatar}
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-700 to-amber-900 shadow-[0_4px_24px_rgba(0,0,0,0.3)] flex items-center justify-center font-bold text-white border-2 border-white/10 select-none text-[18px] overflow-hidden">
+                    {isAvatarImage(podiumUsers[2].avatar) ? (
+                      <img src={podiumUsers[2].avatar} alt={podiumUsers[2].name} className="w-full h-full object-cover" />
+                    ) : (
+                      podiumUsers[2].avatar
+                    )}
                   </div>
                   <div>
                     <h3 className="text-[17px] font-black text-primary">{podiumUsers[2].name}</h3>
@@ -334,8 +351,12 @@ export function LeaderboardPage() {
                     {/* Student Identity cell */}
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-bold text-primary opacity-80 text-[13px] shadow-sm">
-                          {user.avatar}
+                        <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-bold text-primary opacity-80 text-[13px] shadow-sm overflow-hidden">
+                          {isAvatarImage(user.avatar) ? (
+                            <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                          ) : (
+                            user.avatar
+                          )}
                         </div>
                         <div>
                           <div className="text-[14px] font-extrabold text-primary group-hover:text-apple-blue transition-colors">{user.name}</div>
