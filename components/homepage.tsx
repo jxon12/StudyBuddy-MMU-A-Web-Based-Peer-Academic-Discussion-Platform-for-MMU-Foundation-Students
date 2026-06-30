@@ -11,13 +11,15 @@ import {
   Share2,
   Plus,
   Bell,
-  User
+  User,
+  FileText
 } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 import './LiquidGlassCard.css';
 import { CreatePostPage } from './createpost';
 import { ProfilePage } from './profile';
 import { NotificationsPanel } from './notifications';
+import { supabase, isSupabaseConfigured } from '../src/services/supabaseClient';
 
 /**
  * @license
@@ -36,6 +38,9 @@ interface Post {
   likes: number;
   replies: number;
   timestamp: string;
+  image?: string;
+  pdf?: { name: string; size: string; dataUrl: string } | null;
+  student_id?: string;
 }
 
 // --- Mock Data ---
@@ -45,7 +50,7 @@ const PRIMARY_CATEGORIES = [
     id: 'critical',
     name: 'Critical Thinking',
     color: 'bg-[#3634A3]',
-    cover: 'https://i.pinimg.com/736x/ab/14/af/ab14afa819b82804bd89b4d36da486cc.jpg',
+    cover: 'https://i.pinimg.com/736x/88/0b/09/880b09b7b25fdd1bab31bf75ef721382.jpg',
     subsubjects: [
       { id: 'critical', name: 'LCT1113 Critical Thinking', chapters: ['Logic', 'Arguments', 'Fallacies'] }
     ]
@@ -54,37 +59,34 @@ const PRIMARY_CATEGORIES = [
     id: 'math',
     name: 'Mathematics',
     color: 'bg-[#5856D6]',
-    cover: 'https://i.pinimg.com/736x/5f/d8/e7/5fd8e74b21f5084d5de30a54210fa4bc.jpg',
+    cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg',
     subsubjects: [
-      { id: 'math1', name: 'CMT1114 Mathematics I', chapters: ['Algebraic Functions', 'Limits', 'Differentiation'] },
-      { id: 'math2', name: 'CMT1124 Mathematics II', chapters: ['Integration', 'Vector Spaces', 'Matrices'] },
-      { id: 'math3', name: 'CMT1134 Mathematics III', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] }
+      { id: 'math1', name: 'Mathematics I', chapters: ['Algebraic Functions', 'Limits', 'Differentiation'] },
+      { id: 'math2', name: 'Mathematics II', chapters: ['Integration', 'Vector Spaces', 'Matrices'] },
+      { id: 'math3', name: 'CMT 1134 Mathematics III', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] }
     ]
   },
   {
     id: 'english',
     name: 'English',
     color: 'bg-[#AF52DE]',
-    cover: 'https://i.pinimg.com/1200x/73/47/90/7347901f899b0b532c8fa31f87836f81.jpg',
+    cover: 'https://i.pinimg.com/736x/91/d4/91/91d491485a1126a79219f01c444d53db.jpg',
     subsubjects: [
       { id: 'academic-english', name: 'LAE1113 Academic English', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
-      { id: 'essential-english', name: 'LEE1113 Essential English', chapters: ['Vocabulary', 'Grammar', 'Reading Comprehension'] },
-      { id: 'communicative-english', name: 'LCE1113 Communicative English', chapters: ['Conversational Skills', 'Business English', 'Public Speaking'] }
+      { id: 'essential-english', name: 'Essential English', chapters: ['Vocabulary', 'Grammar', 'Reading Comprehension'] },
+      { id: 'communicative-english', name: 'Communicative English', chapters: ['Conversational Skills', 'Business English', 'Public Speaking'] }
     ]
   },
   {
     id: 'technical',
     name: 'Technical',
     color: 'bg-[#7D7AFF]',
-    cover: 'https://i.pinimg.com/736x/43/64/6d/43646dfd1c98f4abf9a1c69e08f2848a.jpg',
+    cover: 'https://i.pinimg.com/1200x/51/83/7e/51837ef0af4628e182418b627f93268d.jpg',
     subsubjects: [
       { id: 'digital', name: 'CDS1114 Intro to Digital System', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
-      { id: 'multimedia', name: 'CMF1114 Multimedia Fundamentals', chapters: ['Imaging & Graphics', 'Audio & Video Synthesis', 'Interactive Tech'] },
+      { id: 'multimedia', name: 'Multimedia Fundamental', chapters: ['Imaging & Graphics', 'Audio & Video Synthesis', 'Interactive Tech'] },
       { id: 'mini-it', name: 'CSP1123 Mini IT Project', chapters: ['Project Planning', 'Development', 'Documentation'] },
-      { id: 'physics', name: 'CPP1113 Principles of Physics', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
-      { id: 'Business', name: 'GNB1114 Intro to business management', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
-      { id: 'computing', name: 'CCT1114 Introduction to Computing Tech', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
-      { id: 'Program design', name: 'CSP1114 Problem Solving & Program Design', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] },
+      { id: 'physics', name: 'CPP1113 Principles of Physics', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] }
     ]
   }
 ];
@@ -595,18 +597,53 @@ const getSubjectTagStyles = (subjectName: string) => {
   return "text-zinc-500 bg-white/5 border border-white/10";
 };
 
+const parsePostContent = (rawContent: string) => {
+  if (!rawContent) return { cleanContent: '', image: undefined, pdf: undefined };
+  
+  const marker = '[METADATA_ATTACHMENTS:';
+  const markerIdx = rawContent.lastIndexOf(marker);
+  if (markerIdx !== -1) {
+    const jsonStart = markerIdx + marker.length;
+    const jsonEnd = rawContent.indexOf(']', jsonStart);
+    if (jsonEnd !== -1) {
+      try {
+        const jsonStr = rawContent.substring(jsonStart, jsonEnd);
+        const attachments = JSON.parse(jsonStr);
+        const cleanContent = rawContent.substring(0, markerIdx).trim();
+        return {
+          cleanContent,
+          image: attachments.image || undefined,
+          pdf: attachments.pdf || undefined
+        };
+      } catch (e) {
+        console.warn('Failed to parse attachments JSON:', e);
+      }
+    }
+  }
+  return { cleanContent: rawContent, image: undefined, pdf: undefined };
+};
+
 interface PostCardProps {
   post: Post;
   key?: string;
 }
 
 const PostCard = ({ post }: PostCardProps) => {
+  const { cleanContent, image: parsedImage, pdf: parsedPdf } = parsePostContent(post.content);
+  const displayImage = parsedImage || post.image;
+  const displayPdf = parsedPdf || post.pdf;
+
   const [upvoted, setUpvoted] = useState(false);
   const [saved, setSaved] = useState(false);
   const [likes, setLikes] = useState(post.likes);
   const [showMenu, setShowMenu] = useState(false);
   const [shared, setShared] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const [repliesExpanded, setRepliesExpanded] = useState(false);
+  const [replies, setReplies] = useState<{ id: string; author: string; avatar: string; content: string; timestamp: string }[]>([]);
+  const [newReplyText, setNewReplyText] = useState('');
+  const [loadingReplies, setLoadingReplies] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -618,13 +655,261 @@ const PostCard = ({ post }: PostCardProps) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const toggleUpvote = () => {
-    if (upvoted) {
-      setLikes(prev => prev - 1);
-    } else {
-      setLikes(prev => prev + 1);
+  const fetchReplies = async () => {
+    setLoadingReplies(true);
+    
+    // Always load locally saved replies first
+    const localKey = 'studybuddy_local_replies_' + post.id;
+    let localReplies: any[] = [];
+    try {
+      const stored = localStorage.getItem(localKey);
+      if (stored) {
+        localReplies = JSON.parse(stored);
+      }
+    } catch (e) {
+      console.warn('Failed to parse local replies:', e);
     }
+
+    const isUuid = (id: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const useMocks = !isUuid(post.id);
+
+    const defaultMockReplies = [
+      {
+        id: 'rep-1',
+        author: 'Sophia Lim',
+        avatar: 'https://i.pinimg.com/1200x/89/ee/ec/89eeec45982a6e3757d27082d68d03b8.jpg',
+        content: 'This really cleared my doubts! Let’s schedule a group zoom if you want to pair program.',
+        timestamp: '1h ago'
+      },
+      {
+        id: 'rep-2',
+        author: 'Lee Seng',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Seng',
+        content: 'Count me in! CMT 1134 is having an exam next week, we need to revise together.',
+        timestamp: '30m ago'
+      }
+    ];
+
+    if (isSupabaseConfigured && supabase && isUuid(post.id)) {
+      try {
+        const { data, error } = await supabase
+          .from('studybuddy_replies')
+          .select('*')
+          .eq('post_id', post.id)
+          .order('created_at', { ascending: true });
+        
+        if (error) {
+          console.warn('Failed to fetch replies from Supabase (maybe table is missing), falling back to local:', error.message);
+          setReplies(localReplies.length > 0 ? localReplies : (useMocks ? defaultMockReplies : []));
+        } else if (data) {
+          const mapped = data.map((d: any) => ({
+            id: d.id,
+            author: d.author,
+            avatar: d.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(d.author),
+            content: d.content,
+            timestamp: new Date(d.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+          }));
+
+          // Merge mapped Supabase replies with local replies
+          const merged = [...mapped];
+          localReplies.forEach((lr) => {
+            if (!merged.some(m => m.content === lr.content && m.author === lr.author)) {
+              merged.push(lr);
+            }
+          });
+          setReplies(merged);
+        }
+      } catch (err) {
+        console.warn('Failed to fetch replies from Supabase, falling back to local:', err);
+        setReplies(localReplies.length > 0 ? localReplies : (useMocks ? defaultMockReplies : []));
+      }
+    } else {
+      // Offline / Local mock replies fallback
+      setReplies(localReplies.length > 0 ? [...defaultMockReplies, ...localReplies] : (useMocks ? defaultMockReplies : []));
+    }
+    setLoadingReplies(false);
+  };
+
+  const handleToggleReplies = () => {
+    if (!repliesExpanded) {
+      fetchReplies();
+    }
+    setRepliesExpanded(!repliesExpanded);
+  };
+
+  const handleAddReply = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newReplyText.trim()) return;
+
+    // Retrieve active user from localStorage dynamically
+    let activeUser = null;
+    try {
+      const saved = localStorage.getItem('studybuddy_active_user');
+      if (saved) activeUser = JSON.parse(saved);
+    } catch (err) {
+      console.warn('Error reading active user for reply:', err);
+    }
+
+    const newReply = {
+      author: activeUser?.name || 'You (Student Buddy)',
+      avatar: activeUser ? ('https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(activeUser.name)) : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Buddy',
+      content: newReplyText,
+      timestamp: 'Just now'
+    };
+
+    // Update local state immediately
+    setReplies(prev => [...prev, { id: 'temp-' + Date.now(), ...newReply }]);
+    setNewReplyText('');
+
+    // Save to local storage cache for persistence
+    const localKey = 'studybuddy_local_replies_' + post.id;
+    try {
+      const currentLocal = JSON.parse(localStorage.getItem(localKey) || '[]');
+      currentLocal.push({
+        id: 'local-' + Date.now(),
+        ...newReply,
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem(localKey, JSON.stringify(currentLocal));
+    } catch (localErr) {
+      console.warn('Failed to save reply locally:', localErr);
+    }
+
+    // Attempt to write to Supabase
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const isUuid = (id: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+        
+        // If the post is not a UUID post, it does not exist in Supabase's studybuddy_posts table.
+        // Thus, inserting it into studybuddy_replies (which has a foreign key) is skipped.
+        if (!isUuid(post.id)) {
+          console.log('Skipping Supabase insert for mock/local post ID:', post.id);
+          return;
+        }
+
+        const { error: replyError } = await supabase
+          .from('studybuddy_replies')
+          .insert({
+            post_id: post.id,
+            author: newReply.author,
+            avatar: newReply.avatar,
+            content: newReply.content
+          });
+        
+        if (replyError) {
+          console.error('Failed to insert reply:', replyError);
+        } else {
+          // Award user points (+5) in studybuddy_profiles for active participation (replying)
+          const repStudentId = activeUser?.studentId || activeUser?.student_id;
+          if (repStudentId) {
+            try {
+              const { data: profileData } = await supabase
+                .from('studybuddy_profiles')
+                .select('points')
+                .eq('student_id', repStudentId)
+                .maybeSingle();
+              if (profileData) {
+                await supabase
+                  .from('studybuddy_profiles')
+                  .update({ points: (profileData.points || 0) + 5 })
+                  .eq('student_id', repStudentId);
+              }
+            } catch (replyPtErr) {
+              console.warn('Failed to award points for reply:', replyPtErr);
+            }
+          }
+
+          // Increment replies count on post
+          const newRepliesCount = (post.replies || 0) + 1;
+          await supabase
+            .from('studybuddy_posts')
+            .update({ replies: newRepliesCount })
+            .eq('id', post.id);
+
+          // Create backend notification for the post author if it is someone else
+          if (post.author !== 'You (Student Buddy)' && post.author !== activeUser?.name) {
+            try {
+              await supabase
+                .from('studybuddy_notifications')
+                .insert({
+                  type: 'reply',
+                  title: `${newReply.author} replied to your thread`,
+                  content: `You (Student Buddy) replied: "${newReply.content.slice(0, 50)}..."`,
+                  avatar: newReply.avatar,
+                  is_unread: true
+                });
+            } catch (notiErr) {
+              console.warn('Failed to insert notification in Supabase:', notiErr);
+            }
+          }
+          fetchReplies();
+        }
+      } catch (err) {
+        console.error('Supabase exception on adding reply:', err);
+      }
+    }
+  };
+
+  const toggleUpvote = async () => {
+    const newLikes = upvoted ? likes - 1 : likes + 1;
+    setLikes(newLikes);
     setUpvoted(!upvoted);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase
+          .from('studybuddy_posts')
+          .update({ likes: newLikes })
+          .eq('id', post.id);
+
+        // Sync likes and points in studybuddy_profiles table for Leaderboard scoring
+        if (post.student_id) {
+          try {
+            const increment = upvoted ? -1 : 1;
+            const { data: profileData, error: profileErr } = await supabase
+              .from('studybuddy_profiles')
+              .select('likes, points')
+              .eq('student_id', post.student_id)
+              .maybeSingle();
+
+            if (profileData && !profileErr) {
+              const currentLikes = profileData.likes || 0;
+              const currentPoints = profileData.points || 0;
+              const updatedLikes = Math.max(0, currentLikes + increment);
+              const updatedPoints = Math.max(0, currentPoints + (increment * 10)); // 10 points per upvote
+
+              await supabase
+                .from('studybuddy_profiles')
+                .update({
+                  likes: updatedLikes,
+                  points: updatedPoints
+                })
+                .eq('student_id', post.student_id);
+            }
+          } catch (profileUpdateErr) {
+            console.warn('Failed to update author profile likes/points:', profileUpdateErr);
+          }
+        }
+
+        // Add a notification for the author on upvote with graceful fallback if table does not exist
+        if (!upvoted && post.author !== 'You (Student Buddy)') {
+          try {
+            await supabase
+              .from('studybuddy_notifications')
+              .insert({
+                type: 'upvote',
+                title: 'Your answer was upvoted!',
+                content: `Lee Seng and other peers upvoted your comment in ${post.subject}.`,
+                is_unread: true
+              });
+          } catch (notiErr) {
+            console.warn('Failed to insert upvote notification in Supabase:', notiErr);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to update likes count in Supabase:', err);
+      }
+    }
   };
 
   const handleShare = (e: React.MouseEvent) => {
@@ -703,31 +988,121 @@ const PostCard = ({ post }: PostCardProps) => {
             Chapter {post.chapter}
           </span>
         </div>
-        <p className="text-[17px] text-white leading-relaxed font-medium">
-          {post.content}
+        <p className="text-[17px] text-white leading-relaxed font-medium font-sans whitespace-pre-line">
+          {cleanContent}
         </p>
+
+        {displayImage && (
+          <div className="mt-4 rounded-2xl overflow-hidden border border-white/10 max-h-[380px] bg-black/40 flex items-center justify-center">
+            <img 
+              src={displayImage} 
+              alt="Attached post asset" 
+              className="max-h-[380px] w-full object-contain"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+        )}
+
+        {displayPdf && (
+          <div className="mt-4 p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 shrink-0">
+                <FileText className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-zinc-300 truncate max-w-[200px] md:max-w-[320px]">{displayPdf.name}</div>
+                <div className="text-[10px] text-zinc-500 font-mono mt-0.5">{displayPdf.size} • PDF Document</div>
+              </div>
+            </div>
+            <a
+              href={displayPdf.dataUrl}
+              download={displayPdf.name}
+              className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer"
+            >
+              Download
+            </a>
+          </div>
+        )}
       </div>
 
       <div className="relative z-10 flex items-center gap-8 pt-6 border-t border-white/[0.05]">
         <button 
           onClick={toggleUpvote}
-          className={`flex items-center gap-2 transition-colors group ${upvoted ? 'text-white' : 'text-white hover:text-white'}`}
+          className={`flex items-center gap-2 transition-colors group ${upvoted ? 'text-white font-semibold' : 'text-zinc-400 hover:text-white'}`}
         >
           <Triangle className={`w-4 h-4 transition-all ${upvoted ? 'text-white fill-white' : 'group-hover:scale-110'}`} />
           <span className="text-[14px] font-bold">{likes} Upvoted</span>
         </button>
-        <button className="flex items-center gap-2 text-white hover:text-white transition-colors group">
+        <button 
+          onClick={handleToggleReplies}
+          className={`flex items-center gap-2 transition-colors group ${repliesExpanded ? 'text-blue-400' : 'text-zinc-400 hover:text-white'}`}
+        >
           <MessageCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
-          <span className="text-[14px] font-bold">{post.replies} Replies</span>
+          <span className="text-[14px] font-bold">{replies.length > 0 ? replies.length : post.replies} Replies</span>
         </button>
         <button 
           onClick={() => setSaved(!saved)}
-          className={`flex items-center gap-2 transition-colors group ${saved ? 'text-yellow-500' : 'text-white hover:text-white'}`}
+          className={`flex items-center gap-2 transition-colors group ${saved ? 'text-yellow-500' : 'text-zinc-400 hover:text-white'}`}
         >
           <Star className={`w-4 h-4 transition-all ${saved ? 'fill-yellow-500' : 'group-hover:scale-110'}`} />
           <span className="text-[14px] font-bold">{saved ? 'Saved' : 'Save'}</span>
         </button>
       </div>
+
+      {/* Replies Expansion Panel */}
+      <AnimatePresence>
+        {repliesExpanded && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="mt-6 pt-6 border-t border-white/[0.05] overflow-hidden"
+          >
+            <h5 className="text-[11px] font-bold uppercase tracking-widest text-zinc-400 mb-4 flex items-center gap-2 font-sans">
+              <span>Peer Responses</span>
+              {loadingReplies && <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />}
+            </h5>
+
+            {/* Replies List */}
+            <div className="space-y-4 mb-5 max-h-60 overflow-y-auto no-scrollbar pr-1">
+              {replies.map((reply, idx) => (
+                <div key={reply.id || idx} className="flex items-start gap-3 bg-white/[0.02] border border-white/[0.04] p-3.5 rounded-2xl">
+                  <img src={reply.avatar} alt={reply.author} className="w-8 h-8 rounded-full border border-white/10" referrerPolicy="no-referrer" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="text-[13px] font-bold text-white">{reply.author}</span>
+                      <span className="text-[10px] font-mono text-zinc-500 font-bold uppercase">{reply.timestamp}</span>
+                    </div>
+                    <p className="text-[13.5px] text-zinc-300 font-medium leading-relaxed font-sans">{reply.content}</p>
+                  </div>
+                </div>
+              ))}
+
+              {replies.length === 0 && !loadingReplies && (
+                <p className="text-xs text-zinc-500 font-semibold italic py-2 font-sans">No replies yet. Start the conversation by posting a response below!</p>
+              )}
+            </div>
+
+            {/* Reply Input Form */}
+            <form onSubmit={handleAddReply} className="flex gap-3">
+              <input
+                type="text"
+                placeholder="Type your constructive answer or help..."
+                value={newReplyText}
+                onChange={(e) => setNewReplyText(e.target.value)}
+                className="flex-grow h-11 px-4 bg-white/5 border border-white/10 rounded-xl text-[14px] text-white placeholder:text-zinc-500 outline-none focus:border-white/25 focus:bg-white/10 transition-all font-sans"
+              />
+              <button
+                type="submit"
+                className="h-11 px-5 bg-white text-black font-bold text-[13px] rounded-xl hover:brightness-110 active:scale-95 transition-all cursor-pointer font-sans"
+              >
+                Reply
+              </button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
@@ -738,12 +1113,13 @@ interface SubjectsPageProps {
   onBack: () => void;
   onSelectSubject: (id: string) => void;
   key?: string;
+  initialSearchQuery?: string;
 }
 
-const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
+const SubjectsPage = ({ onBack, onSelectSubject, initialSearchQuery = '' }: SubjectsPageProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>(initialSearchQuery);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
   // Filter categories based on search
@@ -806,8 +1182,9 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
           onClick={selectedCategoryId ? () => setSelectedCategoryId(null) : onBack}
           className="p-4 rounded-full shadow-2xl hover:bg-white/10 transition-all active:scale-90 group backdrop-blur-2xl border bg-white/5 border-white/10 flex items-center gap-2"
         >
-          <ArrowLeft className="w-4 h-5 transition-colors text-zinc-300 group-hover:text-white" />
+          <ArrowLeft className="w-5 h-5 transition-colors text-zinc-300 group-hover:text-white" />
           <span className="text-xs font-bold uppercase tracking-wider text-zinc-300 group-hover:text-white pr-1">
+            {selectedCategoryId ? "Back to Shelf" : "Back to Feed"}
           </span>
         </button>
 
@@ -1032,14 +1409,61 @@ const SubjectsPage = ({ onBack, onSelectSubject }: SubjectsPageProps) => {
   );
 };
 
-export default function App() {
-  const [view, setView] = useState<'feed' | 'subjects'>('feed');
+interface HomepageProps {
+  currentUser?: any;
+  onSignOut?: () => void;
+  onNavigate?: (page: any) => void;
+  initialSearchQuery?: string;
+}
+
+export default function App({ currentUser, onSignOut, onNavigate, initialSearchQuery = '' }: HomepageProps = {}) {
+  const [view, setView] = useState<'feed' | 'subjects'>(initialSearchQuery ? 'subjects' : 'feed');
   const [activeSubject, setActiveSubject] = useState<string | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [hasUnread, setHasUnread] = useState(true);
+  const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
+
+  useEffect(() => {
+    if (initialSearchQuery) {
+      setView('subjects');
+    }
+  }, [initialSearchQuery]);
   const activeSubjectData = activeSubject ? SUBJECTS.find(s => s.id === activeSubject) : null;
+
+  // Fetch posts from Supabase if configured
+  const loadPostsFromSupabase = async () => {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('studybuddy_posts')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (data && data.length > 0) {
+          const mappedPosts: Post[] = data.map((d: any) => ({
+            id: d.id,
+            author: d.author,
+            avatar: d.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(d.author),
+            subject: d.subject,
+            chapter: d.chapter,
+            content: d.content,
+            likes: d.likes || 0,
+            replies: d.replies || 0,
+            timestamp: new Date(d.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            student_id: d.student_id
+          }));
+          setPosts(mappedPosts);
+        }
+      } catch (err) {
+        console.warn('Failed to load posts from Supabase, using mock fallback:', err);
+      }
+    }
+  };
+
+  useEffect(() => {
+    loadPostsFromSupabase();
+  }, []);
 
   // Reactively track if there are any unread notifications
   useEffect(() => {
@@ -1090,8 +1514,83 @@ export default function App() {
           <CreatePostPage
             key="compose"
             onBack={() => setShowCompose(false)}
-            onPublish={(postData) => {
+            onPublish={async (postData) => {
               console.log('Post published:', postData);
+              
+              // 1. Get logged in user details dynamically
+              const authorName = currentUser?.name || 'You (Student Buddy)';
+              const authorAvatar = currentUser?.name 
+                ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(currentUser.name)
+                : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Buddy';
+              const studentId = currentUser?.studentId || '252FC999SB';
+
+              // 2. Serialize photo/image and PDF attachments into content field for universal compatibility
+              let postContent = postData.title ? `${postData.title}\n\n${postData.content}` : postData.content;
+              if (postData.image || postData.pdf) {
+                const attachments = {
+                  image: postData.image,
+                  pdf: postData.pdf
+                };
+                postContent += `\n\n[METADATA_ATTACHMENTS:${JSON.stringify(attachments)}]`;
+              }
+
+              const newPostLocal: Post = {
+                id: 'P' + Math.floor(1000 + Math.random() * 9000),
+                author: authorName,
+                avatar: authorAvatar,
+                subject: postData.subject,
+                chapter: postData.chapter,
+                content: postContent,
+                likes: 0,
+                replies: 0,
+                timestamp: 'Just now'
+              };
+
+              if (isSupabaseConfigured && supabase) {
+                try {
+                  const { error } = await supabase
+                    .from('studybuddy_posts')
+                    .insert([
+                      {
+                        author: authorName,
+                        avatar: authorAvatar,
+                        subject: postData.subject,
+                        chapter: postData.chapter,
+                        content: postContent,
+                        likes: 0,
+                        replies: 0,
+                        student_id: studentId
+                      }
+                    ]);
+                  if (error) {
+                    console.error('Failed to insert post in Supabase:', error.message);
+                    setPosts(prev => [newPostLocal, ...prev]);
+                  } else {
+                    // Award user points (+20) in studybuddy_profiles for active posting
+                    try {
+                      const { data: profileData } = await supabase
+                        .from('studybuddy_profiles')
+                        .select('points')
+                        .eq('student_id', studentId)
+                        .maybeSingle();
+                      if (profileData) {
+                        await supabase
+                          .from('studybuddy_profiles')
+                          .update({ points: (profileData.points || 0) + 20 })
+                          .eq('student_id', studentId);
+                      }
+                    } catch (ptErr) {
+                      console.warn('Failed to award posting points:', ptErr);
+                    }
+                    await loadPostsFromSupabase();
+                  }
+                } catch (err: any) {
+                  console.error('Supabase exception on post publish:', err);
+                  setPosts(prev => [newPostLocal, ...prev]);
+                }
+              } else {
+                setPosts(prev => [newPostLocal, ...prev]);
+              }
               setShowCompose(false);
             }}
             subjects={SUBJECTS.map(s => ({
@@ -1105,10 +1604,15 @@ export default function App() {
         {showProfile && (
           <ProfilePage
             key="profile"
+            currentUser={currentUser}
             onBack={() => setShowProfile(false)}
             onSignOut={() => {
-              console.log('Signed out');
               setShowProfile(false);
+              if (onSignOut) onSignOut();
+            }}
+            onNavigateToLeaderboard={() => {
+              setShowProfile(false);
+              if (onNavigate) onNavigate('leaderboard');
             }}
           />
         )}
@@ -1154,7 +1658,7 @@ export default function App() {
             {/* Discussion Feed */}
             <div className="space-y-4">
               <AnimatePresence mode="popLayout">
-                {MOCK_POSTS
+                {posts
                   .filter(p => {
                     if (!activeSubject) return true;
                     if (!activeSubjectData) return true;
@@ -1182,6 +1686,7 @@ export default function App() {
         ) : (
           <SubjectsPage 
             key="subjects"
+            initialSearchQuery={initialSearchQuery}
             onBack={() => { 
               setActiveSubject(null);
               setView('feed');

@@ -27,6 +27,7 @@ import { MissionPage } from '../components/Mission';
 import { LeaderboardPage as Leaderboard } from '../components/Leaderboard';
 import { FeedbackPage } from '../components/Feedback';
 import { CoursePage } from '../components/Course';
+import { ProfilePage } from '../components/profile';
 
 
 const ACCENT_COLORS = [
@@ -44,6 +45,19 @@ export default function App() {
   const [showDocsMenu, setShowDocsMenu] = useState(false);
   const [pendingScrollSection, setPendingScrollSection] = useState<string | null>(null);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  const [currentUser, setCurrentUser] = useState<any>(() => {
+    try {
+      const saved = localStorage.getItem('studybuddy_active_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [showProfile, setShowProfile] = useState(false);
+  const [globalSearchQuery, setGlobalSearchQuery] = useState('');
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [searchVal, setSearchVal] = useState('');
 
   // Spatial tap sound generator
   const playSpatialTap = (freq = 600, duration = 0.08) => {
@@ -175,14 +189,67 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
-            <Search className="w-4 h-4 nav-item" />
-            <div className="w-7 h-7 rounded-full liquid-glass flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-all">
-              <User className="w-3.5 h-3.5 opacity-80" />
+          <div className="flex items-center gap-4 md:gap-6">
+            <div className="flex items-center gap-2">
+              <AnimatePresence>
+                {isSearchExpanded && (
+                  <motion.input
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: 140, opacity: 1 }}
+                    exit={{ width: 0, opacity: 0 }}
+                    type="text"
+                    className="bg-white/10 dark:bg-black/30 border border-white/15 text-xs text-white px-3 py-1 rounded-full outline-none focus:border-apple-blue font-sans"
+                    placeholder="Search posts..."
+                    value={searchVal}
+                    onChange={(e) => setSearchVal(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        setGlobalSearchQuery(searchVal);
+                        if (currentUser) {
+                          setCurrentPage('discussion');
+                        } else {
+                          setCurrentPage('auth-signup');
+                        }
+                        setIsSearchExpanded(false);
+                      }
+                    }}
+                    autoFocus
+                  />
+                )}
+              </AnimatePresence>
+              <Search 
+                className="w-4 h-4 nav-item cursor-pointer" 
+                onClick={() => {
+                  playSpatialTap(550, 0.05);
+                  setIsSearchExpanded(!isSearchExpanded);
+                }} 
+              />
             </div>
+
+            <div 
+              className="w-7 h-7 rounded-full liquid-glass flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-all overflow-hidden border border-white/10"
+              onClick={() => {
+                playSpatialTap(500, 0.08);
+                if (currentUser) {
+                  setShowProfile(true);
+                } else {
+                  setCurrentPage('auth-login');
+                }
+              }}
+              title={currentUser ? "View Profile" : "Sign In"}
+            >
+              {currentUser ? (
+                <span className="text-[9px] font-black text-apple-blue font-mono tracking-tight select-none">
+                  {currentUser.name.slice(0, 2).toUpperCase()}
+                </span>
+              ) : (
+                <User className="w-3.5 h-3.5 opacity-80" />
+              )}
+            </div>
+
             <button 
               onClick={toggleTheme}
-              className="w-7 h-7 flex items-center justify-center nav-item"
+              className="w-7 h-7 flex items-center justify-center nav-item cursor-pointer"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
@@ -208,7 +275,11 @@ export default function App() {
               Leaderboard
             </span>
             <span className="text-[11px] md:text-[13px] font-medium opacity-60 hover:opacity-100 cursor-pointer transition-all" onClick={() => {
-              setCurrentPage('discussion');
+              if (currentUser) {
+                setCurrentPage('discussion');
+              } else {
+                setCurrentPage('auth-signup');
+              }
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}>
               Ask Community
@@ -239,12 +310,14 @@ export default function App() {
               key="auth"
               type={currentPage === 'auth-login' ? 'login' : 'signup'}
               onNavigate={(page) => setCurrentPage(page === 'login' ? 'auth-login' : 'auth-signup')}
-              onLogin={() => {
+              onLogin={(user) => {
                 setPreviousAuthType('login');
+                setCurrentUser(user);
                 setCurrentPage('discussion');
               }}
-              onComplete={() => {
+              onComplete={(user) => {
                 setPreviousAuthType('signup');
+                setCurrentUser(user);
                 setCurrentPage('subject-selection');
               }}
             />
@@ -257,7 +330,7 @@ export default function App() {
           ) : currentPage === 'feedback' ? (
             <FeedbackPage key="feedback" />
           ) : currentPage === 'leaderboard' ? (
-            <Leaderboard key="leaderboard" />
+            <Leaderboard key="leaderboard" currentUser={currentUser} onNavigate={setCurrentPage} />
           ) : currentPage === 'home' ? (
             <motion.div
               key="home"
@@ -383,17 +456,17 @@ export default function App() {
               
               <div className="space-y-24">
                 {[
-                  { step: 1, title: 'Create Account', text: 'Sign up using your MMU student email and set up your academic profile with your major and interests.', image: '/images/step-1.png' },
+                   { step: 1, title: 'Create Account', text: 'Sign up using your MMU student email and set up your academic profile with your major and interests.', image: '/images/step-1.png' },
                   { step: 2, title: 'Browse Feed', text: 'Explore questions filtered by your specific subjects and chapters. Find answers that help you right now.', image: '/images/step-2.png' },
                   { step: 3, title: 'Post Questions', text: 'Stuck on a problem? Post it with mandatory tags. High-quality posts get answered faster.', image: '/images/step-3.png' },
-                  { step: 4, title: 'Get Answers', text: 'Receive help from peers, upvote the best responses, and contribute back to climb the leaderboard.' }
+                  { step: 4, title: 'Get Answers', text: 'Receive help from peers, upvote the best responses, and contribute back to climb the leaderboard.', image: '/images/comments.png' }
                 ].map((item, i) => (
                   <motion.div 
                     key={item.step}
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className={`flex flex-col md:flex-row items-stretch gap-12 ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
+                    className={`flex flex-col md:flex-row items-center gap-12 ${i % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
                   >
                     <div className="flex-1 text-center md:text-left space-y-4">
                       <div className="w-12 h-12 rounded-full liquid-glass flex items-center justify-center text-xl font-bold bg-apple-blue/20 mx-auto md:mx-0">
@@ -402,9 +475,9 @@ export default function App() {
                       <h3 className="text-3xl font-bold">{item.title}</h3>
                       <p className="text-lg opacity-60 leading-relaxed font-medium">{item.text}</p>
                     </div>
-                    <div className="flex-1 w-full h-full flex justify-center">
-                       <div className="glass-card w-full h-full min-h-[24rem] md:min-h-0 flex items-center justify-center overflow-hidden rounded-[32px]">
-                          {item.image ? (
+                    <div className="flex-1 w-full flex justify-center">
+                       <div className="glass-card w-full aspect-[4/3] flex items-center justify-center">
+                        {item.image ? (
                             <img
                               src={item.image}
                               alt={item.title}
@@ -412,10 +485,9 @@ export default function App() {
                               referrerPolicy="no-referrer"
                             />
                           ) : (
-                            <span className="text-[12px] font-bold opacity-20 uppercase tracking-widest">
-                              No preview available
-                            </span>
-                          )}
+                          <span className="text-[12px] font-bold opacity-20 uppercase tracking-widest">
+                          </span>
+                             )}
                        </div>
                     </div>
                   </motion.div>
@@ -463,7 +535,6 @@ export default function App() {
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-20">
             <div className="flex-1 order-2 md:order-1">
               <div className="glass-card aspect-[4/3] flex items-center justify-center">
-                <span className="text-[12px] font-bold opacity-20 uppercase tracking-widest"></span>
                 <img src="/images/leaderboard.png" alt="Upvoting Interface" className="w-full h-full object-cover" />
               </div>
             </div>
@@ -478,7 +549,16 @@ export default function App() {
         </section>
             </motion.div>
           ) : currentPage === 'discussion' ? (
-            <Homepage />
+            <Homepage 
+              currentUser={currentUser} 
+              onSignOut={() => {
+                setCurrentUser(null);
+                localStorage.removeItem('studybuddy_active_user');
+                setCurrentPage('home');
+              }}
+              onNavigate={(page) => setCurrentPage(page)}
+              initialSearchQuery={globalSearchQuery}
+            />
           ) : currentPage === 'faqs' ? (
             <FAQPage onNavigate={(page) => { setCurrentPage(page as any); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           ) : currentPage === 'terms' ? (
@@ -611,6 +691,24 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {showProfile && (
+        <ProfilePage
+          key="profile"
+          currentUser={currentUser}
+          onBack={() => setShowProfile(false)}
+          onSignOut={() => {
+            setCurrentUser(null);
+            localStorage.removeItem('studybuddy_active_user');
+            setShowProfile(false);
+            setCurrentPage('home');
+          }}
+          onNavigateToLeaderboard={() => {
+            setShowProfile(false);
+            setCurrentPage('leaderboard');
+          }}
+        />
+      )}
     </div>
   );
 }

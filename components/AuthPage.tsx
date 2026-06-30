@@ -13,12 +13,13 @@ import {
   validateSignupForm,
   validateLoginForm
 } from '../src/services/validationService';
+import { supabase, isSupabaseConfigured } from '../src/services/supabaseClient';
 
 interface AuthPageProps {
   type: 'login' | 'signup';
   onNavigate: (page: any) => void;
-  onLogin?: () => void;
-  onComplete?: () => void;
+  onLogin?: (user: any) => void;
+  onComplete?: (user: any) => void;
 }
 
 export const AuthPage: React.FC<AuthPageProps> = ({ type, onNavigate, onLogin, onComplete }) => {
@@ -70,8 +71,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type, onNavigate, onLogin, o
           break;
       }
     } else {
-      if (name === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        error = 'Enter a valid email address';
+      if (name === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) && !/^\d{10}[a-zA-Z]{0,2}$/.test(value)) {
+        error = 'Enter a valid email address or student ID';
       }
     }
 
@@ -89,7 +90,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type, onNavigate, onLogin, o
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     let validationResult;
@@ -115,11 +116,160 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type, onNavigate, onLogin, o
     }
 
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      if (type === 'signup') {
+        const sId = formData.studentId.toUpperCase();
+        const sEmail = formData.studentEmail.toLowerCase();
+        const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+        const userProfile = {
+          student_id: sId,
+          name: fullName,
+          email: sEmail,
+          password: formData.password,
+          likes: 0,
+          major: 'Foundation FCI',
+          dominant_subject: 'General'
+        };
+
+        let supabaseSuccess = false;
+
+        if (isSupabaseConfigured && supabase) {
+          try {
+            // Check if student ID already exists in profiles
+            const { data: existingProfiles } = await supabase
+              .from('studybuddy_profiles')
+              .select('student_id')
+              .eq('student_id', sId);
+
+            if (existingProfiles && existingProfiles.length > 0) {
+              setErrors({ studentId: 'Student ID already registered in Database.' });
+              setLoading(false);
+              return;
+            }
+
+            const { error: insertError } = await supabase
+              .from('studybuddy_profiles')
+              .insert([userProfile]);
+
+            if (insertError) {
+              console.warn("Supabase insertion error, using local fallback:", insertError.message);
+            } else {
+              supabaseSuccess = true;
+            }
+          } catch (dbErr: any) {
+            console.warn("Supabase error during signup, using local fallback:", dbErr);
+          }
+        }
+
+        // Always save to localStorage as local account list to guarantee offline-readiness
+        const localUsers = JSON.parse(localStorage.getItem('studybuddy_local_users') || '[]');
+        const isDuplicateLocal = localUsers.some((u: any) => u.studentId === sId || u.email === sEmail);
+        if (!isDuplicateLocal) {
+          localUsers.push({
+            name: fullName,
+            studentId: sId,
+            email: sEmail,
+            password: formData.password,
+            likes: 0,
+            major: 'Foundation FCI'
+          });
+          localStorage.setItem('studybuddy_local_users', JSON.stringify(localUsers));
+        }
+
+        const activeUser = {
+          name: fullName,
+          studentId: sId,
+          email: sEmail,
+          likes: 0,
+          major: 'Foundation FCI'
+        };
+        localStorage.setItem('studybuddy_active_user', JSON.stringify(activeUser));
+
+        setTimeout(() => {
+          setLoading(false);
+          if (onComplete) onComplete(activeUser);
+        }, 1200);
+
+      } else {
+        // Handle Login
+        const lookup = formData.email.trim();
+        const pwd = formData.password;
+        let authenticatedUser = null;
+
+        if (isSupabaseConfigured && supabase) {
+          try {
+            const isEmail = lookup.includes('@');
+            let query = supabase.from('studybuddy_profiles').select('*');
+            if (isEmail) {
+              query = query.eq('email', lookup.toLowerCase());
+            } else {
+              query = query.eq('student_id', lookup.toUpperCase());
+            }
+
+            const { data, error } = await query;
+            if (data && data.length > 0) {
+              const dbUser = data[0];
+              // Validate password
+              if (dbUser.password === pwd) {
+                authenticatedUser = {
+                  name: dbUser.name,
+                  studentId: dbUser.student_id,
+                  email: dbUser.email || `${dbUser.student_id.toLowerCase()}@student.mmu.edu.my`,
+                  likes: dbUser.likes || 0,
+                  major: dbUser.major || 'Foundation FCI'
+                };
+              } else {
+                setErrors({ password: 'Password correct validation failed. Try again.' });
+                setLoading(false);
+                return;
+              }
+            }
+          } catch (err) {
+            console.warn("Supabase validation exception, trying local fallback:", err);
+          }
+        }
+
+        // Try local storage fallback if not validated by database
+        if (!authenticatedUser) {
+          const localUsers = JSON.parse(localStorage.getItem('studybuddy_local_users') || '[]');
+          const localMatch = localUsers.find((u: any) => 
+            u.studentId.toLowerCase() === lookup.toLowerCase() || u.email.toLowerCase() === lookup.toLowerCase()
+          );
+
+          if (localMatch) {
+            if (localMatch.password === pwd) {
+              authenticatedUser = {
+                name: localMatch.name,
+                studentId: localMatch.studentId,
+                email: localMatch.email,
+                likes: localMatch.likes || 0,
+                major: localMatch.major || 'Foundation FCI'
+              };
+            } else {
+              setErrors({ password: 'Incorrect password. Please try again.' });
+              setLoading(false);
+              return;
+            }
+          }
+        }
+
+        if (authenticatedUser) {
+          localStorage.setItem('studybuddy_active_user', JSON.stringify(authenticatedUser));
+          setTimeout(() => {
+            setLoading(false);
+            if (onLogin) onLogin(authenticatedUser);
+          }, 1200);
+        } else {
+          setErrors({ email: 'No account found matching credentials. Please sign up first.' });
+          setLoading(false);
+        }
+      }
+    } catch (e: any) {
+      console.error("Auth submit exception:", e);
+      setErrors({ email: 'Authentication error. Please try again later.' });
       setLoading(false);
-      if (type === 'login' && onLogin) onLogin();
-      if (type === 'signup' && onComplete) onComplete();
-    }, 1500);
+    }
   };
 
   const zenChimeVibration = {

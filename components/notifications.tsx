@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bell, Triangle, MessageCircle, Star, Award, CheckCircle2, Trash2, Megaphone } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../src/services/supabaseClient';
 
 export interface NotificationItem {
   id: string;
@@ -43,7 +44,14 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
     timestamp: '3h ago',
     isUnread: false,
   },
-  
+  {
+    id: 'notif-4',
+    type: 'announcement',
+    title: 'New Class Announcement',
+    content: 'Dr. Aminah pinned a new reference repository: "Agile Scrum Practices for CSP1123 Mini IT Project".',
+    timestamp: '1d ago',
+    isUnread: false,
+  },
   {
     id: 'notif-5',
     type: 'reply',
@@ -67,7 +75,37 @@ export function NotificationsPanel({ onBack }: NotificationsPanelProps) {
     return INITIAL_NOTIFICATIONS;
   });
 
-  const saveNotifications = (updated: NotificationItem[]) => {
+  const loadNotificationsFromSupabase = async () => {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('studybuddy_notifications')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (data && data.length > 0) {
+          const mapped = data.map((d: any) => ({
+            id: d.id,
+            type: d.type as any,
+            title: d.title,
+            content: d.content,
+            timestamp: new Date(d.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+            isUnread: d.is_unread,
+            avatar: d.avatar || undefined
+          }));
+          setNotifications(mapped);
+          localStorage.setItem('mmu_studybuddy_notifications_v1', JSON.stringify(mapped));
+        }
+      } catch (err) {
+        console.warn('Failed to load notifications from Supabase:', err);
+      }
+    }
+  };
+
+  useEffect(() => {
+    loadNotificationsFromSupabase();
+  }, []);
+
+  const saveNotifications = async (updated: NotificationItem[]) => {
     setNotifications(updated);
     localStorage.setItem('mmu_studybuddy_notifications_v1', JSON.stringify(updated));
   };
@@ -92,30 +130,77 @@ export function NotificationsPanel({ onBack }: NotificationsPanelProps) {
     } catch (e) {}
   };
 
-  const handleMarkAllRead = () => {
+  const handleMarkAllRead = async () => {
     playCustomTap(700, 0.1);
     const updated = notifications.map(n => ({ ...n, isUnread: false }));
     saveNotifications(updated);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase
+          .from('studybuddy_notifications')
+          .update({ is_unread: false })
+          .eq('is_unread', true);
+      } catch (err) {
+        console.error('Failed to mark all read in Supabase:', err);
+      }
+    }
   };
 
-  const handleClearAll = () => {
+  const handleClearAll = async () => {
     playCustomTap(400, 0.15);
     saveNotifications([]);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase
+          .from('studybuddy_notifications')
+          .delete()
+          .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+      } catch (err) {
+        console.error('Failed to clear notifications in Supabase:', err);
+      }
+    }
   };
 
-  const toggleSingleRead = (id: string) => {
+  const toggleSingleRead = async (id: string) => {
     playCustomTap(580, 0.07);
+    const target = notifications.find(n => n.id === id);
+    const updatedStatus = target ? !target.isUnread : false;
+    
     const updated = notifications.map(n => 
-      n.id === id ? { ...n, isUnread: !n.isUnread } : n
+      n.id === id ? { ...n, isUnread: updatedStatus } : n
     );
     saveNotifications(updated);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase
+          .from('studybuddy_notifications')
+          .update({ is_unread: updatedStatus })
+          .eq('id', id);
+      } catch (err) {
+        console.error('Failed to toggle read in Supabase:', err);
+      }
+    }
   };
 
-  const deleteSingle = (id: string, e: React.MouseEvent) => {
+  const deleteSingle = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     playCustomTap(450, 0.08);
     const updated = notifications.filter(n => n.id !== id);
     saveNotifications(updated);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase
+          .from('studybuddy_notifications')
+          .delete()
+          .eq('id', id);
+      } catch (err) {
+        console.error('Failed to delete notification in Supabase:', err);
+      }
+    }
   };
 
   const getIcon = (type: NotificationItem['type']) => {
@@ -160,7 +245,7 @@ export function NotificationsPanel({ onBack }: NotificationsPanelProps) {
               <div>
                 <h3 className="text-sm font-black tracking-widest text-white uppercase">Notification Desk</h3>
                 {unreadCount > 0 && (
-                  <p className="text-[11px] font-bold text-blue-400 mt-0.5">{unreadCount} unread alert{unreadCount > 1 ? 's' : ''}</p>
+                  <p className="text-[11px] font-bold text-amber-400 mt-0.5">{unreadCount} unread alert{unreadCount > 1 ? 's' : ''}</p>
                 )}
               </div>
             </div>

@@ -1,13 +1,22 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { X, LogOut, Award, User, Mail, Shield, BookOpen, Clock } from 'lucide-react';
 
 interface ProfilePageProps {
   key?: string;
   onBack: () => void;
   onSignOut: () => void;
+  currentUser?: {
+    name: string;
+    studentId: string;
+    email: string;
+    major: string;
+    likes: number;
+    dominant_subject?: string;
+  } | null;
+  onNavigateToLeaderboard?: () => void;
 }
 
-export function ProfilePage({ onBack, onSignOut }: ProfilePageProps) {
+export function ProfilePage({ onBack, onSignOut, currentUser, onNavigateToLeaderboard }: ProfilePageProps) {
   // Clean custom tap audio effect
   const playCustomTap = (freq = 600, duration = 0.08) => {
     try {
@@ -27,6 +36,15 @@ export function ProfilePage({ onBack, onSignOut }: ProfilePageProps) {
       osc.stop(ctx.currentTime + duration);
     } catch (e) {}
   };
+
+  // Get active user data
+  const name = currentUser?.name || 'You (Student Buddy)';
+  const studentId = currentUser?.studentId || '252FC999SB';
+  const email = currentUser?.email || 'student.buddy@student.mmu.edu.my';
+  const major = currentUser?.major || 'Foundation in Computing (FCI)';
+  const likes = currentUser?.likes !== undefined ? currentUser.likes : 31;
+  const helperScore = likes * 10;
+  const avatarText = name.slice(0, 2).toUpperCase();
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-end bg-black/60 backdrop-blur-sm">
@@ -68,20 +86,16 @@ export function ProfilePage({ onBack, onSignOut }: ProfilePageProps) {
             
             <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-apple-blue to-apple-purple p-0.5 shadow-xl">
               <div className="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center font-bold text-lg text-white">
-                <img src="/images/team/liou-zi-en.jpeg" alt="Profile" className="w-full h-full rounded-full object-cover" />
+                {avatarText}
               </div>
             </div>
 
             <div>
-              <h4 className="text-xl font-bold text-white tracking-tight">Liou Zi En</h4>
-              <p className="text-xs text-zinc-400 font-mono mt-1">ID: 252FC251LC</p>
+              <h4 className="text-xl font-bold text-white tracking-tight">{name}</h4>
+              <p className="text-xs text-zinc-400 font-mono mt-1">ID: {studentId}</p>
             </div>
 
             <div className="flex gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center gap-1">
-                <Award className="w-3 h-3" />
-                Silver Tier
-              </span>
               <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-apple-blue/10 border border-apple-blue/20 text-apple-blue">
                 Computing
               </span>
@@ -90,16 +104,27 @@ export function ProfilePage({ onBack, onSignOut }: ProfilePageProps) {
 
           {/* Details / Contribution Stats */}
           <div className="space-y-4">
-            <h5 className="text-xs font-black text-zinc-500 uppercase tracking-widest">Academic Badges</h5>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
-                <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Helper score</div>
-                <div className="text-2xl font-black text-white mt-1">310 <span className="text-xs text-zinc-500">pts</span></div>
-              </div>
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
-                <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Posts Rank</div>
-                <div className="text-2xl font-black text-white mt-1">#4 <span className="text-xs text-zinc-500">buddy</span></div>
+            <div 
+              onClick={() => {
+                playCustomTap(650, 0.08);
+                if (onNavigateToLeaderboard) onNavigateToLeaderboard();
+              }}
+              className="group cursor-pointer"
+            >
+              <h5 className="text-xs font-black text-zinc-500 uppercase tracking-widest group-hover:text-apple-blue transition-colors flex items-center gap-2">
+                Academic Badges
+                <span className="text-[10px] text-apple-blue font-semibold lowercase tracking-normal group-hover:underline opacity-80">(view leaderboard)</span>
+              </h5>
+              
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.05] transition-colors">
+                  <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Helper score</div>
+                  <div className="text-2xl font-black text-white mt-1">{helperScore} <span className="text-xs text-zinc-500">pts</span></div>
+                </div>
+                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.05] transition-colors">
+                  <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Posts Rank</div>
+                  <div className="text-2xl font-black text-white mt-1">#{likes > 0 ? Math.max(1, 10 - Math.floor(likes / 3)) : 12} <span className="text-xs text-zinc-500 font-normal">buddy</span></div>
+                </div>
               </div>
             </div>
 
@@ -107,19 +132,11 @@ export function ProfilePage({ onBack, onSignOut }: ProfilePageProps) {
             <div className="space-y-3.5 pt-4">
               <div className="flex items-center gap-3.5 text-sm">
                 <Mail className="w-4 h-4 text-zinc-500" />
-                <span className="text-zinc-300">LIOU.ZI.EN@student.mmu.edu.my</span>
+                <span className="text-zinc-300 break-all">{email}</span>
               </div>
               <div className="flex items-center gap-3.5 text-sm">
                 <BookOpen className="w-4 h-4 text-zinc-500" />
-                <span className="text-zinc-300">Foundation in Computing (FCI)</span>
-              </div>
-              <div className="flex items-center gap-3.5 text-sm">
-                <Clock className="w-4 h-4 text-zinc-500" />
-                <span className="text-zinc-300">Joined MMU Trimester 1, 2026</span>
-              </div>
-              <div className="flex items-center gap-3.5 text-sm">
-                <Shield className="w-4 h-4 text-zinc-500" />
-                <span className="text-emerald-400 font-medium">Verified Scholar Access</span>
+                <span className="text-zinc-300">{major}</span>
               </div>
             </div>
           </div>
@@ -138,9 +155,7 @@ export function ProfilePage({ onBack, onSignOut }: ProfilePageProps) {
             Sign Out Accounts
           </button>
           
-          <div className="text-center text-[10px] text-zinc-600 font-mono uppercase tracking-wider">
-            MMU Mini IT Project • Group 86
-          </div>
+          <div className="h-4"></div>
         </div>
       </motion.div>
     </div>

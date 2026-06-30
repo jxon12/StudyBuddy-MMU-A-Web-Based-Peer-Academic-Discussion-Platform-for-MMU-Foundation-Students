@@ -80,34 +80,60 @@ export function CreatePostPage({ onBack, onPublish, subjects }: CreatePostProps)
   const selectedSubject = selectedSubjectId ? subjects.find(s => s.id === selectedSubjectId) : null;
   const chapters = selectedSubject ? selectedSubject.chapters : [];
 
-  const startCamera = async () => {
+  const startCamera = () => {
     setCameraError(null);
     playCustomTap(520, 0.1);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-        audio: false
-      });
-      mediaStreamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play().catch(err => console.error("Video play err", err));
-      }
-      setCameraActive(true);
-    } catch (err: any) {
-      console.error("Camera error", err);
-      setCameraError("Camera permission denied or not available.");
-    }
+    setCameraActive(true);
   };
 
   const stopCamera = () => {
     playCustomTap(450, 0.08);
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
-      mediaStreamRef.current = null;
-    }
     setCameraActive(false);
   };
+
+  // Camera stream lifecycle synchronizer
+  useEffect(() => {
+    if (!cameraActive) {
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+        mediaStreamRef.current = null;
+      }
+      return;
+    }
+
+    let active = true;
+    const initCamera = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        if (!active) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+        mediaStreamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          // Use standard play
+          videoRef.current.play().catch(err => console.error("Video play err", err));
+        }
+      } catch (err: any) {
+        console.error("Camera error", err);
+        setCameraActive(false);
+        setCameraError("Camera permission denied or not available.");
+      }
+    };
+
+    initCamera();
+
+    return () => {
+      active = false;
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [cameraActive]);
 
   const capturePhoto = () => {
     playCustomTap(750, 0.12);
@@ -159,6 +185,24 @@ export function CreatePostPage({ onBack, onPublish, subjects }: CreatePostProps)
         reader.onload = (event) => {
           if (event.target?.result) {
             setImage(event.target.result as string);
+          }
+        };
+        reader.readAsDataURL(file);
+      } else if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (event.target?.result) {
+            const sizeInKB = (file.size / 1024).toFixed(1);
+            const sizeStr = parseFloat(sizeInKB) > 1024 
+              ? `${(parseFloat(sizeInKB) / 1024).toFixed(1)} MB` 
+              : `${sizeInKB} KB`;
+
+            setPdfFile({
+              name: file.name,
+              size: sizeStr,
+              dataUrl: event.target.result as string,
+            });
+            playCustomTap(700, 0.1);
           }
         };
         reader.readAsDataURL(file);
@@ -240,8 +284,21 @@ export function CreatePostPage({ onBack, onPublish, subjects }: CreatePostProps)
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 15 }}
         transition={{ type: 'spring', damping: 26, stiffness: 240 }}
-        className="bg-neutral-900 border border-zinc-800/95 max-w-xl w-full rounded-2xl shadow-2xl overflow-hidden relative z-[110]"
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={`bg-neutral-900 border max-w-xl w-full rounded-2xl shadow-2xl overflow-hidden relative z-[110] transition-all duration-200 ${
+          isDragging ? 'border-blue-500 scale-[1.01] shadow-blue-500/20' : 'border-zinc-800/95'
+        }`}
       >
+        {isDragging && (
+          <div className="absolute inset-0 bg-neutral-950/90 z-50 backdrop-blur-sm flex flex-col items-center justify-center gap-3 p-6 pointer-events-none border-2 border-dashed border-blue-500 rounded-2xl m-2 animate-pulse">
+            <UploadCloud className="w-12 h-12 text-blue-400" />
+            <div className="text-base font-bold text-white">Drop Files Here</div>
+            <div className="text-xs text-zinc-400">Supporting images and PDF documents</div>
+          </div>
+        )}
+
         {/* Overlay header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800/40">
           <div className="flex items-center gap-2">
