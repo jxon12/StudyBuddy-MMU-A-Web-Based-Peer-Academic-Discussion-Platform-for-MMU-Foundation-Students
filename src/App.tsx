@@ -148,10 +148,7 @@ export default function App() {
                 onMouseEnter={() => setShowDocsMenu(true)}
                 onMouseLeave={() => setShowDocsMenu(false)}
               >
-                <span className={`nav-item flex items-center gap-1 ${showDocsMenu ? 'active-accent' : ''}`}>
-                  Documentation
-                  <ChevronDown className={`w-3 h-3 transition-transform ${showDocsMenu ? 'rotate-180' : ''}`} />
-                </span>
+                
                 
                 <AnimatePresence>
                   {showDocsMenu && (
