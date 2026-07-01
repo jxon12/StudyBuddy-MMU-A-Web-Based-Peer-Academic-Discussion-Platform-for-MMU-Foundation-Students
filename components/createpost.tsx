@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  X, Check, BookOpen, UploadCloud, Image, Trash2, Link, Camera, 
-  AlertCircle, RefreshCw, Layers, Globe, FileText
+  X, Check, BookOpen, UploadCloud, Image, Trash2, Camera, 
+  AlertCircle, Layers, FileText
 } from 'lucide-react';
 
 interface CreatePostProps {

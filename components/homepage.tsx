@@ -52,7 +52,7 @@ const PRIMARY_CATEGORIES = [
     color: 'bg-[#3634A3]',
     cover: 'https://i.pinimg.com/736x/88/0b/09/880b09b7b25fdd1bab31bf75ef721382.jpg',
     subsubjects: [
-      { id: 'critical', name: 'LCT1113 Critical Thinking', chapters: ['Logic', 'Arguments', 'Fallacies'] }
+      { id: 'LCT1113', name: 'Critical Thinking', chapters: ['Logic', 'Arguments', 'Fallacies'] }
     ]
   },
   {
@@ -61,9 +61,9 @@ const PRIMARY_CATEGORIES = [
     color: 'bg-[#5856D6]',
     cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg',
     subsubjects: [
-      { id: 'math1', name: 'Mathematics I', chapters: ['Algebraic Functions', 'Limits', 'Differentiation'] },
-      { id: 'math2', name: 'Mathematics II', chapters: ['Integration', 'Vector Spaces', 'Matrices'] },
-      { id: 'math3', name: 'CMT 1134 Mathematics III', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] }
+      { id: 'CMT1114', name: 'Mathematics I', chapters: ['Algebraic Functions', 'Limits', 'Differentiation'] },
+      { id: 'CMT1124', name: 'Mathematics II', chapters: ['Integration', 'Vector Spaces', 'Matrices'] },
+      { id: 'CMT1134', name: 'Mathematics III', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] }
     ]
   },
   {
@@ -72,9 +72,9 @@ const PRIMARY_CATEGORIES = [
     color: 'bg-[#AF52DE]',
     cover: 'https://i.pinimg.com/736x/91/d4/91/91d491485a1126a79219f01c444d53db.jpg',
     subsubjects: [
-      { id: 'academic-english', name: 'LAE1113 Academic English', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
-      { id: 'essential-english', name: 'Essential English', chapters: ['Vocabulary', 'Grammar', 'Reading Comprehension'] },
-      { id: 'communicative-english', name: 'Communicative English', chapters: ['Conversational Skills', 'Business English', 'Public Speaking'] }
+      { id: 'LAE1113', name: 'Academic English', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
+      { id: 'LEE1113', name: 'Essential English', chapters: ['Vocabulary', 'Grammar', 'Reading Comprehension'] },
+      { id: 'LCE1113', name: 'Communicative English', chapters: ['Conversational Skills', 'Business English', 'Public Speaking'] }
     ]
   },
   {
@@ -83,10 +83,13 @@ const PRIMARY_CATEGORIES = [
     color: 'bg-[#7D7AFF]',
     cover: 'https://i.pinimg.com/1200x/51/83/7e/51837ef0af4628e182418b627f93268d.jpg',
     subsubjects: [
-      { id: 'digital', name: 'CDS1114 Intro to Digital System', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
-      { id: 'multimedia', name: 'Multimedia Fundamental', chapters: ['Imaging & Graphics', 'Audio & Video Synthesis', 'Interactive Tech'] },
-      { id: 'mini-it', name: 'CSP1123 Mini IT Project', chapters: ['Project Planning', 'Development', 'Documentation'] },
-      { id: 'physics', name: 'CPP1113 Principles of Physics', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] }
+      { id: 'CCT1114', name: 'Introduction to Computing Tech', chapters: ['Programming Basics', 'Computer Systems', 'Digital Literacy'] },
+      { id: 'GNB1114', name: 'Intro to Business Management', chapters: ['Business Concepts', 'Organizational Behaviour', 'Marketing'] },
+      { id: 'CDS1114', name: 'Intro to Digital System', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
+      { id: 'CMF1114', name: 'Multimedia Fundamentals', chapters: ['Imaging & Graphics', 'Audio & Video Synthesis', 'Interactive Tech'] },
+      { id: 'CSP1114', name: 'Problem Solving & Program Design', chapters: ['Algorithms', 'Flowcharts', 'Problem Decomposition'] },
+      { id: 'CSP1123', name: 'Mini IT Project', chapters: ['Project Planning', 'Development', 'Documentation'] },
+      { id: 'CPP1113', name: 'Principles of Physics', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] }
     ]
   }
 ];
@@ -1436,7 +1439,7 @@ export default function App({ currentUser, onSignOut, onNavigate, initialSearchQ
   const loadPostsFromSupabase = async () => {
     if (isSupabaseConfigured && supabase) {
       try {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('studybuddy_posts')
           .select('*')
           .order('created_at', { ascending: false });

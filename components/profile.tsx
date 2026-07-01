@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { X, LogOut, Award, User, Mail, Shield, BookOpen, Clock } from 'lucide-react';
+import { X, LogOut, Mail, BookOpen } from 'lucide-react';
 
 interface ProfilePageProps {
   key?: string;
