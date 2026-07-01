@@ -260,7 +260,7 @@ export function CreatePostPage({ onBack, onPublish, subjects }: CreatePostProps)
     onPublish({
       title: title.trim(),
       content: content.trim(),
-      subject: selectedSubject ? selectedSubject.name : 'General Syllabus',
+      subject: selectedSubject ? `${selectedSubject.id} - ${selectedSubject.name}` : 'General Syllabus',
       chapter: selectedChapter,
       image: image || undefined,
       pdf: pdfFile || undefined
@@ -337,7 +337,7 @@ export function CreatePostPage({ onBack, onPublish, subjects }: CreatePostProps)
                 className="h-8 px-3.5 bg-zinc-800/80 border border-zinc-700/60 hover:border-zinc-650 rounded-full text-[11px] font-black text-blue-400 flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <BookOpen className="w-3.5 h-3.5 text-zinc-400" />
-                <span>Subject: {selectedSubjectId || 'Select Subject'}</span>
+                <span>Subject: {selectedSubject ? `${selectedSubject.id} - ${selectedSubject.name}` : 'Select Subject'}</span>
                 <span className="text-zinc-500 text-[8px]">▼</span>
               </button>
 
