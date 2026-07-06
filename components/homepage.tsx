@@ -7,6 +7,7 @@ import {
   MoreHorizontal,
   ArrowLeft,
   Triangle,
+  Star,
   Share2,
   Plus,
   Bell,
@@ -49,7 +50,7 @@ const PRIMARY_CATEGORIES = [
     id: 'critical',
     name: 'Critical Thinking',
     color: 'bg-[#3634A3]',
-    cover: 'https://i.pinimg.com/736x/88/0b/09/880b09b7b25fdd1bab31bf75ef721382.jpg',
+    cover: 'https://i.pinimg.com/736x/ab/14/af/ab14afa819b82804bd89b4d36da486cc.jpg',
     subsubjects: [
 
       { id: 'LCT1113', name: 'Critical Thinking', chapters: ['Logic', 'Arguments', 'Fallacies'] }
@@ -60,7 +61,7 @@ const PRIMARY_CATEGORIES = [
     id: 'math',
     name: 'Mathematics',
     color: 'bg-[#5856D6]',
-    cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg',
+    cover: 'https://i.pinimg.com/736x/5f/d8/e7/5fd8e74b21f5084d5de30a54210fa4bc.jpg',
     subsubjects: [
 
       { id: 'CMT1114', name: 'Mathematics I', chapters: ['Algebraic Functions', 'Limits', 'Differentiation'] },
@@ -73,7 +74,7 @@ const PRIMARY_CATEGORIES = [
     id: 'english',
     name: 'English',
     color: 'bg-[#AF52DE]',
-    cover: 'https://i.pinimg.com/736x/91/d4/91/91d491485a1126a79219f01c444d53db.jpg',
+    cover: 'https://i.pinimg.com/736x/87/70/b8/8770b892b44a45ecb453733e80df29e5.jpg',
     subsubjects: [
 
       { id: 'LAE1113', name: 'Academic English', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
@@ -86,7 +87,7 @@ const PRIMARY_CATEGORIES = [
     id: 'technical',
     name: 'Technical',
     color: 'bg-[#7D7AFF]',
-    cover: 'https://i.pinimg.com/1200x/51/83/7e/51837ef0af4628e182418b627f93268d.jpg',
+    cover: 'https://i.pinimg.com/736x/43/64/6d/43646dfd1c98f4abf9a1c69e08f2848a.jpg',
     subsubjects: [
       { id: 'CCT1114', name: 'CCT1114 Introduction to Computing Tech', chapters: ['Computer Hardware', 'Operating Systems', 'Networking Basics', 'Cloud & Security'] },
       { id: 'CDS1114', name: 'CDS1114 Introduction to Digital System', chapters: ['Binary & Hexadecimal', 'Logic Gates', 'Boolean Algebra', 'Sequential Circuits'] },
@@ -637,7 +638,7 @@ interface PostCardProps {
   key?: string;
 }
 
-const PostCard = ({ post }: PostCardProps) => {
+const PostCard = React.forwardRef<HTMLDivElement, PostCardProps>(({ post }, ref) => {
   const { cleanContent, image: parsedImage, pdf: parsedPdf } = parsePostContent(post.content);
   const displayImage = parsedImage || post.image;
   const displayPdf = parsedPdf || post.pdf;
@@ -1068,6 +1069,7 @@ const PostCard = ({ post }: PostCardProps) => {
 
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, scale: 0.98 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
@@ -1241,7 +1243,7 @@ const PostCard = ({ post }: PostCardProps) => {
       </AnimatePresence>
     </motion.div>
   );
-};
+});
 
 // --- New Subjects Page Component ---
 
@@ -1586,7 +1588,7 @@ export default function App({ currentUser, onSignOut, onNavigate, initialSearchQ
             content: d.content,
             likes: d.likes || 0,
             replies: d.replies || 0,
-            timestamp: new Date(d.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            timestamp: d.created_at && !isNaN(Date.parse(d.created_at)) ? new Date(d.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Just now',
             student_id: d.student_id
           }));
           setPosts(mappedPosts);

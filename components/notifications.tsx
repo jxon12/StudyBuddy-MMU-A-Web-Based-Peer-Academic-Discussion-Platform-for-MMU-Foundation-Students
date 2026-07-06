@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Bell, Triangle, MessageCircle, Award, CheckCircle2, Trash2, Megaphone } from 'lucide-react';
+import { X, Bell, Triangle, MessageCircle, Star, Award, CheckCircle2, Trash2, Megaphone } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../src/services/supabaseClient';
 
 export interface NotificationItem {
@@ -78,20 +78,29 @@ export function NotificationsPanel({ onBack }: NotificationsPanelProps) {
   const loadNotificationsFromSupabase = async () => {
     if (isSupabaseConfigured && supabase) {
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('studybuddy_notifications')
           .select('*')
           .order('created_at', { ascending: false });
         if (data && data.length > 0) {
-          const mapped = data.map((d: any) => ({
-            id: d.id,
-            type: d.type as any,
-            title: d.title,
-            content: d.content,
-            timestamp: new Date(d.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-            isUnread: d.is_unread,
-            avatar: d.avatar || undefined
-          }));
+          const mapped = data.map((d: any) => {
+            let formattedTime = 'Just now';
+            if (d.created_at) {
+              const parsedDate = new Date(d.created_at);
+              if (!isNaN(parsedDate.getTime())) {
+                formattedTime = parsedDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+              }
+            }
+            return {
+              id: d.id,
+              type: d.type as any,
+              title: d.title,
+              content: d.content,
+              timestamp: formattedTime,
+              isUnread: d.is_unread,
+              avatar: d.avatar || undefined
+            };
+          });
           setNotifications(mapped);
           localStorage.setItem('mmu_studybuddy_notifications_v1', JSON.stringify(mapped));
         }
