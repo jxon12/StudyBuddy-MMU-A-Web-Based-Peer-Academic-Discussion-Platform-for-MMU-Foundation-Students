@@ -7,6 +7,9 @@ export default defineConfig({
   server: {
     port: parseInt(process.env.PORT || '3000'),
     host: '0.0.0.0',
-    open: false
+    open: false,
+    allowedHosts: [
+      'studybuddy-mmu.onrender.com'
+    ]
   }
 })
