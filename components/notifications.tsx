@@ -78,7 +78,7 @@ export function NotificationsPanel({ onBack }: NotificationsPanelProps) {
   const loadNotificationsFromSupabase = async () => {
     if (isSupabaseConfigured && supabase) {
       try {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('studybuddy_notifications')
           .select('*')
           .order('created_at', { ascending: false });
