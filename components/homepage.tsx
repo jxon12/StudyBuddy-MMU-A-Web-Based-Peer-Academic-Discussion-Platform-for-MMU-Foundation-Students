@@ -7,7 +7,6 @@ import {
   MoreHorizontal,
   ArrowLeft,
   Triangle,
-  Star,
   Share2,
   Plus,
   Bell,

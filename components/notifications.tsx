@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Bell, Triangle, MessageCircle, Star, Award, CheckCircle2, Trash2, Megaphone } from 'lucide-react';
+import { X, Bell, Triangle, MessageCircle, Award, CheckCircle2, Trash2, Megaphone } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../src/services/supabaseClient';
 
 export interface NotificationItem {
