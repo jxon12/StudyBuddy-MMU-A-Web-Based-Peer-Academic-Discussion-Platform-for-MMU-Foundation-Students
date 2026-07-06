@@ -9,9 +9,6 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
-  ChevronDown, 
-  BookOpen, 
-  Play, 
   Moon,
   Sun,
   User
@@ -42,7 +39,6 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'team' | 'discussion' | 'course' | 'faqs' | 'terms' | 'privacy' | 'mission' | 'leaderboard' | 'feedback' | 'auth-login' | 'auth-signup' | 'subject-selection'>('home');
   const [previousAuthType, setPreviousAuthType] = useState<'login' | 'signup'>('login');
   const [accentColor] = useState(ACCENT_COLORS[0]);
-  const [showDocsMenu, setShowDocsMenu] = useState(false);
   const [pendingScrollSection, setPendingScrollSection] = useState<string | null>(null);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
@@ -143,49 +139,6 @@ export default function App() {
               <span className="nav-item cursor-pointer" onClick={() => navigateToPage('team')}>About Us</span>
               <span className="nav-item cursor-pointer" onClick={() => document.getElementById('academic-help')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>StudyBuddy</span>
               <span className="nav-item cursor-pointer" onClick={() => navigateToHomeSection('how-it-works')}>How it Works</span>
-              <div 
-                className="relative"
-                onMouseEnter={() => setShowDocsMenu(true)}
-                onMouseLeave={() => setShowDocsMenu(false)}
-              >
-                <span className={`nav-item flex items-center gap-1 ${showDocsMenu ? 'active-accent' : ''}`}>
-                  Documentation
-                  <ChevronDown className={`w-3 h-3 transition-transform ${showDocsMenu ? 'rotate-180' : ''}`} />
-                </span>
-                
-                <AnimatePresence>
-                  {showDocsMenu && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-                      className="absolute top-full left-0 pt-3 w-72 -translate-x-1/4"
-                    >
-                      <div className="glass-card !p-2 !rounded-[24px]">
-                        <div className="flex items-start gap-4 p-4 rounded-[18px] hover:bg-white/10 dark:hover:bg-white/5 transition-all cursor-pointer group" onClick={() => { navigateToPage('team'); setShowDocsMenu(false); }}>
-                           <div className="w-10 h-10 rounded-[14px] liquid-glass flex items-center justify-center bg-apple-blue/20 text-apple-blue">
-                             <BookOpen className="w-5 h-5" />
-                           </div>
-                           <div>
-                             <div className="text-[15px] font-semibold">About StudyBuddy</div>
-                             <div className="text-[13px] opacity-60 leading-tight mt-1">Meet our founders.</div>
-                           </div>
-                        </div>
-                        <div className="flex items-start gap-4 p-4 rounded-[18px] hover:bg-white/10 dark:hover:bg-white/5 transition-all cursor-pointer group">
-                           <div className="w-10 h-10 rounded-[14px] liquid-glass flex items-center justify-center bg-apple-indigo/20 text-apple-indigo">
-                             <Play className="w-5 h-5" />
-                           </div>
-                           <div>
-                             <div className="text-[15px] font-semibold">Youtube user guide</div>
-                             <div className="text-[13px] opacity-60 leading-tight mt-1">Explore spatial features.</div>
-                           </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
             </div>
           </div>
 

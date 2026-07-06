@@ -132,8 +132,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type, onNavigate, onLogin, o
           dominant_subject: 'General'
         };
 
-        let supabaseSuccess = false;
-
         if (isSupabaseConfigured && supabase) {
           try {
             // Check if student ID already exists in profiles
@@ -154,8 +152,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type, onNavigate, onLogin, o
 
             if (insertError) {
               console.warn("Supabase insertion error, using local fallback:", insertError.message);
-            } else {
-              supabaseSuccess = true;
             }
           } catch (dbErr: any) {
             console.warn("Supabase error during signup, using local fallback:", dbErr);
@@ -207,7 +203,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ type, onNavigate, onLogin, o
               query = query.eq('student_id', lookup.toUpperCase());
             }
 
-            const { data, error } = await query;
+            const { data } = await query;
             if (data && data.length > 0) {
               const dbUser = data[0];
               // Validate password

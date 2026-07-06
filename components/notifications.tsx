@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Bell, Triangle, MessageCircle, Star, Award, CheckCircle2, Trash2, Megaphone } from 'lucide-react';
+import { X, Bell, Triangle, MessageCircle, Award, CheckCircle2, Trash2, Megaphone } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../src/services/supabaseClient';
 
 export interface NotificationItem {
@@ -78,7 +78,7 @@ export function NotificationsPanel({ onBack }: NotificationsPanelProps) {
   const loadNotificationsFromSupabase = async () => {
     if (isSupabaseConfigured && supabase) {
       try {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('studybuddy_notifications')
           .select('*')
           .order('created_at', { ascending: false });

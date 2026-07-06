@@ -12,9 +12,7 @@ import {
   Lock,
   Database,
   AlertTriangle,
-  CheckCircle,
   Server,
-  HelpCircle
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../src/services/supabaseClient';
 

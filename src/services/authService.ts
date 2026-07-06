@@ -36,6 +36,10 @@ export async function signUp(data: SignupData) {
       throw new Error(JSON.stringify(validation.errors));
     }
 
+    if (!supabase) {
+      throw new Error('Supabase is not configured');
+    }
+
     // Create auth user
     const { data: { user }, error: authError } = await supabase.auth.signUp({
       email: data.email,
@@ -81,6 +85,10 @@ export async function signIn(credentials: AuthCredentials) {
       throw new Error(JSON.stringify(validation.errors));
     }
 
+    if (!supabase) {
+      throw new Error('Supabase is not configured');
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email: credentials.email,
       password: credentials.password,
@@ -100,6 +108,10 @@ export async function signIn(credentials: AuthCredentials) {
  */
 export async function signOut() {
   try {
+    if (!supabase) {
+      throw new Error('Supabase is not configured');
+    }
+
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     return { success: true };
@@ -114,6 +126,10 @@ export async function signOut() {
  */
 export async function getCurrentSession() {
   try {
+    if (!supabase) {
+      return null;
+    }
+
     const { data, error } = await supabase.auth.getSession();
     if (error) throw error;
     return data.session;
@@ -128,6 +144,10 @@ export async function getCurrentSession() {
  */
 export async function getUserProfile(userId: string) {
   try {
+    if (!supabase) {
+      return null;
+    }
+
     const { data, error } = await supabase
       .from('users')
       .select('*')

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Trophy, 
@@ -131,10 +131,11 @@ export function LeaderboardPage({ currentUser, onNavigate }: LeaderboardPageProp
   const [leaderboardData, setLeaderboardData] = useState<Omit<LeaderboardUser, 'rank'>[]>(LEADERBOARD_DATA);
 
   useEffect(() => {
-    if (isSupabaseConfigured && supabase) {
+    const client = supabase;
+    if (isSupabaseConfigured && client) {
       const fetchProfiles = async () => {
         try {
-          const { data, error } = await supabase
+          const { data } = await client
             .from('studybuddy_profiles')
             .select('*')
             .order('likes', { ascending: false });
