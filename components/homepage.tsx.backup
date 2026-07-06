@@ -50,46 +50,46 @@ const PRIMARY_CATEGORIES = [
     id: 'critical',
     name: 'Critical Thinking',
     color: 'bg-[#3634A3]',
-    cover: 'https://i.pinimg.com/736x/88/0b/09/880b09b7b25fdd1bab31bf75ef721382.jpg',
+    cover: 'https://i.pinimg.com/736x/ab/14/af/ab14afa819b82804bd89b4d36da486cc.jpg',
     subsubjects: [
-      { id: 'LCT1113', name: 'LCT1113 Critical Thinking', chapters: ['Logic', 'Arguments', 'Fallacies', 'Cognitive Biases'] }
+      { id: 'LCT1113', name: 'Critical Thinking', chapters: ['Logic', 'Arguments', 'Fallacies'] }
     ]
   },
   {
     id: 'math',
     name: 'Mathematics',
     color: 'bg-[#5856D6]',
-    cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg',
+    cover: 'https://i.pinimg.com/736x/5f/d8/e7/5fd8e74b21f5084d5de30a54210fa4bc.jpg',
     subsubjects: [
-      { id: 'CMT1114', name: 'CMT1114 Mathematics 1', chapters: ['Functions & Graphs', 'Limits & Continuity', 'Differentiation', 'Applications of Derivative'] },
-      { id: 'CMT1124', name: 'CMT1124 Mathematics 2', chapters: ['Integration Techniques', 'Definite Integrals', 'Matrices', 'Vector Spaces'] },
-      { id: 'CMT1134', name: 'CMT1134 Mathematics 3', chapters: ['Multivariate Calculus', 'Linear Programming', 'Probability Distributions', 'Descriptive Statistics'] }
+      { id: 'CMT1114', name: 'Mathematics I', chapters: ['Algebraic Functions', 'Limits', 'Differentiation'] },
+      { id: 'CMT1124', name: 'Mathematics II', chapters: ['Integration', 'Vector Spaces', 'Matrices'] },
+      { id: 'CMT1134', name: 'Mathematics III', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] }
     ]
   },
   {
     id: 'english',
     name: 'English',
     color: 'bg-[#AF52DE]',
-    cover: 'https://i.pinimg.com/736x/91/d4/91/91d491485a1126a79219f01c444d53db.jpg',
+    cover: 'https://i.pinimg.com/736x/87/70/b8/8770b892b44a45ecb453733e80df29e5.jpg',
     subsubjects: [
-      { id: 'LAE1113', name: 'LAE1113 Academic English', chapters: ['Academic Writing Style', 'Citation & Referencing', 'Literature Review', 'Oral Presentations'] },
-      { id: 'LEE1113', name: 'LEE1113 Essential English', chapters: ['Grammar Fundamentals', 'Reading for Main Ideas', 'Vocabulary Expansion', 'Sentence Construction'] },
-      { id: 'LCE1113', name: 'LCE1113 Communicative English', chapters: ['Interpersonal Dynamics', 'Public Speaking', 'Business Correspondence', 'Conflict Resolution'] }
+      { id: 'LAE1113', name: 'Academic English', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
+      { id: 'LEE1113', name: 'Essential English', chapters: ['Vocabulary', 'Grammar', 'Reading Comprehension'] },
+      { id: 'LCE1113', name: 'Communicative English', chapters: ['Conversational Skills', 'Business English', 'Public Speaking'] }
     ]
   },
   {
     id: 'technical',
     name: 'Technical',
     color: 'bg-[#7D7AFF]',
-    cover: 'https://i.pinimg.com/1200x/51/83/7e/51837ef0af4628e182418b627f93268d.jpg',
+    cover: 'https://i.pinimg.com/736x/43/64/6d/43646dfd1c98f4abf9a1c69e08f2848a.jpg',
     subsubjects: [
-      { id: 'CCT1114', name: 'CCT1114 Introduction to Computing Tech', chapters: ['Computer Hardware', 'Operating Systems', 'Networking Basics', 'Cloud & Security'] },
-      { id: 'CDS1114', name: 'CDS1114 Introduction to Digital System', chapters: ['Binary & Hexadecimal', 'Logic Gates', 'Boolean Algebra', 'Sequential Circuits'] },
-      { id: 'CMF1114', name: 'CMF1114 Multimedia Fundamentals', chapters: ['Digital Graphics', 'Audio Processing', 'Video Production', 'Animation & UI/UX'] },
-      { id: 'CPP1113', name: 'CPP1113 Principles of Physics', chapters: ['Kinematics & Dynamics', 'Work, Energy & Power', 'Thermal Physics', 'Electrostatics'] },
-      { id: 'CSP1114', name: 'CSP1114 Problem Solving & Program Design', chapters: ['Algorithm & Flowchart', 'Control Structures', 'Functions & Recursion', 'Arrays & Pointers'] },
-      { id: 'CSP1123', name: 'CSP1123 Mini IT Project', chapters: ['Project Ideation', 'Software Development', 'System Testing', 'Documentation'] },
-      { id: 'GNB1114', name: 'GNB1114 Intro to Business Management', chapters: ['Business Environments', 'Management Functions', 'Marketing Mix', 'Financial Planning'] }
+      { id: 'CCT1114', name: 'Introduction to Computing Tech', chapters: ['Programming Basics', 'Computer Systems', 'Digital Literacy'] },
+      { id: 'GNB1114', name: 'Intro to Business Management', chapters: ['Business Concepts', 'Organizational Behaviour', 'Marketing'] },
+      { id: 'CDS1114', name: 'Intro to Digital System', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
+      { id: 'CMF1114', name: 'Multimedia Fundamentals', chapters: ['Imaging & Graphics', 'Audio & Video Synthesis', 'Interactive Tech'] },
+      { id: 'CSP1114', name: 'Problem Solving & Program Design', chapters: ['Algorithms', 'Flowcharts', 'Problem Decomposition'] },
+      { id: 'CSP1123', name: 'Mini IT Project', chapters: ['Project Planning', 'Development', 'Documentation'] },
+      { id: 'CPP1113', name: 'Principles of Physics', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] }
     ]
   }
 ];
@@ -647,72 +647,6 @@ const PostCard = ({ post }: PostCardProps) => {
   const [newReplyText, setNewReplyText] = useState('');
   const [loadingReplies, setLoadingReplies] = useState(false);
 
-  // Dynamically load upvoted state from both Supabase and localStorage on mount to restrict multiple upvotes
-  useEffect(() => {
-    const initUpvoteState = async () => {
-      let studentId = '';
-      try {
-        const savedUser = localStorage.getItem('studybuddy_active_user');
-        if (savedUser) {
-          const activeUser = JSON.parse(savedUser);
-          studentId = activeUser.studentId || activeUser.student_id || '';
-        }
-      } catch (e) {
-        console.warn('Error reading active user for upvote check:', e);
-      }
-
-      if (!studentId) {
-        try {
-          const upvotedList = JSON.parse(localStorage.getItem('studybuddy_upvoted_posts_guest') || '[]');
-          setUpvoted(upvotedList.includes(post.id));
-        } catch (_) {}
-        return;
-      }
-
-      const upvotedKey = `studybuddy_upvoted_posts_${studentId}`;
-      let locallyUpvoted = false;
-      try {
-        const upvotedList = JSON.parse(localStorage.getItem(upvotedKey) || '[]');
-        locallyUpvoted = upvotedList.includes(post.id);
-        if (locallyUpvoted) {
-          setUpvoted(true);
-        }
-      } catch (_) {}
-
-      if (isSupabaseConfigured && supabase) {
-        try {
-          const { data, error } = await supabase
-            .from('studybuddy_upvotes')
-            .select('post_id')
-            .eq('student_id', studentId)
-            .eq('post_id', post.id)
-            .maybeSingle();
-
-          if (!error) {
-            const serverUpvoted = !!data;
-            setUpvoted(serverUpvoted);
-
-            try {
-              const upvotedList = JSON.parse(localStorage.getItem(upvotedKey) || '[]');
-              const hasLocal = upvotedList.includes(post.id);
-              if (serverUpvoted && !hasLocal) {
-                upvotedList.push(post.id);
-                localStorage.setItem(upvotedKey, JSON.stringify(upvotedList));
-              } else if (!serverUpvoted && hasLocal) {
-                const filtered = upvotedList.filter((id: string) => id !== post.id);
-                localStorage.setItem(upvotedKey, JSON.stringify(filtered));
-              }
-            } catch (_) {}
-          }
-        } catch (err) {
-          console.warn('studybuddy_upvotes table fetch failed, using local fallback:', err);
-        }
-      }
-    };
-
-    initUpvoteState();
-  }, [post.id]);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -746,7 +680,7 @@ const PostCard = ({ post }: PostCardProps) => {
         id: 'rep-1',
         author: 'Sophia Lim',
         avatar: 'https://i.pinimg.com/1200x/89/ee/ec/89eeec45982a6e3757d27082d68d03b8.jpg',
-        content: 'This really cleared my doubts! Let\'s schedule a group zoom if you want to pair program.',
+        content: 'This really cleared my doubts! Let’s schedule a group zoom if you want to pair program.',
         timestamp: '1h ago'
       },
       {
@@ -760,30 +694,14 @@ const PostCard = ({ post }: PostCardProps) => {
 
     if (isSupabaseConfigured && supabase && isUuid(post.id)) {
       try {
-        let queryResult = await supabase
+        const { data, error } = await supabase
           .from('studybuddy_replies')
           .select('*')
           .eq('post_id', post.id)
           .order('created_at', { ascending: true });
         
-        let error = queryResult.error;
-        let data = queryResult.data;
-
         if (error) {
-          console.warn('Failed to fetch replies with order, trying without order:', error.message);
-          // Try fetching without ordering in case created_at is not standard or indexing fails
-          const backupResult = await supabase
-            .from('studybuddy_replies')
-            .select('*')
-            .eq('post_id', post.id);
-          if (!backupResult.error) {
-            data = backupResult.data;
-            error = null;
-          }
-        }
-        
-        if (error) {
-          console.warn('Failed to fetch replies from Supabase (maybe table is missing or RLS restricts it), falling back to local:', error.message);
+          console.warn('Failed to fetch replies from Supabase (maybe table is missing), falling back to local:', error.message);
           setReplies(localReplies.length > 0 ? localReplies : (useMocks ? defaultMockReplies : []));
         } else if (data) {
           const mapped = data.map((d: any) => ({
@@ -791,7 +709,7 @@ const PostCard = ({ post }: PostCardProps) => {
             author: d.author,
             avatar: d.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(d.author),
             content: d.content,
-            timestamp: d.created_at ? new Date(d.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Just now'
+            timestamp: new Date(d.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
           }));
 
           // Merge mapped Supabase replies with local replies
@@ -918,7 +836,7 @@ const PostCard = ({ post }: PostCardProps) => {
                 .insert({
                   type: 'reply',
                   title: `${newReply.author} replied to your thread`,
-                  content: `${newReply.author} replied: "${newReply.content.slice(0, 50)}..."`,
+                  content: `You (Student Buddy) replied: "${newReply.content.slice(0, 50)}..."`,
                   avatar: newReply.avatar,
                   is_unread: true
                 });
@@ -935,43 +853,9 @@ const PostCard = ({ post }: PostCardProps) => {
   };
 
   const toggleUpvote = async () => {
-    // Determine active user to limit upvotes
-    let studentId = 'guest';
-    let activeUser = null;
-    try {
-      const savedUser = localStorage.getItem('studybuddy_active_user');
-      if (savedUser) {
-        activeUser = JSON.parse(savedUser);
-        studentId = activeUser.studentId || activeUser.student_id || 'guest';
-      }
-    } catch (e) {
-      console.warn('Error fetching active user for upvote:', e);
-    }
-
-    const upvotedKey = `studybuddy_upvoted_posts_${studentId}`;
-    let upvotedList = [];
-    try {
-      upvotedList = JSON.parse(localStorage.getItem(upvotedKey) || '[]');
-    } catch (e) {
-      console.warn('Error loading upvoted list:', e);
-    }
-
-    const isAlreadyUpvoted = upvotedList.includes(post.id);
-    const newUpvoted = !isAlreadyUpvoted;
-    const newLikes = newUpvoted ? likes + 1 : Math.max(0, likes - 1);
-
+    const newLikes = upvoted ? likes - 1 : likes + 1;
     setLikes(newLikes);
-    setUpvoted(newUpvoted);
-
-    // Update localStorage immediately
-    if (newUpvoted) {
-      if (!upvotedList.includes(post.id)) {
-        upvotedList.push(post.id);
-      }
-    } else {
-      upvotedList = upvotedList.filter((id: string) => id !== post.id);
-    }
-    localStorage.setItem(upvotedKey, JSON.stringify(upvotedList));
+    setUpvoted(!upvoted);
 
     if (isSupabaseConfigured && supabase) {
       try {
@@ -980,28 +864,10 @@ const PostCard = ({ post }: PostCardProps) => {
           .update({ likes: newLikes })
           .eq('id', post.id);
 
-        // Also track upvotes relation table if it exists
-        try {
-          if (studentId !== 'guest') {
-            if (newUpvoted) {
-              await supabase
-                .from('studybuddy_upvotes')
-                .insert({ student_id: studentId, post_id: post.id });
-            } else {
-              await supabase
-                .from('studybuddy_upvotes')
-                .delete()
-                .match({ student_id: studentId, post_id: post.id });
-            }
-          }
-        } catch (upvoteTableErr) {
-          console.warn('studybuddy_upvotes table might not exist, falling back to local list:', upvoteTableErr);
-        }
-
         // Sync likes and points in studybuddy_profiles table for Leaderboard scoring
         if (post.student_id) {
           try {
-            const increment = newUpvoted ? 1 : -1;
+            const increment = upvoted ? -1 : 1;
             const { data: profileData, error: profileErr } = await supabase
               .from('studybuddy_profiles')
               .select('likes, points')
@@ -1028,15 +894,14 @@ const PostCard = ({ post }: PostCardProps) => {
         }
 
         // Add a notification for the author on upvote with graceful fallback if table does not exist
-        if (newUpvoted && post.author !== 'You (Student Buddy)' && post.author !== activeUser?.name) {
+        if (!upvoted && post.author !== 'You (Student Buddy)') {
           try {
-            const likerName = activeUser?.name || 'A peer';
             await supabase
               .from('studybuddy_notifications')
               .insert({
                 type: 'upvote',
                 title: 'Your answer was upvoted!',
-                content: `${likerName} upvoted your post in ${post.subject}.`,
+                content: `Lee Seng and other peers upvoted your comment in ${post.subject}.`,
                 is_unread: true
               });
           } catch (notiErr) {
@@ -1828,6 +1693,8 @@ export default function App({ currentUser, onSignOut, onNavigate, initialSearchQ
           />
         )}
       </AnimatePresence>
+
+
 
       {/* Global CSS for hiding scrollbar */}
       <style>{`
