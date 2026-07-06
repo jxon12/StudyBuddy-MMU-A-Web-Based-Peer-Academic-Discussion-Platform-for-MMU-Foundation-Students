@@ -52,11 +52,9 @@ const PRIMARY_CATEGORIES = [
     color: 'bg-[#3634A3]',
     cover: 'https://i.pinimg.com/736x/88/0b/09/880b09b7b25fdd1bab31bf75ef721382.jpg',
     subsubjects: [
-<<<<<<< HEAD
-      { id: 'LCT1113', name: 'LCT1113 Critical Thinking', chapters: ['Logic', 'Arguments', 'Fallacies', 'Cognitive Biases'] }
-=======
+
       { id: 'LCT1113', name: 'Critical Thinking', chapters: ['Logic', 'Arguments', 'Fallacies'] }
->>>>>>> c8272e9ae2e562ceaa374369f0def2b49007104a
+
     ]
   },
   {
@@ -65,15 +63,11 @@ const PRIMARY_CATEGORIES = [
     color: 'bg-[#5856D6]',
     cover: 'https://i.pinimg.com/736x/82/66/1e/82661e73c6b7c7f45e316531d4bc895d.jpg',
     subsubjects: [
-<<<<<<< HEAD
-      { id: 'CMT1114', name: 'CMT1114 Mathematics 1', chapters: ['Functions & Graphs', 'Limits & Continuity', 'Differentiation', 'Applications of Derivative'] },
-      { id: 'CMT1124', name: 'CMT1124 Mathematics 2', chapters: ['Integration Techniques', 'Definite Integrals', 'Matrices', 'Vector Spaces'] },
-      { id: 'CMT1134', name: 'CMT1134 Mathematics 3', chapters: ['Multivariate Calculus', 'Linear Programming', 'Probability Distributions', 'Descriptive Statistics'] }
-=======
+
       { id: 'CMT1114', name: 'Mathematics I', chapters: ['Algebraic Functions', 'Limits', 'Differentiation'] },
       { id: 'CMT1124', name: 'Mathematics II', chapters: ['Integration', 'Vector Spaces', 'Matrices'] },
       { id: 'CMT1134', name: 'Mathematics III', chapters: ['Calculus', 'Linear Algebra', 'Statistics'] }
->>>>>>> c8272e9ae2e562ceaa374369f0def2b49007104a
+
     ]
   },
   {
@@ -82,15 +76,11 @@ const PRIMARY_CATEGORIES = [
     color: 'bg-[#AF52DE]',
     cover: 'https://i.pinimg.com/736x/91/d4/91/91d491485a1126a79219f01c444d53db.jpg',
     subsubjects: [
-<<<<<<< HEAD
-      { id: 'LAE1113', name: 'LAE1113 Academic English', chapters: ['Academic Writing Style', 'Citation & Referencing', 'Literature Review', 'Oral Presentations'] },
-      { id: 'LEE1113', name: 'LEE1113 Essential English', chapters: ['Grammar Fundamentals', 'Reading for Main Ideas', 'Vocabulary Expansion', 'Sentence Construction'] },
-      { id: 'LCE1113', name: 'LCE1113 Communicative English', chapters: ['Interpersonal Dynamics', 'Public Speaking', 'Business Correspondence', 'Conflict Resolution'] }
-=======
+
       { id: 'LAE1113', name: 'Academic English', chapters: ['Writing Skills', 'Academic Reading', 'Presentation'] },
       { id: 'LEE1113', name: 'Essential English', chapters: ['Vocabulary', 'Grammar', 'Reading Comprehension'] },
       { id: 'LCE1113', name: 'Communicative English', chapters: ['Conversational Skills', 'Business English', 'Public Speaking'] }
->>>>>>> c8272e9ae2e562ceaa374369f0def2b49007104a
+
     ]
   },
   {
@@ -99,7 +89,6 @@ const PRIMARY_CATEGORIES = [
     color: 'bg-[#7D7AFF]',
     cover: 'https://i.pinimg.com/1200x/51/83/7e/51837ef0af4628e182418b627f93268d.jpg',
     subsubjects: [
-<<<<<<< HEAD
       { id: 'CCT1114', name: 'CCT1114 Introduction to Computing Tech', chapters: ['Computer Hardware', 'Operating Systems', 'Networking Basics', 'Cloud & Security'] },
       { id: 'CDS1114', name: 'CDS1114 Introduction to Digital System', chapters: ['Binary & Hexadecimal', 'Logic Gates', 'Boolean Algebra', 'Sequential Circuits'] },
       { id: 'CMF1114', name: 'CMF1114 Multimedia Fundamentals', chapters: ['Digital Graphics', 'Audio Processing', 'Video Production', 'Animation & UI/UX'] },
@@ -107,15 +96,7 @@ const PRIMARY_CATEGORIES = [
       { id: 'CSP1114', name: 'CSP1114 Problem Solving & Program Design', chapters: ['Algorithm & Flowchart', 'Control Structures', 'Functions & Recursion', 'Arrays & Pointers'] },
       { id: 'CSP1123', name: 'CSP1123 Mini IT Project', chapters: ['Project Ideation', 'Software Development', 'System Testing', 'Documentation'] },
       { id: 'GNB1114', name: 'GNB1114 Intro to Business Management', chapters: ['Business Environments', 'Management Functions', 'Marketing Mix', 'Financial Planning'] }
-=======
-      { id: 'CCT1114', name: 'Introduction to Computing Tech', chapters: ['Programming Basics', 'Computer Systems', 'Digital Literacy'] },
-      { id: 'GNB1114', name: 'Intro to Business Management', chapters: ['Business Concepts', 'Organizational Behaviour', 'Marketing'] },
-      { id: 'CDS1114', name: 'Intro to Digital System', chapters: ['Binary Logic', 'Gates', 'Circuit Design'] },
-      { id: 'CMF1114', name: 'Multimedia Fundamentals', chapters: ['Imaging & Graphics', 'Audio & Video Synthesis', 'Interactive Tech'] },
-      { id: 'CSP1114', name: 'Problem Solving & Program Design', chapters: ['Algorithms', 'Flowcharts', 'Problem Decomposition'] },
-      { id: 'CSP1123', name: 'Mini IT Project', chapters: ['Project Planning', 'Development', 'Documentation'] },
-      { id: 'CPP1113', name: 'Principles of Physics', chapters: ['Mechanics', 'Thermodynamics', 'Electricity'] }
->>>>>>> c8272e9ae2e562ceaa374369f0def2b49007104a
+
     ]
   }
 ];
